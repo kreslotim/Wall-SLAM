@@ -15,3 +15,12 @@ March 2023
  0.7 Weekly Tasks . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
  0.8 Progress documentation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
  0.9 References . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+
+
+    • OpenStreetMap (Fond standart)
+    • Cycle-OSM (Fond avec les routes cyclables)
+    • Dark Layer (Fond sombre, pour les cyclistes sensibles à la luminosité)
+    • Light Layer (Fond clair, pour observer clairement la forme du trajet)
+    • Swiss Style (Fond adapté au territoire de la Suisse)
+    
+    
