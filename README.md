@@ -166,7 +166,8 @@ SMARS robot (total 120.- frs):
     7. 180 Servo Motor                                            1x (2 for 15.30.-)
 
 We wish to build a second SMARS for optional goal and to have some redundancy in case one
-part fails. SMARS robot illustration: ![image](https://user-images.githubusercontent.com/56829239/232310908-d8e2eb6b-0b33-4ed4-a58d-663cec184cc3.png)
+part fails. SMARS robot illustration:
+<img src = "https://user-images.githubusercontent.com/56829239/232310908-d8e2eb6b-0b33-4ed4-a58d-663cec184cc3.png" width = 600/>
 
 
 ## 0.6 Milestones
@@ -380,20 +381,20 @@ a micro-controller. For a first prototype, the stepper motors both go in the bac
 for the back weight, we would put the batteries and micro-controller in the front, finally in the
 center the servo holding the sensors.
 
-<img src = "https://user-images.githubusercontent.com/56829239/232310112-f7f68b36-d2c5-4ecf-8979-ef074a0ed3eb.png" width = 1000>
+<img src = "https://user-images.githubusercontent.com/56829239/232310112-f7f68b36-d2c5-4ecf-8979-ef074a0ed3eb.png" width = 700/>
 
 
 Our second prototype has the stepper motors diagonally spilt from each other. This version
 is more campact (smaller in terms of width). We want to test different configurations in turns
 of weight dispersion:
 
-<img src = "https://user-images.githubusercontent.com/56829239/232310079-931594a3-6049-4ff0-9cc0-58b74d3c37e4.png" width = 1000>
+<img src = "https://user-images.githubusercontent.com/56829239/232310079-931594a3-6049-4ff0-9cc0-58b74d3c37e4.png" width = 700/>
 
 Here is first SMARS prototype with our own equipment. This will allow us to quickly test if
 tracks are a good use in our project, so we can change our design if this isn’t the case.
 
-<img src = "https://user-images.githubusercontent.com/56829239/232310221-48497394-6d34-42c5-9630-422581552723.png" width = 400/>
-<img src = "https://user-images.githubusercontent.com/56829239/232310280-4229fd2a-700a-45fc-84d2-e9abf6f51453.png" width = 400/>
+<img src = "https://user-images.githubusercontent.com/56829239/232310221-48497394-6d34-42c5-9630-422581552723.png" width = 300/>
+<img src = "https://user-images.githubusercontent.com/56829239/232310280-4229fd2a-700a-45fc-84d2-e9abf6f51453.png" width = 300/>
 
 
 ## 0.9 References
