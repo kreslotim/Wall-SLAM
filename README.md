@@ -393,7 +393,7 @@ of weight dispersion:
 Here is first SMARS prototype with our own equipment. This will allow us to quickly test if
 tracks are a good use in our project, so we can change our design if this isn’t the case.
 
-<img src = "https://user-images.githubusercontent.com/56829239/232310221-48497394-6d34-42c5-9630-422581552723.png" width = 300/>
+<img align = "left" src = "https://user-images.githubusercontent.com/56829239/232310221-48497394-6d34-42c5-9630-422581552723.png" width = 300/>
 <img src = "https://user-images.githubusercontent.com/56829239/232310280-4229fd2a-700a-45fc-84d2-e9abf6f51453.png" width = 300/>
 
 
