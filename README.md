@@ -275,7 +275,7 @@ center the servo holding the sensors.
 <img src = "https://user-images.githubusercontent.com/56829239/232310112-f7f68b36-d2c5-4ecf-8979-ef074a0ed3eb.png" width = 700/>
 
 
-Our second prototype has the stepper motors diagonally spilt from each other. This version
+Our second prototype has the stepper motors diagonally split from each other. This version
 is more campact (smaller in terms of width). 
 We want to test different configurations in turns
 of weight dispersion:
