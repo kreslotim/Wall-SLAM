@@ -167,6 +167,7 @@ SMARS robot (total 120.- frs):
 
 We wish to build a second SMARS for optional goal and to have some redundancy in case one
 part fails. SMARS robot illustration:
+
 <img src = "https://user-images.githubusercontent.com/56829239/232310908-d8e2eb6b-0b33-4ed4-a58d-663cec184cc3.png" width = 600/>
 
 
