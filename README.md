@@ -31,7 +31,7 @@ as the motor control system, the ultrasonic sensor system, and the Wi-Fi communi
 Overall, the project consists of deploying an autonomous robot that will map its surrounding
 area using SLAM algorithm with an end goal of displaying a cohesive 2D-map of the area.
 
-<img src = "https://user-images.githubusercontent.com/56829239/232311084-90cc7f72-1b31-460a-8c03-257f2a87a241.png" width = 400 height = 200 />
+<img align = "middle" src = "https://user-images.githubusercontent.com/56829239/232311084-90cc7f72-1b31-460a-8c03-257f2a87a241.png" width = 400 />
 
 ## 0.2 How are we going to build it ?
 ### Obstacle detection
@@ -57,10 +57,9 @@ obstacle around the robot) (ex: https://howtomechatronics.com/projects/arduino-r
 ar-project/). Software wise : Knowing the direction of the ultrasonic sensor we can create a
 block (representing an obstacle) of a distance D from the sensor).
 
-![image](https://user-images.githubusercontent.com/56829239/232311292-8a2b68fb-5e41-4616-a399-67ffa0f45f40.png)
-![image](https://user-images.githubusercontent.com/56829239/232311342-40701424-a3a3-41a2-a878-7908d8a43223.png)
-![image](https://user-images.githubusercontent.com/56829239/232311379-c23d53fa-cd01-4fae-97e1-4c63016e2084.png)
-
+<img align = "left" src = "https://user-images.githubusercontent.com/56829239/232311292-8a2b68fb-5e41-4616-a399-67ffa0f45f40.png" width = 200 />
+<img align = "middle" src = "https://user-images.githubusercontent.com/56829239/232311342-40701424-a3a3-41a2-a878-7908d8a43223.png" width = 200 />
+<img align = "right" src = "https://user-images.githubusercontent.com/56829239/232311379-c23d53fa-cd01-4fae-97e1-4c63016e2084.png" width = 200 />
 
 ### Robot localization
 To determine where the robot is on the map we will use two stepper motors, the inputs given
