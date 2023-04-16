@@ -31,17 +31,20 @@ as the motor control system, the ultrasonic sensor system, and the Wi-Fi communi
 Overall, the project consists of deploying an autonomous robot that will map its surrounding
 area using SLAM algorithm with an end goal of displaying a cohesive 2D-map of the area.
 
+![image](https://user-images.githubusercontent.com/56829239/232311084-90cc7f72-1b31-460a-8c03-257f2a87a241.png)
+
+
 ## 0.2 How are we going to build it ?
 ### Obstacle detection
 Lidar and ultrasound are both commonly used sensors for Simultaneous Localization and Map-
 ping applications. However, Lidar has the following advantages:
 
-   - 1. Accuracy: Lidar sensors provide much higher accuracy measurements than ultrasound.
+   - 1. **Accuracy**: Lidar sensors provide much higher accuracy measurements than ultrasound.
     Lidar can measure distances with a precision of a few millimeters, whereas ultrasound can
     only measure distances to within a few centimeters. Also the resolution is much higher.
-   - 2. Noise immunity: Lidar sensors are less susceptible to noise and interference than ultra-sound sensors. Lidar uses light to measure distances, whereas ultrasound uses sound waves.
+   - 2. **Noise immunity**: Lidar sensors are less susceptible to noise and interference than ultra-sound sensors. Lidar uses light to measure distances, whereas ultrasound uses sound waves.
     This makes Lidar less sensitive to acoustic noise and interference.
-   - 3. Mechanical aspect: Lidar has a bigger range or aperture angle (in degrees) so i would
+   - 3. **Mechanical aspect**: Lidar has a bigger range or aperture angle (in degrees) so i would
     need to be spun around, unlike the ultra sound solution.
     
 Overall, Lidar sensors provide much more accurate and detailed information about the envi-
@@ -54,6 +57,11 @@ will be rotating on top of the robot (back-to-back on a 180 degrees servo, so we
 obstacle around the robot) (ex: https://howtomechatronics.com/projects/arduino-rad
 ar-project/). Software wise : Knowing the direction of the ultrasonic sensor we can create a
 block (representing an obstacle) of a distance D from the sensor).
+
+![image](https://user-images.githubusercontent.com/56829239/232311292-8a2b68fb-5e41-4616-a399-67ffa0f45f40.png)
+![image](https://user-images.githubusercontent.com/56829239/232311342-40701424-a3a3-41a2-a878-7908d8a43223.png)
+![image](https://user-images.githubusercontent.com/56829239/232311379-c23d53fa-cd01-4fae-97e1-4c63016e2084.png)
+
 
 ### Robot localization
 To determine where the robot is on the map we will use two stepper motors, the inputs given
@@ -161,7 +169,8 @@ SMARS robot (total 120.- frs):
     7. 180 Servo Motor                                            1x (2 for 15.30.-)
 
 We wish to build a second SMARS for optional goal and to have some redundancy in case one
-part fails.
+part fails. SMARS robot illustration: ![image](https://user-images.githubusercontent.com/56829239/232310908-d8e2eb6b-0b33-4ed4-a58d-663cec184cc3.png)
+
 
 ## 0.6 Milestones
 ### • Milestone 1 : Build a 3D PRINTED prototype of the chassis with working step-per motors, check track driving behaviour and get communication between the computer and the vehicle+sensors to work (Deadline : 1st May).
