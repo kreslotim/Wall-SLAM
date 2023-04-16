@@ -166,9 +166,10 @@ SMARS robot (total 120.- frs):
     7. 180 Servo Motor                                            1x (2 for 15.30.-)
 
 We wish to build a second SMARS for optional goal and to have some redundancy in case one
-part fails. SMARS robot illustration:
+part fails. 
+SMARS robot illustration:
 
-<img src = "https://user-images.githubusercontent.com/56829239/232310908-d8e2eb6b-0b33-4ed4-a58d-663cec184cc3.png" width = 600/>
+<img src = "https://user-images.githubusercontent.com/56829239/232310908-d8e2eb6b-0b33-4ed4-a58d-663cec184cc3.png" width = 500/>
 
 
 ## 0.6 Milestones
