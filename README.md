@@ -195,3 +195,172 @@ together. This is might be quite complicated, and we haven’t really thought of
 we are leaving the door open.
 ### • Optional Goal: Sound integration
 It would be amazing if the robot could produce noises/music on command, or produce noises in real time through Wi-Fi. This would allow the robot to communicate in real time to a person blocking its way or allowing it to call for help if it is stuck.
+
+
+## 0.7 Weekly Tasks
+This section is to split up the jobs, that have to be done, evenly with the team members. We
+plan weekly team meetings between us (without the Phd student) to keep us up to date on
+what is going on and where we are exactly in the project. We find it important to have good
+communication especially when it comes to asking for help. We will be focusing a lot on talking
+and understanding the other team members. With that said the tasks here will not always be
+done by the person mentioned because on the moment problems might arise or even the initial
+plan wasn’t a good solution to the problem. On the other hand, we can guarantee that all team
+members will have a saying in the more general tasks in the Week n°# column
+
+    Week n°#                Tim                 Florian     Finn    Alonso     Sylvain
+    6 (Discussion on        Building a pro-
+      how we are go-        totype version
+      ing to design the     of the SMARS
+      robot)                (with smaller
+                            competents that
+                            Tim has)
+    
+    
+    
+
+Modelling on
+Fusion 360,
+first model
+with diagonal
+stepped motors
+Modelling on
+Fusion 360 and
+brainstorming
+Modelling on
+Fusion360,
+second model
+with side by
+side stepped
+motors
+Modelling and
+brainstorming
+on the software
+a connectivity
+through Wi-Fi
+7 (Analysing
+SMARS pro-
+totype and
+3D printed
+prototype chas-
+sis as well as
+clarifying the
+electric wiring)
+Analyse 3D
+printed models,
+and draw an
+electric circuit
+Compare and
+analyse 3D
+printed models
+Learn how
+to control a
+stepped motor
+Compare and
+analyse 3D
+printed models
+Draw an elec-
+tric circuit to
+see if all connec-
+tions are good
+Holidays
+(Start the soft-
+ware research,
+to learn how to
+correctly use
+our equipment
+and starting to
+understand how
+we are going to
+design and code
+the software)
+Do research
+on ultrasonic
+sensor and how
+to use it and
+see how we can
+use python to
+utilize it’s data
+Do research on
+stepper motor
+and how to
+use it and see
+how we can
+use python to
+utilize it’s data
+Advance on
+the circuit
+and review
+prototype with
+the constraints
+of the wiring,
+if done check
+how to create
+a 2D map with
+Python
+Advance on
+the circuit
+and review
+prototype with
+the constraints
+of the wiring,
+if done check
+how to create
+a 2D map with
+Python
+Do research on
+IMU and how to
+use it, and see
+how we can use
+python to utilize
+it’s data
+8 (Assemble the
+hardware, and
+the software)
+Debugging
+the ultrasonic
+sensors code
+and real life
+testing
+Playing around
+with the step-
+per motors and
+see how precious
+they are (code
+to real life ratio)
+Debugging
+the ultrasonic
+sensors code
+and see how
+it would work
+with the 360
+servo
+Soldering and
+assembling the
+hardware
+Soldering and
+assembling the
+hardware
+9 (This should
+just be a debug-
+ging week and
+time to reflect a
+bit on how we
+are working as a
+team)
+Debugging Debugging (ca-
+ble management
+if necessary)
+Debugging
+(hardware if
+cables fall off)
+Debugging (re-
+modelling if nec-
+essary)
+Debugging (re-
+modelling if nec-
+essary)
+
+
+For now, we only planned individual tasks till week 9 (for Milestone) to see the dynamic of
+our group. When the first milestone is achieved, we will plan new weekly tasks for the next
+milestone.
