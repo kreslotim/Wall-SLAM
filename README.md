@@ -36,12 +36,12 @@ area using SLAM algorithm with an end goal of displaying a cohesive 2D-map of th
 Lidar and ultrasound are both commonly used sensors for Simultaneous Localization and Map-
 ping applications. However, Lidar has the following advantages:
 
-    1. Accuracy: Lidar sensors provide much higher accuracy measurements than ultrasound.
+   * 1. Accuracy: Lidar sensors provide much higher accuracy measurements than ultrasound.
     Lidar can measure distances with a precision of a few millimeters, whereas ultrasound can
     only measure distances to within a few centimeters. Also the resolution is much higher.
-    2. Noise immunity: Lidar sensors are less susceptible to noise and interference than ultra-sound sensors. Lidar uses light to measure distances, whereas ultrasound uses sound waves.
+   * 2. Noise immunity: Lidar sensors are less susceptible to noise and interference than ultra-sound sensors. Lidar uses light to measure distances, whereas ultrasound uses sound waves.
     This makes Lidar less sensitive to acoustic noise and interference.
-    3. Mechanical aspect: Lidar has a bigger range or aperture angle (in degrees) so i would
+   * 3. Mechanical aspect: Lidar has a bigger range or aperture angle (in degrees) so i would
     need to be spun around, unlike the ultra sound solution.
     
 Overall, Lidar sensors provide much more accurate and detailed information about the envi-
