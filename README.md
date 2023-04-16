@@ -214,158 +214,47 @@ done by the person mentioned because on the moment problems might arise or even 
 plan wasn’t a good solution to the problem. On the other hand, we can guarantee that all team
 members will have a saying in the more general tasks in the Week n°# column
 
-    Week n°#                Tim                 Florian     Finn    Alonso     Sylvain
-    6 (Discussion on        Building a pro-
-      how we are go-        totype version
-      ing to design the     of the SMARS
-      robot)                (with smaller
-                            competents that
-                            Tim has)
+    Week n°#                Tim                 Florian             Finn                Alonso              Sylvain
+    6. Discussion on        Building a pro-     Modelling on        Modelling on        Modelling on        Modelling and
+      how we are go-        totype version      Fusion 360,         Fusion 360 and      Fusion360,          brainstorming
+      ing to design the     of the SMARS        first model         brainstorming.      second model        on the software
+      robot.                (with smaller       with diagonal                           with side by        a connectivity
+                            components that     stepped motors.                         side stepped        through Wi-Fi.
+                            Tim has).                                                   motors.
     
+    7. Analysing            Analyse 3D          Compare and         Learn how           Compare and         Draw an electric
+    SMARS prototype and     printed models,     analyse 3D          to control a        analyse 3D          circuit to see if
+    3D printed prototype    and draw an         printed models.     stepper motor.      printed models.     all connections 
+    chassis as well as      electric circuit.                                                               are good.
+    clarifying the
+    electric wiring.
     
-    
-
-Modelling on
-Fusion 360,
-first model
-with diagonal
-stepped motors
-Modelling on
-Fusion 360 and
-brainstorming
-Modelling on
-Fusion360,
-second model
-with side by
-side stepped
-motors
-Modelling and
-brainstorming
-on the software
-a connectivity
-through Wi-Fi
-7 (Analysing
-SMARS pro-
-totype and
-3D printed
-prototype chas-
-sis as well as
-clarifying the
-electric wiring)
-Analyse 3D
-printed models,
-and draw an
-electric circuit
-Compare and
-analyse 3D
-printed models
-Learn how
-to control a
-stepped motor
-Compare and
-analyse 3D
-printed models
-Draw an elec-
-tric circuit to
-see if all connec-
-tions are good
-Holidays
-(Start the soft-
-ware research,
-to learn how to
-correctly use
-our equipment
-and starting to
-understand how
-we are going to
-design and code
-the software)
-Do research
-on ultrasonic
-sensor and how
-to use it and
-see how we can
-use python to
-utilize it’s data
-Do research on
-stepper motor
-and how to
-use it and see
-how we can
-use python to
-utilize it’s data
-Advance on
-the circuit
-and review
-prototype with
-the constraints
-of the wiring,
-if done check
-how to create
-a 2D map with
-Python
-Advance on
-the circuit
-and review
-prototype with
-the constraints
-of the wiring,
-if done check
-how to create
-a 2D map with
-Python
-Do research on
-IMU and how to
-use it, and see
-how we can use
-python to utilize
-it’s data
-8 (Assemble the
-hardware, and
-the software)
-Debugging
-the ultrasonic
-sensors code
-and real life
-testing
-Playing around
-with the step-
-per motors and
-see how precious
-they are (code
-to real life ratio)
-Debugging
-the ultrasonic
-sensors code
-and see how
-it would work
-with the 360
-servo
-Soldering and
-assembling the
-hardware
-Soldering and
-assembling the
-hardware
-9 (This should
-just be a debug-
-ging week and
-time to reflect a
-bit on how we
-are working as a
-team)
-Debugging Debugging (ca-
-ble management
-if necessary)
-Debugging
-(hardware if
-cables fall off)
-Debugging (re-
-modelling if nec-
-essary)
-Debugging (re-
-modelling if nec-
-essary)
+    Holidays                Do research         Do research on      Advance on          Advance on          Do research on
+    Start the software      on ultrasonic       stepper motor       the circuit         the circuit         IMU and how to
+    research, to learn      sensor and how      and how to          and review          and review          use it, and see
+    how to correctly        to use it and       use it and see      prototype with      prototype with      how we can use
+    use our equipment       see how we can      how we can          the constraints     the constraints     python to utilize
+    and starting to         use python to       use python to       of the wiring,      of the wiring,      it’s data.
+    understand how          utilize it’s data.  utilize it’s data.  if done check       if done check
+    we are going to                                                 how to create       how to create
+    design and code                                                 a 2D map with       a 2D map with
+    the software.                                                   Python.             Python.
+                                    
+    8. Assemble the         Debugging           Playing around      Debugging           Soldering and       Soldering and
+    hardware, and           the ultrasonic      with the stepper    the ultrasonic      assembling the      assembling the
+    the software.           sensors code        motors and see      sensors code        hardware.           hardware.
+                            and real life       how precious        and see how
+                            testing.            they are            it would work
+                                                code to             with the 360
+                                                real life ratio).   servo.
+                                                
+    9. This should          Debugging.          Debugging           Debugging           Debugging           Debugging
+    just be a                                   cable management    hardware if         remodelling         remodelling
+    debugging week                              if necessary.       cables fall off.    if necessary.       if necessary.
+    and time to reflect
+    a bit on how we
+    are working as a
+    team.
 
 
 For now, we only planned individual tasks till week 9 (for Milestone) to see the dynamic of
