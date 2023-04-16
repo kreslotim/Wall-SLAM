@@ -176,3 +176,22 @@ FIRST SMARS PROTOTYPE should be built on the 7th of April
 * Task 4: Check that the sensors work well and that the output are correct. So we can change the sensors if we aren’t satisfied with the current ones
 * Task 5: Transfer the output of the robot on a map, so we can start utilizing the data.
 * Task 6: Create an algorithm that moves the car from an initial position to another given position. Starting to send instruction to the SMARS from the CC to see if are able to correctly control the robot.
+
+### • Milestone 2: Implement an algorithm that allows the robot to create a map of its environment and return to its initial position using the map.(Deadline : 26th May)
+(From Week 10-11)
+* Task 1: Code the mapping and localization algorithm, needs to be autonomous. So we can start plotting the obstacles.
+* Task 2: Test the limit of our robot and debug the mapping and localization algorithm, if any problem are detected.
+
+OVERALL WORKING SLAM ROBOT should be able to map on the 20th of May
+
+(From Week 11-13)
+* Task 3: Have a working SLAM robot.
+* Task 4: Have a working UI.
+
+### • Optional Goal: Scale up the number of SMARS
+The integration of another robot. The goal would be to reduce the time needed to map out
+an area. One of the possible solution would be by scaling up the number of robots working
+together. This is might be quite complicated, and we haven’t really thought of it yet but
+we are leaving the door open.
+### • Optional Goal: Sound integration
+It would be amazing if the robot could produce noises/music on command, or produce noises in real time through Wi-Fi. This would allow the robot to communicate in real time to a person blocking its way or allowing it to call for help if it is stuck.
