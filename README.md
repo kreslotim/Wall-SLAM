@@ -1,1 +1,1 @@
-# CS-358 Making Intelligent Things
+# **CS-358 Making Intelligent Things**
