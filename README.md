@@ -59,15 +59,13 @@ block (representing an obstacle) of a distance D from the sensor).
 
 <img align = "left" src = "https://user-images.githubusercontent.com/56829239/232311292-8a2b68fb-5e41-4616-a399-67ffa0f45f40.png" width = 200 />
 <img align = "middle" src = "https://user-images.githubusercontent.com/56829239/232311342-40701424-a3a3-41a2-a878-7908d8a43223.png" width = 200 /> 
-<img align = "right" src = "https://user-images.githubusercontent.com/56829239/232311379-c23d53fa-cd01-4fae-97e1-4c63016e2084.png" width = 300 />
+<img src = "https://user-images.githubusercontent.com/56829239/232311379-c23d53fa-cd01-4fae-97e1-4c63016e2084.png" width = 300 />
 
 
 ### Robot localization
-To determine where the robot is on the map we will use two stepper motors, the inputs given
-to the motors allow us to calculate the position of the robot based on its starting point.
-(https://www.youtube.com/watch?v=5CmjB4WF5XA) . Regarding the software, we need to
-create an algorithm that creates a link between the current position and the new targeted posi-
-tion without going through obstacle. To limit inaccuracy, we will use an IMU to determine the orientation of the robot (ex: https://www.youtube.com/watch?v=KMhbV1p3MWk).
+To determine where the robot is on the map we will use two stepper motors, the inputs given to the motors allow us to calculate the position of the robot based on its starting point.
+(https://www.youtube.com/watch?v=5CmjB4WF5XA). 
+Regarding the software, we need to create an algorithm that creates a link between the current position and the new targeted position without going through obstacle. To limit inaccuracy, we will use an IMU to determine the orientation of the robot (ex: https://www.youtube.com/watch?v=KMhbV1p3MWk).
 
 ### Computational Work
 Unfortunately, the SLAM algorithm is too memory bound and computationally slow for a micro-
