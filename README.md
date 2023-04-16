@@ -364,3 +364,18 @@ essary)
 For now, we only planned individual tasks till week 9 (for Milestone) to see the dynamic of
 our group. When the first milestone is achieved, we will plan new weekly tasks for the next
 milestone.
+
+## 0.8 Progress documentation
+In development from Week 7 onwards...
+
+We started to develop the chassis for the robot. First we need consider what it needs to hold,
+followed by how to arrange it. The robot will hold the 2 stepper motors, a servo, a battery and
+a micro-controller. For a first prototype, the stepper motors both go in the back, to compensate
+for the back weight, we would put the batteries and micro-controller in the front, finally in the
+center the servo holding the sensors.
+
+Our second prototype has the stepper motors diagonally spilt from each other. This version
+is more campact (smaller in terms of width). We want to test different configurations in turns
+of weight dispersion:
+
+![image](https://user-images.githubusercontent.com/56829239/232310079-931594a3-6049-4ff0-9cc0-58b74d3c37e4.png)
