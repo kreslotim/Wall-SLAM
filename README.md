@@ -153,13 +153,13 @@ await till good communication is made, every time there seem to be a perturbatio
 SMARS robot (total 120.- frs):
 
 ### Electronics 1x SMARS
-    1 ESP-32 1 (14.-)
-    2 Stepper Motor / (replaced by smaller motor 5V) 2 (22.-)
-    3 A4988 Motor Driver 2 (3,9)
-    4 Ultrasonic Module Distance Sensor HC-SR04 2 (4,5)
-    5 Battery Block Coupler 6 Battery 9V [Same as the lego car] 1 (5.-)
-    6 9 axis ICM-20948 9DoF IMU 1 (24.-)
-    7 180 Servo Motor 1 (2 for 15.30.-)
+    1 ESP-32                                                     1x (14.-)
+    2 Stepper Motor / (replaced by smaller motor 5V)             2x (22.-)
+    3 A4988 Motor Driver                                         2x (3,9)
+    4 Ultrasonic Module Distance Sensor HC-SR04                  2x (4,5)
+    5 Battery Block Coupler 6 Battery 9V [Same as the lego car]  1x (5.-)
+    6 9 axis ICM-20948 9DoF IMU                                  1x (24.-)
+    7 180 Servo Motor                                            1x (2 for 15.30.-)
 
 We wish to build a second SMARS for optional goal and to have some redundancy in case one
 part fails.
