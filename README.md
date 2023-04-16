@@ -151,15 +151,33 @@ await till good communication is made, every time there seem to be a perturbatio
 
 ## 0.5 Buy list
 SMARS robot (total 120.- frs):
-
 ### Electronics 1x SMARS
-    1 ESP-32                                                     1x (14.-)
-    2 Stepper Motor / (replaced by smaller motor 5V)             2x (22.-)
-    3 A4988 Motor Driver                                         2x (3,9)
-    4 Ultrasonic Module Distance Sensor HC-SR04                  2x (4,5)
-    5 Battery Block Coupler 6 Battery 9V [Same as the lego car]  1x (5.-)
-    6 9 axis ICM-20948 9DoF IMU                                  1x (24.-)
-    7 180 Servo Motor                                            1x (2 for 15.30.-)
+    1. ESP-32                                                     1x (14.-)
+    2. Stepper Motor / (replaced by smaller motor 5V)             2x (22.-)
+    3. A4988 Motor Driver                                         2x (3,9)
+    4. Ultrasonic Module Distance Sensor HC-SR04                  2x (4,5)
+    5. Battery Block Coupler 6 Battery 9V [Same as the lego car]  1x (5.-)
+    6. 9 axis ICM-20948 9DoF IMU                                  1x (24.-)
+    7. 180 Servo Motor                                            1x (2 for 15.30.-)
 
 We wish to build a second SMARS for optional goal and to have some redundancy in case one
 part fails.
+
+## 0.6 Milestones
+### • Milestone 1 : Build a 3D PRINTED prototype of the chassis with working step-per motors, check track driving behaviour and get communication between the computer and the vehicle+sensors to work (Deadline : 1st May).
+(From Week 6 - 7)
+Task 1: Design and print the chassis prototype for our vehicle.
+Task 2: Assemble and collect all the necessary hardware and sensors. So we can rapidly
+combine it with the 3D parts
+Task 3: (Start coding the software) Find a way to collect the data from the sensors/Arduino
+and send them to the CC via Wi-fi.
+
+FIRST SMARS PROTOTYPE should be built on the 7th of April
+
+(From Week 8 - 9)
+Task 4: Check that the sensors work well and that the output are correct. So we can
+change the sensors if we aren’t satisfied with the current ones
+Task 5: Transfer the output of the robot on a map, so we can start utilizing the data.
+Task 6: Create an algorithm that moves the car from an initial position to another given
+position. Starting to send instruction to the SMARS from the CC to see if are able to
+correctly control the robot.
