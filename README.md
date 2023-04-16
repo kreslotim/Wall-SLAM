@@ -374,8 +374,25 @@ a micro-controller. For a first prototype, the stepper motors both go in the bac
 for the back weight, we would put the batteries and micro-controller in the front, finally in the
 center the servo holding the sensors.
 
+![image](https://user-images.githubusercontent.com/56829239/232310112-f7f68b36-d2c5-4ecf-8979-ef074a0ed3eb.png)
+
+
 Our second prototype has the stepper motors diagonally spilt from each other. This version
 is more campact (smaller in terms of width). We want to test different configurations in turns
 of weight dispersion:
 
 ![image](https://user-images.githubusercontent.com/56829239/232310079-931594a3-6049-4ff0-9cc0-58b74d3c37e4.png)
+
+Here is first SMARS prototype with our own equipment. This will allow us to quickly test if
+tracks are a good use in our project, so we can change our design if this isn’t the case.
+![image](https://user-images.githubusercontent.com/56829239/232310221-48497394-6d34-42c5-9630-422581552723.png)
+![image](https://user-images.githubusercontent.com/56829239/232310280-4229fd2a-700a-45fc-84d2-e9abf6f51453.png)
+
+
+## 0.9 References
+* [1] Figure 1 : Alain Godot. Algorithmes SLAM (Simultaneous Localization and Mapping). May 2019. URL: https://www.innowtech.com/2019/05/16/les-algorithmes-slam-simultaneous-localization-and-mapping/
+* [2] Figure 2 : @CodersCafeTech. DIY Radar With Ultrasonic Sensor And Chat-GPT Generated Arduino Code — Coders Cafe. Youtube. 2023. URL: https://youtube.com/shorts
+/o7DMHJKhpws?feature=share
+* [3] Figure 3 : Channel Everything. Two ultrasonic sensors on a servo for angle and distance data. Youtube. 2016. URL: https://www.youtube.com/watch?v=dHZB0WhLl8g&t=12s
+* [4] Figure 4 : Hani’s Experiments. How to make an ultrasonic Radar. Youtube. 2021. URL: https://www.youtube.com/watch?v=xngpwyQKnRw
+* [5] Figure 5 : Kevin McAleer. SMARS Fan. 2018. URL: https://www.smarsfan.com
