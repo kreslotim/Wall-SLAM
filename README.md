@@ -31,7 +31,7 @@ as the motor control system, the ultrasonic sensor system, and the Wi-Fi communi
 Overall, the project consists of deploying an autonomous robot that will map its surrounding
 area using SLAM algorithm with an end goal of displaying a cohesive 2D-map of the area.
 
-<img src = "https://user-images.githubusercontent.com/56829239/232311084-90cc7f72-1b31-460a-8c03-257f2a87a241.png" scale = 0.5 />
+<img src = "https://user-images.githubusercontent.com/56829239/232311084-90cc7f72-1b31-460a-8c03-257f2a87a241.png" scale = 0.1 />
 
 ## 0.2 How are we going to build it ?
 ### Obstacle detection
