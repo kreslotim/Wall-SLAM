@@ -54,3 +54,34 @@ will be rotating on top of the robot (back-to-back on a 180 degrees servo, so we
 obstacle around the robot) (ex: https://howtomechatronics.com/projects/arduino-rad
 ar-project/). Software wise : Knowing the direction of the ultrasonic sensor we can create a
 block (representing an obstacle) of a distance D from the sensor).
+
+### Robot localization
+To determine where the robot is on the map we will use two stepper motors, the inputs given
+to the motors allow us to calculate the position of the robot based on its starting point.
+(https://www.youtube.com/watch?v=5CmjB4WF5XA) . Regarding the software, we need to
+create an algorithm that creates a link between the current position and the new targeted posi-
+tion without going through obstacle. To limit inaccuracy, we will use an IMU to determine the orientation of the robot (ex: https://www.youtube.com/watch?v=KMhbV1p3MWk).
+
+### Computational Work
+Unfortunately, the SLAM algorithm is too memory bound and computationally slow for a micro-
+controller. To deal with this problem, we plan having the micro-controller connect through Wi-Fi
+to a capable external computer, the Command Computer (CC), hence why the micro-controller
+used has Wi-Fi capability. The Wi-Fi connection also allows the robot to move freely. Therefore,
+the micro-controller only receives commands for movement and returns the sensors data to the
+CC.
+
+### Algorithm & Data
+To create the map and control the robot with the CC, the micro-controller will collect and send
+to the CC the following elements: the position of the robot, the orientation of the robot (IMU),
+the distance detected from the ultrasonic sensor and the orientation of the sensor (180 Servo).
+Then using the data it receives, the CC generates the map and sends new commands to the robot
+from a distance. We want to use Python and the Robot Operation System (ROS) as a framework
+since its industry standard and can provide a myriad of useful tools/resources. Regarding ROS
+and Arduino compatibility, we have found the following solution. If we have time, we might use
+some basic machine learning algorithms to detect noise.
+
+## 0.3 Resources
+Firstly, we have discovered open-source projects and tutorials available at :
+- https://wired.chillibasket.com/3d-printed-wall-e/
+- https://3delworld.com/how-to-make-smars-robot-3d-printed-2023/
+- https://youtu.be/htoBvSq8jLA (position tracking)
