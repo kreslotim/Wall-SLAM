@@ -380,19 +380,20 @@ a micro-controller. For a first prototype, the stepper motors both go in the bac
 for the back weight, we would put the batteries and micro-controller in the front, finally in the
 center the servo holding the sensors.
 
-![image](https://user-images.githubusercontent.com/56829239/232310112-f7f68b36-d2c5-4ecf-8979-ef074a0ed3eb.png)
+<img src = "https://user-images.githubusercontent.com/56829239/232310112-f7f68b36-d2c5-4ecf-8979-ef074a0ed3eb.png" width = 1000>
 
 
 Our second prototype has the stepper motors diagonally spilt from each other. This version
 is more campact (smaller in terms of width). We want to test different configurations in turns
 of weight dispersion:
 
-![image](https://user-images.githubusercontent.com/56829239/232310079-931594a3-6049-4ff0-9cc0-58b74d3c37e4.png)
+<img src = "https://user-images.githubusercontent.com/56829239/232310079-931594a3-6049-4ff0-9cc0-58b74d3c37e4.png" width = 1000>
 
 Here is first SMARS prototype with our own equipment. This will allow us to quickly test if
 tracks are a good use in our project, so we can change our design if this isn’t the case.
-<img src = "https://user-images.githubusercontent.com/56829239/232310221-48497394-6d34-42c5-9630-422581552723.png" width = 200/>
-<img src = "https://user-images.githubusercontent.com/56829239/232310280-4229fd2a-700a-45fc-84d2-e9abf6f51453.png" width = 200/>
+
+<img src = "https://user-images.githubusercontent.com/56829239/232310221-48497394-6d34-42c5-9630-422581552723.png" width = 400/>
+<img src = "https://user-images.githubusercontent.com/56829239/232310280-4229fd2a-700a-45fc-84d2-e9abf6f51453.png" width = 400/>
 
 
 ## 0.9 References
