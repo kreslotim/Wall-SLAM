@@ -166,18 +166,13 @@ part fails.
 ## 0.6 Milestones
 ### • Milestone 1 : Build a 3D PRINTED prototype of the chassis with working step-per motors, check track driving behaviour and get communication between the computer and the vehicle+sensors to work (Deadline : 1st May).
 (From Week 6 - 7)
-Task 1: Design and print the chassis prototype for our vehicle.
-Task 2: Assemble and collect all the necessary hardware and sensors. So we can rapidly
-combine it with the 3D parts
-Task 3: (Start coding the software) Find a way to collect the data from the sensors/Arduino
-and send them to the CC via Wi-fi.
+* Task 1: Design and print the chassis prototype for our vehicle.
+* Task 2: Assemble and collect all the necessary hardware and sensors. So we can rapidly combine it with the 3D parts
+* Task 3: (Start coding the software) Find a way to collect the data from the sensors/Arduino and send them to the CC via Wi-fi.
 
 FIRST SMARS PROTOTYPE should be built on the 7th of April
 
 (From Week 8 - 9)
-Task 4: Check that the sensors work well and that the output are correct. So we can
-change the sensors if we aren’t satisfied with the current ones
-Task 5: Transfer the output of the robot on a map, so we can start utilizing the data.
-Task 6: Create an algorithm that moves the car from an initial position to another given
-position. Starting to send instruction to the SMARS from the CC to see if are able to
-correctly control the robot.
+* Task 4: Check that the sensors work well and that the output are correct. So we can change the sensors if we aren’t satisfied with the current ones
+* Task 5: Transfer the output of the robot on a map, so we can start utilizing the data.
+* Task 6: Create an algorithm that moves the car from an initial position to another given position. Starting to send instruction to the SMARS from the CC to see if are able to correctly control the robot.
