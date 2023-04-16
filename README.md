@@ -96,3 +96,55 @@ the environment autonomously while avoiding obstacles. The Dijkstra algorithm is
 based algorithm that finds the shortest path between two points in a graph. We will modify this
 algorithm to suit the needs of our project, such as incorporating the sensor data from the camera
 vision system to avoid obstacles in real-time.
+
+## 0.4 Risks
+1. Mechanical issues:
+We are using precise steppers motors, to navigate through the map but we still need to take
+into account error accumulation. This can be an issue since we are planning continuously
+updating the robots position via the stepping information of the motors.
+Also using tracks could turn out to be a bad idea, because tracks slip when touring on the
+spot, resulting in screwed up data for odometry (=”use of data from motion sensors to
+estimate change in position over time”).
+
+Solution: We added an IMU sensor to check the rotational information. In case this does
+not work, we need to consider a simplified design of the chassis, a bit like an automatic
+hoover. (That is, only two wheels and one stabilizing thing in front/back).
+After all, there is a reason why those vacuum cleaners are built the way they are.
+Now, if it still has problems on the localizing part, we need modifying the area. to map
+and setting up some kind of orientation system (reflective tape around cylinders is common
+way in industrial environments, an easier way would be to simply add a grid like pattern
+for the robot to follow on the ground).
+
+2. Sensor accuracy:
+Our SLAM robot rely heavily on ultrasonic sensors to navigate and build maps of their
+environment. These sensors must be accurate and reliable, otherwise the robot will struggle
+to locate itself or map its surroundings. The sensors should be as good as possible.
+
+Solution: If the ultrasonic sensors are inaccurate, means that we would have to change the
+placement of the sensors, worst case scenario the sensor has to be right in front of the wall,
+we would put the sensor in front of the car and make it work similar to a Roomba.
+
+3. Environmental Interference:
+The surface on which the robot is must be flat and stable, if those condition aren’t respected
+we will easily lost the position of the robot, making it challenging for the robot to navigate
+and detect its surroundings accurately, resulting in a poor map.
+
+Solution: We will restrain the robot environment to avoid that, and in case of such en-
+vironment we will able to detect them due the gyro (IMU) and stop the algorithm if the
+environment is unavoidable. An example of such will be a small jump that if the robot is
+not aware of it, it will get flipped.
+
+4. Computational power:
+Building a SLAM robot requires significant computational power to process sensor data,
+run algorithms, and control the robot’s movements. The ESP8266 lacks this power.
+
+Solution: Computation will be done on a laptop with wireless communication.
+
+5. Communication problems:
+Our SLAM robot will rely on wireless communication to receive commands or send data,
+and any communication problems can lead to delays or malfunctions in its real time map-
+ping ability.
+
+Solution: We could try Bluetooth instead but the problem might still arise. We can use
+a cable but that strongly reduces the mobility of the robot. Another approach will be to
+await till good communication is made, every time there seem to be a perturbation.
