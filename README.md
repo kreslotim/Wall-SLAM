@@ -85,3 +85,14 @@ Firstly, we have discovered open-source projects and tutorials available at :
 - https://wired.chillibasket.com/3d-printed-wall-e/
 - https://3delworld.com/how-to-make-smars-robot-3d-printed-2023/
 - https://youtu.be/htoBvSq8jLA (position tracking)
+
+That gives us access to numerous STL files for SMARS parts. These files include components
+that we can use to construct our SMARS robots for SLAM. This will save us a significant amount
+of time and effort, as we do not need to design and model these parts from scratch.
+
+Additionally, we have also developed a program, last year, for efficient route finding using
+Dijkstra algorithms. This program will be instrumental in enabling our robot to navigate through
+the environment autonomously while avoiding obstacles. The Dijkstra algorithm is a graph-
+based algorithm that finds the shortest path between two points in a graph. We will modify this
+algorithm to suit the needs of our project, such as incorporating the sensor data from the camera
+vision system to avoid obstacles in real-time.
