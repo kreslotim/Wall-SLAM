@@ -148,3 +148,18 @@ ping ability.
 Solution: We could try Bluetooth instead but the problem might still arise. We can use
 a cable but that strongly reduces the mobility of the robot. Another approach will be to
 await till good communication is made, every time there seem to be a perturbation.
+
+## 0.5 Buy list
+SMARS robot (total 120.- frs):
+Electronics 1x SMARS
+Name Quantity (Price/item)
+1 ESP-32 1 (14.-)
+2 Stepper Motor / (replaced by smaller motor 5V) 2 (22.-)
+3 A4988 Motor Driver 2 (3,9)
+4 Ultrasonic Module Distance Sensor HC-SR04 2 (4,5)
+5 Battery Block Coupler 6 Battery 9V [Same as the lego car] 1 (5.-)
+6 9 axis ICM-20948 9DoF IMU 1 (24.-)
+7 180 Servo Motor 1 (2 for 15.30.-)
+#
+We wish to build a second SMARS for optional goal and to have some redundancy in case one
+part fails.
