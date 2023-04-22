@@ -53,6 +53,9 @@ AccelStepper stepperRight(FULLSTEP, rIN1, rIN3, rIN2, rIN4);
 int sonarDistance;
 int16_t lidarDistance;
 
+const unsigned long interval = 10;
+unsigned long previousMillis = 0;
+
 void setup() {
 
   // Serial Monitor
@@ -74,6 +77,8 @@ void setup() {
 }
 
 void loop() {
+  unsigned long currentMillis = millis(); // millis() = number of milliseconds that have elapsed since the board started running
+
   // Read lidar sensor
   readAndPrintLidar();
   //if (vl53.dataReady()) lidarDistance = vl53.distance();
@@ -96,7 +101,11 @@ void loop() {
 
   moveForward();
 
-  rotateServo();
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+    rotateServo();
+  }
+
 }
 
 void moveForward() {
@@ -114,7 +123,7 @@ void rotateServo() {
   }
   servo.write(servoAngle);
   //Serial.println(servoAngle);
-  delay(10);
+  //delay(10);
 }
 
 void printSonar() {
