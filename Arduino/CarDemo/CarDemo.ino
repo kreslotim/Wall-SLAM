@@ -101,6 +101,7 @@ void loop() {
 
   moveForward();
 
+  // This code executes every 10 milliseconds (rotating servo)
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
     rotateServo();
