@@ -54,6 +54,7 @@ const float acceleration = 250.0;
 const float maxSpeed = 2000;
 const float constSpeed = 1000;
 const int STEPS_PER_REV = 2038;
+const int STEPS_90_DEG = 1740;
 
 // Creates two instances
 // Pins entered in sequence IN1-IN3-IN2-IN4 for proper step sequence
@@ -104,8 +105,8 @@ void loop() {
     stepperLeft.setCurrentPosition(0);
     stepperRight.setCurrentPosition(0);
     //delay(500);  // stop for 0.5 seconds
-    stepperLeft.move(-STEPS_PER_REV);  // turn right 90 degrees
-    stepperRight.move(-STEPS_PER_REV);
+    stepperLeft.move(-STEPS_90_DEG);  // turn right 90 degrees
+    stepperRight.move(-STEPS_90_DEG);
     while (stepperLeft.distanceToGo() != 0 || stepperRight.distanceToGo() != 0) {
       stepperLeft.run();
       stepperRight.run();
