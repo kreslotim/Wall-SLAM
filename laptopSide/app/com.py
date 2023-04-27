@@ -1,16 +1,6 @@
 import socket
 import time
 import struct
-import math
-
-
-def encode_angles(angle1, angle2, angle3):
-
-    # Combine the scaled angles into a 24-bit integer
-    encoded = (angle1 << 16) | (angle2 << 8) | angle3
-
-    return encoded
-
 
 # IP address and port number of the ESP32
 host = '192.168.210.79'

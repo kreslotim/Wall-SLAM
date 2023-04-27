@@ -40,9 +40,9 @@ void loop() {
       Serial.print("Received angles: ");
       Serial.print(angle1_deg);
       Serial.print(", ");
-      Serial.println(angle2_deg);
+      Serial.print(angle2_deg);
       Serial.print(", ");
-      Serial.print(angle3_deg);
+      Serial.println(angle3_deg);
     
     }
   }
