@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% import "bootstrap/utils.html" as utils %}
+
+{% block content %}
+<div class="container">
+    <span class="title m-5" ><h1>WALL-SLAM Interface</h1></span>
+
+    <div class="card m-5">
+        <div class="card-body">
+            <h5 class="card-tile ">Status</h5>
+            <hr>
+        
+            <div class="row">
+                <p class="col-3 m-2"> Connected : True</p>
+                <p class="col-3 m-2"> Wifi : EspTest / 123456789</p>
+                <p class="col-3 m-2"> Ip : {{ip}} </p>
+
+                <input type="range" min="0" max="100" value="50" class="slider" id="mySlider">
+            </div>
+        </div>
+    </div>
+
+
+
+      <div class="card m-5">
+        <h3 class="card-tile m-4">Communication</h3>
+        <div class="card-body">
+            <div class="row">
+                <p class="col-5"> Packet Sent </p>
+                <p class="col-5"> Move 50m, 20m </p>
+                <p class="col-5"> Pack Recieve </p>
+                <p class="col-5"> distance 3.5m</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+<script src="{{ url_for('static', filename='js/bootsrap/bootstrap.min.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}
