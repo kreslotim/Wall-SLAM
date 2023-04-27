@@ -43,7 +43,9 @@ void loop() {
       Serial.print(angle2_deg);
       Serial.print(", ");
       Serial.println(angle3_deg);
-    
+
+      // Send "200" back to the client
+      client.println("200");
     }
   }
   else {
@@ -60,6 +62,3 @@ void loop() {
   }
   delay(100);
 }
-
-
-
