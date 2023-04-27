@@ -26,15 +26,13 @@
         <h3 class="card-tile m-4">Communication</h3>
         <div class="card-body">
             <div class="row">
-                <p class="col-5"> Packet Sent </p>
-                <p class="col-5"> Move 50m, 20m </p>
-                <p class="col-5"> Pack Recieve </p>
-                <p class="col-5"> distance 3.5m</p>
+              <div id="graph"></div>
             </div>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
 <script src="{{ url_for('static', filename='js/bootsrap/bootstrap.min.js') }}"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
