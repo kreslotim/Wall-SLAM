@@ -33,18 +33,19 @@ class ESP32Connection:
 
             # Wait for a response from the ESP32
             response = self.client.recv(1024).decode()
-
+            
             if response == "200":
                 print("Received response from ESP32:", response)
             else:
                 print("Invalid response from ESP32, reconnecting...")
                 self.connect()
+                self.send_angles(angle1,angle2,angle3)
 
         except Exception as e:
             print("Connection error :", e)
             self.connect()
 
-    def setting(self, speed1, speed2, angle3):
+    def setting(self, speed1, speed2):
         # Encode the angles as floats and pack them into a binary format
         packed_setting = struct.pack('fff', speed1, speed2)
 
@@ -61,6 +62,7 @@ class ESP32Connection:
             else:
                 print("Invalid response from ESP32, reconnecting...")
                 self.connect()
+                self.setting(self,speed1,speed2)
 
         except Exception as e:
             print("Connection error :", e)
