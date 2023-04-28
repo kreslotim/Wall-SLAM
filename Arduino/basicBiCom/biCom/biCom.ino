@@ -29,26 +29,36 @@ void setup() {
 
 
 void loop() {
+  recvConnect();
+  sendConnect();
   recv();
   send();
-
-
-  delay(1000);
+  disconnect();
+  delay(5000);
 }
 
 void recv(){
+  if(recieve_client.available()){
+    Serial.println(recieve_client.readString());
+    recieve_client.println("200");
+  }
+}
+void send(){
+  send_client.print("Hello from ESP32!");
+}
+
+void recvConnect(){
   recieve_client = wifiServer.available();
 
   if (recieve_client) {
 
     Serial.print("Client connected with IP:");
     Serial.println(recieve_client.remoteIP());
-    Serial.println("Recv Disconnecting...");
-    recieve_client.stop();
+    
   }
 }
 
-void send(){
+void sendConnect(){
   if (!send_client.connect(host, send_port)) {
 
         Serial.println("Connection to host failed");
@@ -58,11 +68,19 @@ void send(){
     }
 
   Serial.println("Connected to server successful!");
+}
 
-  send_client.print("Hello from ESP32!");
+void disconnect(){
 
+  if (send_client.connect(host, send_port)) {
   Serial.println("Sent Disconnecting...");
   send_client.stop();
+  }
+  if (recieve_client) {
+    Serial.println("Recv Disconnecting...");
+    recieve_client.stop();
+  }
+
 }
 
 void loop1() {

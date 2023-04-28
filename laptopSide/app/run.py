@@ -7,6 +7,7 @@ recv_port = 8090
 send_port = 8091
 
 esp = esp.ESP32Connection(host,send_port,recv_port)
+esp.send_hello()
 esp.listen()
 
 
