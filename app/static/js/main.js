@@ -17,18 +17,31 @@ document.getElementById("mySlider").addEventListener("input", function() {
   callPythonFunction(sliderValue);
 });
 
+function resetConnection() {
+  $.ajax({
+    url: "/reset-connection",
+    type: "POST",
+    data: {},
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+}
+
 $(document).ready(function() {
   
   var layout = {
     width: 500,
     height: 300,
     xaxis: {
-      tickmode: 'linear',
-      dtick: 0.25,
-      tickformat: '.2f',
-      title: 'Time (s)'
+      //range: [Date.now() - 60000, Date.now()], // show only the last 60 seconds
+      tickformat: 'S', // display time in seconds, e.g. "30s" for 30 seconds ago
     },
     yaxis: {
+      tickformat: ',d', // display values as numbers
       title: 'Number of Packets'
     }
   };
