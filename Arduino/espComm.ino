@@ -10,81 +10,88 @@
 #include <Wire.h>
 #include <AccelStepper.h>
 
-const int maxDistanceSonar = 400;  // in cm
+TaskHandle_t Task1;
+
+sensors_event_t event;
+sensors_event_t aevent, mevent;
 int distanceSonarFront = 0;
 int16_t lidarDistance;
 float dataSend[12];
-const unsigned long interval = 10;
-unsigned long previousMillis = 0;
-#define FULLSTEP 4
-#define HALFSTEP 8
-sensors_event_t event;
-sensors_event_t aevent, mevent;
+int servoAngle;
+int numberOfConnectionOld = 0;
+float actionNumber = 0;
 
-// Define acceleration and maximum speed values
-const float acceleration = 250.0;
-const float maxSpeed = 2000;
-const float constSpeed = 1000;
+const float ACCELERATION_STEPPER = 250.0;
+const float MAX_SPEED_STEPPER = 2000;
+const float CONST_SPEED_STEPPER = 1000;
 const int STEPS_PER_REV = 2038;
 const int STEPS_90_DEG = 1740;
+const int16_t  MIN_LIDAR_DISTANCE = 150;  // in mm
+const int SERVO_INIT_POS = 84;
+const int MAX_DISTANCE_SONAR = 400;
+
+#define FULLSTEP 4
+#define HALFSTEP 8
 
 // FrontUtlrasonic settings
-#define trigPinFront 12
-#define echoPinFront 14
-NewPing frontUltrasonic(trigPinFront, echoPinFront, maxDistanceSonar);
+#define TRIG_PIN 12
+#define ECHO_PIN 14
 
 // VL53L1X Lidar
 #define IRQ_PIN 2
 #define XSHUT_PIN 3
-Adafruit_VL53L1X vl53 = Adafruit_VL53L1X(XSHUT_PIN, IRQ_PIN);
-const int16_t minLidarDistance = 150;  // in mm 
 
 // Servo settings
 #define servoPin 16
-Servo servo;
-const int servoInitPos = 84;
-int servoAngle = servoInitPos;
-int direction = 1;
 
 // Gyro Accel Mag (GAM)
-#define SDA_2 26                                            // New I2C Data Pin
-#define SCL_2 27                                            // New I2C Clock Pin
-Adafruit_FXAS21002C gyro = Adafruit_FXAS21002C(0x0021002C); /* Assign a unique ID to the sensors at the same time */
+#define SDA_2 26 // New I2C Data Pin
+#define SCL_2 27 // New I2C Clock Pin
+
+// Pins for left motor
+#define L_IN1 2
+#define L_IN2 0
+#define L_IN3 4
+#define L_IN4 16
+
+// Pins for right motor
+#define R_IN1 17
+#define R_IN2 5
+#define R_IN3 18
+#define R_IN4 19
+
+// Create instance of Servo
+Servo servo;
+
+// Create instance of Lidar
+Adafruit_VL53L1X vl53 = Adafruit_VL53L1X(XSHUT_PIN, IRQ_PIN);
+
+// Create intance of Gyro, Accel and Mag
+Adafruit_FXAS21002C gyro = Adafruit_FXAS21002C(0x0021002C);
 Adafruit_FXOS8700 accelmag = Adafruit_FXOS8700(0x8700A, 0x8700B);
 
-// Left Motor
-#define lIN1 2
-#define lIN2 0
-#define lIN3 4
-#define lIN4 16
+// Create instance of ultrasonic 
+NewPing frontUltrasonic(TRIG_PIN, ECHO_PIN, MAX_DISTANCE_SONAR);
 
-// Right Motor
-#define rIN1 17
-#define rIN2 5
-#define rIN3 18
-#define rIN4 19
-
-// Creates two instances of Stepper Motors
-AccelStepper stepperLeft(FULLSTEP, lIN1, lIN3, lIN2, lIN4);
-AccelStepper stepperRight(FULLSTEP, rIN1, rIN3, rIN2, rIN4);
+// Create instances of stepper motors
+AccelStepper stepperLeft(FULLSTEP, L_IN1, L_IN3, L_IN2, L_IN4);
+AccelStepper stepperRight(FULLSTEP, R_IN1, R_IN3, R_IN2, R_IN4);
 
 // SSID and password of Wifi connection:
 const char* password = "0123456789";
 const char* ssid = "espWifi2";
 
 // Port to send data
-const uint16_t sendDataPort = 8888;
-const uint16_t recieveDataPort = 8889;
+const uint16_t SEND_DATA_PORT = 8888;
+const uint16_t RECIEVE_DATA_PORT = 8889;
 
 //Open Wifi Port
-WiFiServer sendServer(sendDataPort);
-WiFiServer recieveServer(recieveDataPort);
+WiFiServer sendServer(SEND_DATA_PORT);
+WiFiServer recieveServer(RECIEVE_DATA_PORT);
 
 //Open WifiClients
 WiFiClient sendClient;
 WiFiClient recieveClient;
-
-int numberOfConnectionOld = 0;
 
 // Configure IP addresses of the local access point
 IPAddress local_IP(192, 168, 1, 22);
@@ -105,28 +112,38 @@ void setup() {
   // WifiServer Setup
   sendServer.begin();
   Serial.print("Sending Port is open at : ");
-  Serial.println(sendDataPort);
+  Serial.println(SEND_DATA_PORT);
 
   recieveServer.begin();
   Serial.print("Recieving Port is open at : ");
-  Serial.println(recieveDataPort);
+  Serial.println(RECIEVE_DATA_PORT);
 
   // Servo Setup
   servo.attach(servoPin);
-  servo.write(servoInitPos);  // Put servo to initial position (looking forward)
+  servo.write(SERVO_INIT_POS);  // Put servo to initial position (looking forward)
 
-   // Gyro Accel Mag (GAM) Setup
+  // Gyro Accel Mag (GAM) Setup
   setupGAM();
 
   // Lidar Setup
   setupLidar();
 
   // Motors Setup
-  stepperLeft.setMaxSpeed(maxSpeed);
-  stepperLeft.setAcceleration(acceleration);
-  stepperRight.setMaxSpeed(maxSpeed);
-  stepperRight.setAcceleration(acceleration);
+  stepperLeft.setMaxSpeed(MAX_SPEED_STEPPER);
+  stepperLeft.setAcceleration(ACCELERATION_STEPPER);
+  stepperRight.setMaxSpeed(MAX_SPEED_STEPPER);
+  stepperRight.setAcceleration(ACCELERATION_STEPPER);
 
+  // Setup core to Move
+  xTaskCreatePinnedToCore(
+    Task1code, /* Task function. */
+    "Task1",   /* name of task. */
+    10000,     /* Stack size of task */
+    NULL,      /* parameter of the task */
+    1,         /* priority of the task */
+    &Task1,    /* Task handle to keep track of created task */
+    1);        /* pin task to core 0 */
+  delay(500);
 }
 
 void setupLidar() {
@@ -189,57 +206,51 @@ void setupGAM() {
 
 void readLidar() {
   if (vl53.dataReady()) {
-    // new measurement for the taking!
     lidarDistance = vl53.distance();
   }
 }
 
 void readData() {
-  if(!recieveClient.connected()){
+  if (!recieveClient.connected()) {
     Serial.println("No client connected (Recieve)");
     recieveClient = recieveServer.available();
   } else {
-      Serial.println("New client connected (Recieve)");
+    Serial.println("New client connected (Recieve)");
     if (recieveClient.connected() && recieveClient.available()) {
       // Read the packed dataRecievd from the socket
       float dataRecievd[3];
       recieveClient.read((byte*)dataRecievd, sizeof(dataRecievd));
 
       // Unpack the dataRecievd
-      float servoAngle = dataRecievd[0];
+      actionNumber = dataRecievd[0];
       float leftStepperMotor = dataRecievd[1];
       float rightStepperMotor = dataRecievd[2];
 
       // Do something with the decoded angles
       Serial.print("Received angles: ");
-      Serial.print(servoAngle);
+      Serial.print(actionNumber);
       Serial.print(", ");
       Serial.print(leftStepperMotor);
       Serial.print(", ");
       Serial.println(rightStepperMotor);
-  
+
+      //action(actionNumber);
       // Send "200" back to the client
-      recieveClient.flush();
       recieveClient.write("200");
     }
-  } 
-}
-
-void sendData() { 
-  packData();
-
-  if (!sendClient.connected() && sendClient.connect(user_IP, sendDataPort)) {
-    Serial.println("Connected to server");
-  } 
-
-  if (sendClient.connected()) {
-    sendClient.flush();
-    sendClient.write((byte*)dataSend, sizeof(dataSend));
   }
 }
 
-void action(int actionNumber) { 
-  
+void sendData() {
+  packData();
+
+  if (!sendClient.connected() && sendClient.connect(user_IP, SEND_DATA_PORT)) {
+    Serial.println("Connected to server");
+  }else {  
+    sendClient.flush();
+    sendClient.write((byte*)dataSend, sizeof(dataSend));
+    Serial.println("Data Sent");
+  }
 }
 
 void updateSensors() {
@@ -254,7 +265,7 @@ void updateSensors() {
   accelmag.getEvent(&aevent, &mevent);
 }
 
-void packData(){
+void packData() {
   updateSensors();
   dataSend[0] = servo.read();
   dataSend[1] = distanceSonarFront;
@@ -270,6 +281,49 @@ void packData(){
   dataSend[11] = mevent.magnetic.z;
 }
 
+void action(float actionNumber) {
+  switch ((int) actionNumber) {
+    case 0:
+      stopMotors();
+      break;
+    case 1:
+      moveForward();
+      break;
+    case 2:
+      moveRight();
+      actionNumber = 0;
+      break;
+    default:
+      stopMotors();
+      break;
+  }
+  stepperLeft.runSpeed();
+  stepperRight.runSpeed();
+}
+
+void moveForward() {
+  // Move forward at constant speed if distance is greater than or equal to minDistance
+  stepperLeft.setSpeed(-CONST_SPEED_STEPPER); 
+  stepperRight.setSpeed(CONST_SPEED_STEPPER);
+}
+
+void moveRight() {
+  stepperLeft.setCurrentPosition(0);
+  stepperRight.setCurrentPosition(0);
+  //delay(500);  // stop for 0.5 seconds
+  stepperLeft.move(-STEPS_90_DEG);  // turn right 90 degrees
+  stepperRight.move(-STEPS_90_DEG);
+  while (stepperLeft.distanceToGo() != 0 || stepperRight.distanceToGo() != 0) {
+    stepperLeft.run();
+    stepperRight.run();
+  }
+}
+
+void stopMotors() {
+  stepperLeft.setSpeed(0);   
+  stepperRight.setSpeed(0);
+}
+
 void numberConnected() {
   int numberOfConnection = WiFi.softAPgetStationNum();
   if (numberOfConnectionOld != numberOfConnection) {
@@ -279,13 +333,15 @@ void numberConnected() {
   }
 }
 
+void Task1code(void* pvParameters) {
+  for (;;) {
+    Serial.print(actionNumber);
+    action(actionNumber);
+    // action(actionNumber);
+  }
+}
+
 void loop() {
-  // WifiServers
   sendData();
   readData();
-
-  // Updates everytime someone connects or disconnects from WiFi
-  numberConnected();
-
-  delay(10);
 }
