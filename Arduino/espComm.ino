@@ -335,9 +335,7 @@ void numberConnected() {
 
 void Task1code(void* pvParameters) {
   for (;;) {
-    Serial.print(actionNumber);
     action(actionNumber);
-    // action(actionNumber);
   }
 }
 
