@@ -9,7 +9,10 @@
         <div class="card-body">
             <h5 class="card-tile ">Status</h5>
             <hr>
-        
+            
+            <!--
+                Place Holder
+           
             <div class="row">
                 <button onclick="resetConnection()">Reset ESP Connection</button>
 
@@ -17,16 +20,46 @@
                 <p class="col-3 m-2"> Wifi : EspTest / 123456789</p>
                 <p class="col-3 m-2"> Ip : {{ip}} </p>
 
-                <input type="range" min="0" max="100" value="50" class="slider" id="mySlider">
             </div>
+            -->
         </div>
     </div>
 
+    <div class="card m-5">
+       
+        <div class="card-body"> 
+            <h5 class="card-tile">Debuging</h5>
+            <hr>
 
+            <p> This to manually test the command send to the ESP </p>
+            
+           
+            <div class="m-4">
+                <p class="my-2"> Chewbacca direct input :</p>
+                <button class="btn btn-secondary" onclick="sendStop()">Stop</button>
+                <button class="btn btn-secondary" onclick="sendMoveForward()">Move Forward</button>
+                <button class="btn btn-secondary" onclick="sendMoveRight()">Move Right</button>
+                <button class="btn btn-secondary" onclick="sendMoveLeft()">Move Left</button>
+
+            </div>
+
+            
+            <div class="m-4">
+                <p class="my-2"> Chewbacca Setting</p>
+                <div class="d-flex justify-content-around"> 
+                    <p> Speed </p>
+                    <input type="range" min="0" max="100" value="50" class="slider" id="mySlider">
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
 
     <div class="card m-5">
-        <h3 class="card-tile m-4">Communication</h3>
         <div class="card-body">
+            <h5 class="card-tile">Communication</h5>
+            <hr>
             <div class="row">
               <div id="graph"></div>
             </div>
@@ -34,9 +67,10 @@
     </div>
 
 
-      <div class="card m-5">
-        <h3 class="card-tile m-4">Data Point</h3>
+      <div class="card m-5">  
         <div class="card-body">
+            <h5 class="card-tile">Data Point</h5>
+            <hr>
             <div class="row">
               <div id="graph-obstacle"></div>
             </div>

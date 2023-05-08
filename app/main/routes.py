@@ -37,6 +37,32 @@ def run_python_function():
 @bp.route('/reset-connection', methods=['POST'])
 def init_connection():
     result = reset_esp_connection()
+    print("RESETTTT")
+    return jsonify(result=result)
+
+@bp.route('/move-forward', methods=['POST'])
+def init_connection():
+    result = reset_esp_connection()
+    return jsonify(result=result)
+
+@bp.route('/move-backward', methods=['POST'])
+def init_connection():
+    result = reset_esp_connection()
+    return jsonify(result=result)
+
+@bp.route('/move-left', methods=['POST'])
+def init_connection():
+    result = reset_esp_connection()
+    return jsonify(result=result)
+
+@bp.route('/move-right', methods=['POST'])
+def init_connection():
+    result = reset_esp_connection()
+    return jsonify(result=result)
+
+@bp.route('/move-stop', methods=['POST'])
+def init_connection():
+    result = reset_esp_connection()
     return jsonify(result=result)
 
 

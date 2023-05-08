@@ -30,7 +30,73 @@ function resetConnection() {
     }
   });
 }
-
+function sendStop() {
+  $.ajax({
+    url: "/move-stop",
+    type: "POST",
+    data: {},
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+}
+function sendMoveForward() {
+  $.ajax({
+    url: "/move-forward",
+    type: "POST",
+    data: {},
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+}
+function sendMoveBackward() {
+  $.ajax({
+    url: "/move-backward",
+    type: "POST",
+    data: {},
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+}
+function sendMoveRight() {
+  $.ajax({
+    url: "/move-right",
+    type: "POST",
+    data: {},
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+}
+function sendMoveLeft() {
+  $.ajax({
+    url: "/move-left",
+    type: "POST",
+    data: {},
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+}
+   
+   
 $(document).ready(function() {
   
   var layout = {
