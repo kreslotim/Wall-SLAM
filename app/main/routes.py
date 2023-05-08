@@ -34,43 +34,38 @@ def run_python_function():
     return jsonify(result=result)
 
 
-@bp.route('/reset-connection', methods=['POST'])
-def init_connection():
-    result = reset_esp_connection()
-    print("RESETTTT")
-    return jsonify(result=result)
-
 @bp.route('/move-forward', methods=['POST'])
-def init_connection():
-    result = reset_esp_connection()
-    return jsonify(result=result)
+def move_forward():
+    print("FORWARDDDD")
+    return jsonify()
 
 @bp.route('/move-backward', methods=['POST'])
-def init_connection():
-    result = reset_esp_connection()
-    return jsonify(result=result)
+def move_backward():
+    print("BACKWARRRDDD")
+    return jsonify()
 
 @bp.route('/move-left', methods=['POST'])
-def init_connection():
-    result = reset_esp_connection()
-    return jsonify(result=result)
+def move_left():
+    print("LEFTTT")
+    return jsonify()
 
 @bp.route('/move-right', methods=['POST'])
-def init_connection():
-    result = reset_esp_connection()
-    return jsonify(result=result)
+def move_right():
+    print("RIGGHHH")
+    
+    return jsonify()
 
 @bp.route('/move-stop', methods=['POST'])
-def init_connection():
-    result = reset_esp_connection()
-    return jsonify(result=result)
+def move_stop():
+    print("STOPPPPP")
+    return jsonify()
 
-
+    
 def reset_esp_connection():
     print("RESETTTT")
 
 def my_python_function(slider):  
-    print("hello from web")
+    print("SPED SET TO")
     print(slider)
    
 

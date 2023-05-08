@@ -17,19 +17,6 @@ document.getElementById("mySlider").addEventListener("input", function() {
   callPythonFunction(sliderValue);
 });
 
-function resetConnection() {
-  $.ajax({
-    url: "/reset-connection",
-    type: "POST",
-    data: {},
-    success: function(response) {
-      console.log(response);
-    },
-    error: function(error) {
-      console.log(error);
-    }
-  });
-}
 function sendStop() {
   $.ajax({
     url: "/move-stop",
