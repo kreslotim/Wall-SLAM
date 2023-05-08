@@ -51,7 +51,7 @@ $(document).ready(function() {
 
   function updateGraph() {
     $.ajax({
-      url: '/get-graph-data',
+      url: '/get-graph-data-com',
       type: 'POST',
       success: function(response) {
         var x_sent = response.x_sent;
@@ -63,6 +63,97 @@ $(document).ready(function() {
       }
     });
   }
+
+  setInterval(updateGraph, 1000);
+});
+
+
+$(document).ready(function() {
+
+  var layout = {
+    width: 500,
+    height: 500,
+    xaxis: {
+      title: 'X position',
+      autorange: true,
+    },
+    yaxis: {
+      title: 'Y position',
+      autorange: true,
+    },
+    shapes: []
+  };
+
+  // Define the data trace for the car position
+  var carTrace = {
+    x: [0],
+    y: [0],
+    mode: 'markers',
+    marker: {
+      size: 10,
+      color: 'red'
+    }
+  };
+
+  // Define the data trace for the obstacles
+  var obstacleTrace = {
+    x: [],
+    y: [],
+    mode: 'markers',
+    marker: {
+      size: 7,
+      color: 'blue'
+    }
+  };
+
+  var data = [carTrace, obstacleTrace];
+  Plotly.newPlot('graph-obstacle', data, layout);
+
+  function updateGraph() {
+    $.ajax({
+      url: '/get-graph-data-obstacle',
+      type: 'POST',
+      success: function(response) {
+             // Extract the obstacle data from the response
+        var obstacleData = response.obstacles;
+        
+        // Update the obstacle trace data
+        var obstacleX = obstacleData.map(function(obstacle) {
+          return obstacle[0];
+        });
+        var obstacleY = obstacleData.map(function(obstacle) {
+          return obstacle[1];
+        });
+        Plotly.extendTraces('graph-obstacle', {x: [obstacleX], y: [obstacleY]}, [1]);
+
+        // Update the layout with the obstacle shapes
+        layout.shapes = obstacleData.map(function(obstacle) {
+          return {
+            type: 'circle',
+            xref: 'x',
+            yref: 'y',
+            x0: obstacle[0] - obstacle[2],
+            y0: obstacle[1] - obstacle[2],
+            x1: obstacle[0] + obstacle[2],
+            y1: obstacle[1] + obstacle[2],
+            line: {
+              color: 'blue'
+            }
+          };
+        });
+
+        // Extract the car position data from the response
+        var carPosition = response.carPosition;
+
+        // Update the car trace data
+        carTrace.x = [carPosition[0]];
+        carTrace.y = [carPosition[1]];
+        Plotly.update('graph-obstacle', data, layout);
+      }
+    
+    });
+  }
+
 
   setInterval(updateGraph, 1000);
 });

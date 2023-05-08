@@ -24,7 +24,7 @@
 
 
 
-      <div class="card m-5">
+    <div class="card m-5">
         <h3 class="card-tile m-4">Communication</h3>
         <div class="card-body">
             <div class="row">
@@ -32,11 +32,23 @@
             </div>
         </div>
     </div>
+
+
+      <div class="card m-5">
+        <h3 class="card-tile m-4">Data Point</h3>
+        <div class="card-body">
+            <div class="row">
+              <div id="graph-obstacle"></div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<script src="{{ url_for('static', filename='js/plotly/plotly.min.js') }}"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
 <script src="{{ url_for('static', filename='js/bootsrap/bootstrap.min.js') }}"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ url_for('static', filename='js/jsquery/jsquery.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}

@@ -1,25 +1,26 @@
+
 from flask import render_template, jsonify,request
 from app.main import bp
 from datetime import datetime, timedelta
 import time
 import random
-from .esp32Connection import ESP32Connection
+import app.models.dummyData as dummy
+import app.models.esp32Connection as esp
 
 ip="168.20.13.1"
 startTime= time.time()
 
-host = '192.168.28.79'
-recv_port = 8090
-send_port = 8091
-esp = ESP32Connection(send_port,recv_port)
+ # IP address and port number of the ESP32
+data = dummy.dummyData()
+
+ 
+
+
+
 
 @bp.route('/')
 def index():
     # Make connection to ESP here
-
-    #Dummy data
-    connected = True
-    
 
     return render_template('index.html', ip=ip)
 
@@ -47,20 +48,34 @@ def my_python_function(slider):
     print(slider)
    
 
-@bp.route('/get-graph-data', methods=['POST'])
-def get_graph_data():
-    esp.send_hello()
-    
-    x_sent = [row[1] for row in esp.send_stat]
-    x_received = [row[1] for row in esp.recv_stat]
-    y_sent = [row[0] for row in esp.send_stat]
-    y_received = [row[0] for row in esp.recv_stat]
-    print(x_sent)
-    #
-    #for i in range(10):
-    #    x_sent.append(time.time()-startTime)
-    #    y_sent.append(random.randint(0, 10))
-    #    x_received.append(time.time()-startTime)
-    #    y_received.append(random.randint(0, 10))
-  
+@bp.route('/get-graph-data-com', methods=['POST'])
+def get_graph_data_com():
+    x_sent =[]
+    x_received = []
+    y_sent = []
+    y_received =[]
+
+    for i in range(10):
+        x_sent.append(time.time()-startTime)
+        x_received.append(time.time()-startTime)
+        y_sent.append(2)
+        y_received.append( 2)
+        time.sleep(0.2)
+
+   
     return jsonify(x_sent=x_sent, y_sent=y_sent, x_received=x_received,y_received=y_received)
+
+@bp.route('/get-graph-data-obstacle', methods=['POST'])
+def get_graph_data_obstacle():
+    obstacles = []
+    car_position = (random.uniform(-15, 15), random.uniform(-15, 15))
+    distance = random.uniform(0,3)
+    for i in range(4):
+        x = random.uniform(car_position[0]-distance, car_position[0]+distance)
+        y = random.uniform(car_position[1]-distance, car_position[1]+distance)
+        radius = random.uniform(0.3, 1)
+        obstacles.append((x, y, radius))
+
+    data = {'obstacles': obstacles, 'carPosition': car_position}
+    return jsonify(data)
+
