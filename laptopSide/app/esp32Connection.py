@@ -1,23 +1,18 @@
 import socket
 import time
 import struct
-import threading
-import math
 
 class ESP32Connection:
     def __init__(self, send_port, recv_port):
         print("Establishing Connection")
         self.host = None
-        self.connected = False
         self.send_port = send_port
         self.recv_port = recv_port
         self.send_socket = None
         self.recv_socket = None
-        self.recv_stat = []
-        self.send_stat = []
-        self.obstacle = {}
         self.time = time.time()
 
+############ COMUNICATION METHOD #############
                 
     def _connect(self):
         print(" Connecting...")
@@ -38,17 +33,11 @@ class ESP32Connection:
             self.send_socket.connect((self.host, self.send_port))
             print("Connection established successfully")
             
-            self.connected = True
-
         except Exception as e:
             print("Connection error :", e)
             print("Reconnecting ...")
-            self.connected = False
             time.sleep(1)
 
-
-
-############ COMUNICATION METHOD #############
 
     def _listen(self):
         # Receive data from the client socket
@@ -62,12 +51,12 @@ class ESP32Connection:
             print(f"Received data: {data_decoded}")
 
 
-    def _send_hello(self):
+    def _send_actionNumber(self, actionNumber):
         try:
             # Send the packed angles over the socket
-            packed_angles = struct.pack('fff', 2, 3, 4)
+            packed_angles = struct.pack('f', actionNumber)
             self.send_socket.sendall(packed_angles)
-            print("Send Message")
+            print("Message sent")
 
             # Wait for a response from the ESP32
             response = 0
@@ -81,13 +70,30 @@ class ESP32Connection:
                 self.recv_socket.close()
                 self.send_socket.close()
                 self._connect() 
-                self._send_hello()
-
-                
+                self._send_actionNumber(actionNumber)
 
         except Exception as e:
             print("Connection error :", e)
-            self.connected = False
+
+
+############ Moving METHOD ########
+
+    def _sendStop(self):
+        self._send_actionNumber(0)
+    
+    def _sendMove_Forward(self):
+        self._send_actionNumber(1)
+    
+    def _sendMove_Backward(self):
+        self._send_actionNumber(2)
+
+    def _sendMove_Right(self):
+        self._send_actionNumber(3)
+
+    def _sendMove_Left(self):
+        self._send_actionNumber(4)
+
+
 
 ############ HELPER METHOD ########
 
