@@ -85,7 +85,6 @@ def compute_centers(data, cluster_assignments, K):
     Returns:
         centers: the new centers of each cluster, shape is (K,D) where K is the number of clusters, D the number of features
     """
-    ### WRITE YOUR CODE HERE
     #initialization:
     centers = np.zeros((K, data.shape[1]))
     for k in range(K):

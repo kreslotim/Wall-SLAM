@@ -11,6 +11,7 @@ class ESP32Connection:
         self.send_socket = None
         self.recv_socket = None
         self.time = time.time()
+        self._connect()
 
 ############ COMUNICATION METHOD #############
                 

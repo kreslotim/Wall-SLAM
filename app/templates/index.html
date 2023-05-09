@@ -50,6 +50,10 @@
                     <p> Speed </p>
                     <input type="range" min="0" max="100" value="50" class="slider" id="mySlider">
                 </div>
+                <div class="d-flex justify-content-around"> 
+                    <p> Frequency of Sensor </p>
+                    <input type="range" min="0" max="100" value="50" class="slider" id="mySlider1">
+                </div>
             </div>
             
             
@@ -67,12 +71,23 @@
     </div>
 
 
-      <div class="card m-5">  
+    <div class="card m-5">  
         <div class="card-body">
             <h5 class="card-tile">Data Point</h5>
             <hr>
             <div class="row">
               <div id="graph-obstacle"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card m-5">  
+        <div class="card-body">
+            <h5 class="card-tile">Mapping</h5>
+            <hr>
+            <button class="btn btn-secondary" onclick="kmean()">Run Kmeans</button>
+            <div class="row">
+              <div id="img"></div>
             </div>
         </div>
     </div>
