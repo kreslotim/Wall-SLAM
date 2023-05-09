@@ -77,8 +77,8 @@ Adafruit_FXOS8700 accelmag = Adafruit_FXOS8700(0x8700A, 0x8700B);
 NewPing frontUltrasonic(TRIG_PIN, ECHO_PIN, MAX_DISTANCE_SONAR);
 
 // Create instances of stepper motors
-AccelStepper stepperRight(FULLSTEP, L_IN1, L_IN3, L_IN2, L_IN4);
-AccelStepper stepperLeft(FULLSTEP, R_IN1, R_IN3, R_IN2, R_IN4);
+AccelStepper stepperLeft(FULLSTEP, L_IN1, L_IN3, L_IN2, L_IN4);
+AccelStepper stepperRight(FULLSTEP, R_IN1, R_IN3, R_IN2, R_IN4);
 
 // SSID and password of Wifi connection:
 const char* password = "0123456789";
