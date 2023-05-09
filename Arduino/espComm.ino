@@ -20,10 +20,13 @@ float dataSend[12];
 int servoAngle;
 int numberOfConnectionOld = 0;
 float actionNumber = 0;
+float orientation = 0;
+int goToOrientation = 0;
+
 
 const float ACCELERATION_STEPPER = 250.0;
 const float MAX_SPEED_STEPPER = 2000;
-const float CONST_SPEED_STEPPER = 1000;
+const float CONST_SPEED_STEPPER = 500;
 const int STEPS_PER_REV = 2038;
 const int STEPS_90_DEG = 1740;
 const int16_t  MIN_LIDAR_DISTANCE = 150;  // in mm
@@ -74,8 +77,8 @@ Adafruit_FXOS8700 accelmag = Adafruit_FXOS8700(0x8700A, 0x8700B);
 NewPing frontUltrasonic(TRIG_PIN, ECHO_PIN, MAX_DISTANCE_SONAR);
 
 // Create instances of stepper motors
-AccelStepper stepperLeft(FULLSTEP, L_IN1, L_IN3, L_IN2, L_IN4);
-AccelStepper stepperRight(FULLSTEP, R_IN1, R_IN3, R_IN2, R_IN4);
+AccelStepper stepperRight(FULLSTEP, L_IN1, L_IN3, L_IN2, L_IN4);
+AccelStepper stepperLeft(FULLSTEP, R_IN1, R_IN3, R_IN2, R_IN4);
 
 // SSID and password of Wifi connection:
 const char* password = "0123456789";
@@ -105,7 +108,7 @@ void setup() {
 
   // Access Point SetUp
   WiFi.softAPConfig(local_IP, gateway, subnet);
-  WiFi.softAP(ssid, password);
+  WiFi.softAP(ssid, password, 1); //limit connection to 1 user
   Serial.print("IP address = ");
   Serial.println(WiFi.softAPIP());
 
@@ -218,21 +221,15 @@ void readData() {
     Serial.println("New client connected (Recieve)");
     if (recieveClient.connected() && recieveClient.available()) {
       // Read the packed dataRecievd from the socket
-      float dataRecievd[3];
+      float dataRecievd[1];
       recieveClient.read((byte*)dataRecievd, sizeof(dataRecievd));
 
       // Unpack the dataRecievd
       actionNumber = dataRecievd[0];
-      float leftStepperMotor = dataRecievd[1];
-      float rightStepperMotor = dataRecievd[2];
 
       // Do something with the decoded angles
-      Serial.print("Received angles: ");
+      Serial.print("Action recieved: ");
       Serial.print(actionNumber);
-      Serial.print(", ");
-      Serial.print(leftStepperMotor);
-      Serial.print(", ");
-      Serial.println(rightStepperMotor);
 
       //action(actionNumber);
       // Send "200" back to the client
@@ -258,11 +255,15 @@ void updateSensors() {
   distanceSonarFront = frontUltrasonic.ping_cm();
 
   // Lidar Update
+  rotateServo();
   readLidar();
 
   // IMU Update
   gyro.getEvent(&event);
   accelmag.getEvent(&aevent, &mevent);
+  
+  // Orientation Update
+  orientation = atan2(event.gyro.y, event.gyro.x) * 180 / PI;
 }
 
 void packData() {
@@ -270,7 +271,7 @@ void packData() {
   dataSend[0] = servo.read();
   dataSend[1] = distanceSonarFront;
   dataSend[2] = lidarDistance;
-  dataSend[3] = event.gyro.x;
+  dataSend[3] = orientation;
   dataSend[4] = event.gyro.y;
   dataSend[5] = event.gyro.z;
   dataSend[6] = aevent.acceleration.x;
@@ -281,42 +282,39 @@ void packData() {
   dataSend[11] = mevent.magnetic.z;
 }
 
+void rotateServo(){
+  servoAngle = (servoAngle + 1) % 180;
+  servo.write(servoAngle);
+}
+
 void action(float actionNumber) {
   switch ((int) actionNumber) {
     case 0:
       stopMotors();
       break;
+
     case 1:
       moveForward();
       break;
+
     case 2:
-      moveRight();
-      actionNumber = 0;
+      moveBackward();
       break;
+
+    case 3:
+      moveRight();
+      break;
+
+    case 4:
+      moveLeft();
+      break;
+
     default:
-      stopMotors();
+      Serial.println("No output for the actionNumber");
       break;
   }
   stepperLeft.runSpeed();
   stepperRight.runSpeed();
-}
-
-void moveForward() {
-  // Move forward at constant speed if distance is greater than or equal to minDistance
-  stepperLeft.setSpeed(-CONST_SPEED_STEPPER); 
-  stepperRight.setSpeed(CONST_SPEED_STEPPER);
-}
-
-void moveRight() {
-  stepperLeft.setCurrentPosition(0);
-  stepperRight.setCurrentPosition(0);
-  //delay(500);  // stop for 0.5 seconds
-  stepperLeft.move(-STEPS_90_DEG);  // turn right 90 degrees
-  stepperRight.move(-STEPS_90_DEG);
-  while (stepperLeft.distanceToGo() != 0 || stepperRight.distanceToGo() != 0) {
-    stepperLeft.run();
-    stepperRight.run();
-  }
 }
 
 void stopMotors() {
@@ -324,18 +322,45 @@ void stopMotors() {
   stepperRight.setSpeed(0);
 }
 
-void numberConnected() {
-  int numberOfConnection = WiFi.softAPgetStationNum();
-  if (numberOfConnectionOld != numberOfConnection) {
-    Serial.print("Stations connected: ");
-    Serial.println(numberOfConnection);
-    numberOfConnectionOld = numberOfConnection;
+void moveForward() {
+  stepperLeft.setSpeed(-CONST_SPEED_STEPPER); 
+  stepperRight.setSpeed(CONST_SPEED_STEPPER);
+}
+
+void moveBackward() {
+  stepperLeft.setSpeed(CONST_SPEED_STEPPER); 
+  stepperRight.setSpeed(-CONST_SPEED_STEPPER);
+}
+
+void moveRight() {
+  goToOrientation = (int)(orientation + 90) % 360;
+  Serial.println("goToOrientation : ");
+  Serial.println(goToOrientation);
+  while( goToOrientation !=  (int) orientation) {
+    updateSensors();
+    Serial.println("Orientation : ");
+    Serial.println(orientation);
+    stepperLeft.setSpeed(-CONST_SPEED_STEPPER); 
+    stepperRight.setSpeed(-CONST_SPEED_STEPPER);
+    stepperLeft.runSpeed();
+    stepperRight.runSpeed();    
+  }
+}
+
+void moveLeft() {
+  goToOrientation = (int) (orientation - 90) % 360;
+  while(goToOrientation !=  (int) orientation) {
+    updateSensors();
+    stepperLeft.setSpeed(CONST_SPEED_STEPPER); 
+    stepperRight.setSpeed(CONST_SPEED_STEPPER);
+    stepperLeft.runSpeed();
+    stepperRight.runSpeed();
   }
 }
 
 void Task1code(void* pvParameters) {
   for (;;) {
-    action(actionNumber);
+    //action(actionNumber);
   }
 }
 
