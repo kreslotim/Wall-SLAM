@@ -21,42 +21,32 @@ class ESP32Connection():
         self.obstacle = {}
         self.time = time.time()
         self.running = False
+        self.start_thread()
     
+######## Thread Looping #############
+
     def stop_thread(self):
         self.running = False
 
     def start_thread(self):
-        self._connect()
-
-        while not self.connected:
-            time.sleep(1)
-            print("waiting...")
-
         self.running = True
-        connectLoop = threading.Thread(target=self.thread_connect)
+        connectLoop = threading.Thread(target=self.thread_connect) 
         listenLoop = threading.Thread(target=self._listen)
         connectLoop.start()
         listenLoop.start()
 
     def thread_connect(self):
- 
         while self.running:
-            if not self._connected():
+            if not self._is_socket_alive():
                 print("Thread reconnecting......")
                 self._connect()
             time.sleep(1)
         print("Thread stopped")
 
-    def _connected(self):
-        err1 = self.send_socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
-        err2 = self.recv_socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
 
-        if err1 == 0 and err2==0:
-            self.connected=True
-            return True
-        else:
-            return False
-          
+
+############ COMUNICATION METHOD #############
+
     def _connect(self):
         print(" Connecting...")
         try:
@@ -85,81 +75,72 @@ class ESP32Connection():
             self.connected = False
             time.sleep(1)
 
-
-
-############ COMUNICATION METHOD #############
-
     def _listen(self):
-         while self.running :
-            if self._connected():
-                # Receive data from the client socket
-                data = self.recv_socket.recv(48)
-                if data:
-                    self.recv_socket.send("200".encode())
-                    self.recv_stat.append([1, time.time()-self.time])
-                    # Print the received data
+        if self.connected:
+            # Receive data from the client socket
+            data = self.recv_socket.recv(48)
+            data_decoded = struct.unpack('ffffffffffff', data)
+            print(data)
 
-                    data_decoded = struct.unpack('ffffffffffff', data)
-                    print(f"Received data: {data_decoded}")
-            else :
-                time.sleep(1)
-
-    def _send_hello(self):
+            if data:
+                self.recv_socket.send("200".encode())
+                self.recv_stat.append([1, time.time()-self.time])
+                # Print the received data
+                print(f"Received data: {data_decoded}")
+ 
+    def _send_actionNumber(self, actionNumber):
         try:
             # Send the packed angles over the socket
-            self.send_socket.sendall("hello".encode())
+            packed_angles = struct.pack('f', actionNumber)
+            self.send_socket.sendall(packed_angles)
+            print("Message sent")
 
-            time.sleep(1)
             # Wait for a response from the ESP32
-            response = self.send_socket.recv(1024).decode()   
+            response = 0
 
-            if response == "200" :
+            while (self._is_socket_alive() and not response == "200") :
+                
+                response = self.send_socket.recv(1024).decode()   
                 print("Received response from ESP32:", response)
-                timeav =  time.time()-self.time
-                print(timeav)
-                self.send_stat.append([1,timeav]) # To make a graph about the number of packet send
-            else:
+
+            if not self._is_socket_alive() :  
                 print("Invalid response from ESP32, reconnecting...")
-                    
-                self.send_socket.close()
                 self.recv_socket.close()
-                self.connected= False
-            
+                self.send_socket.close()
+                self._connect() 
+                self._send_actionNumber(actionNumber)
 
         except Exception as e:
             print("Connection error :", e)
-            self.connected = False
+            
+        timeav =  time.time()-self.time
+        print(timeav)
+        self.send_stat.append([1,timeav]) # To make a graph about the number of packet send
+
+
+############ Moving METHOD ########
+
+    def _sendStop(self):
+        self._send_actionNumber(0)
+    
+    def _sendMove_Forward(self):
+        self._send_actionNumber(1)
+    
+    def _sendMove_Backward(self):
+        self._send_actionNumber(2)
+
+    def _sendMove_Right(self):
+        self._send_actionNumber(3)
+
+    def _sendMove_Left(self):
+        self._send_actionNumber(4)
+
+
 
 ############ HELPER METHOD ########
 
-    def _dataToObstacle(self,x_car,y_car, distance,orientation):    
-        # Calculate the x and y coordinates of the obstacle
-        orientation = math.radians(orientation)
-        point_x = x_car + distance * math.cos(orientation)
-        point_y = y_car + distance * math.sin(orientation)
-        obstacle_position = (point_x, point_y)
-        
-        # Check if the obstacle position is already in the dictionary
-        if obstacle_position in self.obstacles:
-            self.obstacles[obstacle_position].add((x_car, y_car))
-        else:
-            self.obstacles[obstacle_position] = {(x_car, y_car)}
-    
-    def _randomlyFill(self):
-        # Generate random car position within range (-100, 100)
-        x_car = random.uniform(-100, 100)
-        y_car = random.uniform(-100, 100)
-        num_obstacles = random.uniform(0,5)
-        # Generate random obstacles and add them to the obstacle map
-        for i in range(num_obstacles):
-            # Generate random obstacle position within range (-100, 100)
-            x_obstacle = random.uniform(-100, 100)
-            y_obstacle = random.uniform(-100, 100)
-
-            # Calculate distance and orientation between car position and obstacle position
-            distance =  random.uniform(0, 3)
-            orientation = random.uniform(0,180)
-
-            # Add obstacle to the obstacle map
-            self._dataToObstacle(x_car,y_car,distance,orientation)
-
+    def _is_socket_alive(self):
+        if self.send_socket is None: 
+            return False
+        err = self.send_socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
+        return err == 0
