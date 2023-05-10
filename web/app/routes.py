@@ -1,30 +1,32 @@
 
-from flask import render_template, jsonify,request
-from app.main import bp
-from datetime import datetime, timedelta
+from flask import render_template, jsonify, request
+from flask import Blueprint
 import time
 import random
-import app.models.dummyData as dummy
-import app.models.esp32Connection as esp
+
+
+from app.models.dummyData import DummyData
+from app.models.esp32 import ESP32Connection
+
 
 ip="168.20.13.1"
+
 startTime= time.time()
 
  # IP address and port number of the ESP32
-data = dummy.dummyData()
-
- 
+data = DummyData()
 
 
+main = Blueprint('main', __name__)
 
 
-@bp.route('/')
+@main.route('/')
 def index():
     # Make connection to ESP here
 
-    return render_template('index.html', ip=ip)
+    return render_template("index.html", ip=ip)
 
-@bp.route('/run-python-function', methods=['POST'])
+@main.route('/run-python-function', methods=['POST'])
 def run_python_function():
     # Get the value of the slider from the AJAX request
     slider_value = request.form.get('value')
@@ -34,28 +36,28 @@ def run_python_function():
     return jsonify(result=result)
 
 
-@bp.route('/move-forward', methods=['POST'])
+@main.route('/move-forward', methods=['POST'])
 def move_forward():
     print("FORWARDDDD")
     return jsonify()
 
-@bp.route('/move-backward', methods=['POST'])
+@main.route('/move-backward', methods=['POST'])
 def move_backward():
     print("BACKWARRRDDD")
     return jsonify()
 
-@bp.route('/move-left', methods=['POST'])
+@main.route('/move-left', methods=['POST'])
 def move_left():
     print("LEFTTT")
     return jsonify()
 
-@bp.route('/move-right', methods=['POST'])
+@main.route('/move-right', methods=['POST'])
 def move_right():
     print("RIGGHHH")
     
     return jsonify()
 
-@bp.route('/move-stop', methods=['POST'])
+@main.route('/move-stop', methods=['POST'])
 def move_stop():
     print("STOPPPPP")
     return jsonify()
@@ -69,7 +71,7 @@ def my_python_function(slider):
     print(slider)
    
 
-@bp.route('/get-graph-data-com', methods=['POST'])
+@main.route('/get-graph-data-com', methods=['POST'])
 def get_graph_data_com():
     x_sent =[]
     x_received = []
@@ -86,7 +88,7 @@ def get_graph_data_com():
    
     return jsonify(x_sent=x_sent, y_sent=y_sent, x_received=x_received,y_received=y_received)
 
-@bp.route('/get-graph-data-obstacle', methods=['POST'])
+@main.route('/get-graph-data-obstacle', methods=['POST'])
 def get_graph_data_obstacle():
     obstacles = []
     car_position = (random.uniform(-15, 15), random.uniform(-15, 15))

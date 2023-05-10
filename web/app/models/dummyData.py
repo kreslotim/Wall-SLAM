@@ -1,7 +1,7 @@
 import math
 import random
 
-class dummyData:
+class DummyData:
 
     def __init__(self):
         self.obstacles = {}
