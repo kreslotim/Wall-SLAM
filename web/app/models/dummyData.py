@@ -1,11 +1,22 @@
 import math
 import random
+import time
 
 class DummyData:
-
-    def __init__(self):
+    def __init__(self, nbData):
         self.obstacles = {}
-        
+        self.startTime = time.time()
+        self.nbData = nbData
+       
+        self.x_sent =[]
+        self.x_received = []
+        self.y_sent = []
+        self.y_received =[]
+
+        for u in range(nbData):
+            self._randomlyFill()
+
+        self.startTime = time.time()
         
 
     def _dataToObstacle(self,x_car,y_car, distance,orientation):    
@@ -30,11 +41,16 @@ class DummyData:
     
         # Generate random obstacles and add them to the obstacle map
         for i in range(2):
-
             # Calculate distance and orientation between car position and obstacle position
             distance =  random.uniform(4, 6)
             orientation = random.uniform(0,180)
-            return self._dataToObstacle(x_car,y_car,distance,orientation)
+            self.obstacles[(x_car,y_car)] = self._dataToObstacle(x_car,y_car,distance,orientation)
 
-            # Add obstacle to the obstacle map
-        
+
+    # Add obstacle to the obstacle map
+    def random_com(self):
+        self.x_sent.append(time.time()-self.startTime)
+        self.x_received.append(time.time()-self.startTime)
+        self.y_sent.append(2)
+        self.y_received.append( 2)
+        return self.x_sent,self.x_received,self.y_sent,self.y_received
