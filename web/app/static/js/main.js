@@ -210,3 +210,49 @@ $(document).ready(function() {
 
   setInterval(updateGraph, 1000);
 });
+
+// Add this to your JavaScript file
+setInterval(function() {
+  $.ajax({
+    url: "/get-status-value", // Change this to the URL of your Flask endpoint
+    type: "GET",
+    success: function(data) {
+      // The Flask endpoint should return a JSON object with a "status" key
+      var status = data.status;
+  
+      var hostIP = $('#host-ip')
+      hostIP.text(data.hostIP)
+
+      var hostName = $('#host-name')
+      hostName.text( data.hostName)
+
+      
+      // Use the status to update the badge text and color
+      var badge = $("#badge-status");
+      if (status) {
+        badge.text("Connected to ESP");
+        badge.removeClass("bg-danger");
+        badge.addClass("bg-success");
+      } else {
+        badge.text("No ESP found");
+        badge.removeClass("bg-success");
+        badge.addClass("bg-danger");
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.log("Error: " + textStatus);
+    }
+  });
+}, 1000); // Change this to the interval (in milliseconds) at which you want to update the status
+
+function updateIpAddress() {
+  fetch('/get-ip-address')
+    .then(response => response.json())
+    .then(data => {
+      const ipAddressElement = document.getElementById('ip-address');
+      ipAddressElement.textContent = data.ip_address;
+    })
+    .catch(error => console.error(error));
+}
+
+setInterval(updateIpAddress, 5000);

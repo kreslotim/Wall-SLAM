@@ -136,8 +136,7 @@ class KMeans(object):
                 print(f"Iteration {i+1}/{max_iter}...")
         
             old_centers = centers.copy()  # keep in memory the centers of the previous iteration
-
-            ### WRITE YOUR CODE HERE
+            
             centers = compute_centers(data, find_closest_cluster(compute_distance(data,old_centers)),self.K)
 
             # End of the algorithm if the centers have not moved (hint: use old_centers and look into np.all)

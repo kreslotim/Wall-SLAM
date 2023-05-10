@@ -96,3 +96,8 @@ def get_graph_data_com():
 def get_graph_data_obstacle():
     data = {}
     return jsonify(data)
+
+@main.route('/get-status-value', methods=['GET'])
+def get_status_value():
+    return jsonify({'status': espT.connected, 'hostIP' : espT.hostIp, 'hostName' : espT.hostName})
+

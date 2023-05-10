@@ -16,7 +16,9 @@ class ESP32Connection:
         self.recv_port = recv_port
 
         # Connection variable
-        self.host = None
+        self.espIP = None
+        self.hostName = socket.gethostname()
+        self.hostIp = socket.gethostbyname(self.hostName) 
         self.connected = False
         self.send_socket = None
         self.recv_socket = None
@@ -68,10 +70,10 @@ class ESP32Connection:
             self.recv_socket, client_address = recv_socket.accept()
             print('Recv established successfully by', client_address)
             recv_socket.close()
-            self.host = client_address[0]
+            self.espIP = client_address[0]
 
             self.send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.send_socket.connect((self.host, self.send_port))
+            self.send_socket.connect((self.espIP, self.send_port))
             print("Send established successfully")
 
             print("Connection established successfully")
