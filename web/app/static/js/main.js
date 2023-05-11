@@ -1,3 +1,7 @@
+
+
+/* --------------- ChewBacca Setting -------------- */
+
 function callPythonFunction(sliderValue) {
   $.ajax({
     url: "/run-python-function",
@@ -17,6 +21,9 @@ document.getElementById("mySlider").addEventListener("input", function() {
   callPythonFunction(sliderValue);
 });
 
+
+/* --------------- Movement Function --------------- */
+// TODO Simplify in one function
 function sendStop() {
   $.ajax({
     url: "/move-stop",
@@ -82,7 +89,9 @@ function sendMoveLeft() {
     }
   });
 }
-   
+
+
+/* --------------- Graph Function --------------- */
    
 $(document).ready(function() {
   
@@ -119,7 +128,6 @@ $(document).ready(function() {
 
   setInterval(updateGraph, 1000);
 });
-
 
 $(document).ready(function() {
 
@@ -206,12 +214,11 @@ $(document).ready(function() {
     
     });
   }
-
-
   setInterval(updateGraph, 1000);
 });
 
-// Add this to your JavaScript file
+
+/* --------------- Connection Status Checker --------------- */
 setInterval(function() {
   $.ajax({
     url: "/get-status-value", // Change this to the URL of your Flask endpoint
@@ -219,6 +226,7 @@ setInterval(function() {
     success: function(data) {
       // The Flask endpoint should return a JSON object with a "status" key
       var status = data.status;
+      var setting = data.setting;
   
       var hostIP = $('#host-ip')
       hostIP.text(data.hostIP)
@@ -229,21 +237,32 @@ setInterval(function() {
       
       // Use the status to update the badge text and color
       var badge = $("#badge-status");
-      if (status) {
-        badge.text("Connected to ESP");
-        badge.removeClass("bg-danger");
-        badge.addClass("bg-success");
+      if(setting){
+        if (status) {
+          badge.text("Connected to ESP");
+          badge.removeClass("bg-danger");
+          badge.removeClass("bg-info")
+          badge.addClass("bg-success");
+        } else {
+          badge.text("No ESP found");
+          badge.removeClass("bg-success");
+          badge.removeClass("bg-info")
+          badge.addClass("bg-danger");
+        }
       } else {
-        badge.text("No ESP found");
+        badge.text("Connection Setting is off")
         badge.removeClass("bg-success");
-        badge.addClass("bg-danger");
+        badge.removeClass("bg-danger");
+        badge.addClass("bg-info");
+
       }
+
     },
     error: function(jqXHR, textStatus, errorThrown) {
       console.log("Error: " + textStatus);
     }
   });
-}, 1000); // Change this to the interval (in milliseconds) at which you want to update the status
+}, 1000);
 
 function updateIpAddress() {
   fetch('/get-ip-address')
@@ -256,3 +275,68 @@ function updateIpAddress() {
 }
 
 setInterval(updateIpAddress, 5000);
+
+
+/* --------------- Setting Switch --------------- */
+
+function SettingConnectionState() {
+  var isChecked = $('#connection-switch').is(':checked');
+  var dataESPSwitch = $('#data-ESP-switch');
+  var autoSwitch = $('#auto-switch');
+
+  if( !isChecked){
+    dataESPSwitch.prop('disabled', true);
+    dataESPSwitch.prop('checked', false);
+    autoSwitch.prop('disabled', true);
+    autoSwitch.prop('checked', false);
+
+   
+  } else {
+    dataESPSwitch.prop('disabled', false);
+    autoSwitch.prop('disabled', false);
+  }
+  sendSwitchSettingState();
+}
+
+function SettingDataESP() {
+  var isChecked = $('#data-ESP-switch').is(':checked');
+  var dataSIMSwitch = $('#data-SIM-switch');
+  if( isChecked){
+    dataSIMSwitch.prop('disabled', true);
+    dataSIMSwitch.prop('checked', false);
+  } else {
+    dataSIMSwitch.prop('disabled', false);
+  }
+  sendSwitchSettingState();
+}
+function SettingDataSIM() {
+  var isChecked = $('#data-SIM-switch').is(':checked');
+  var dataESPSwitch = $('#data-ESP-switch');
+  if( isChecked){
+    dataESPSwitch.prop('disabled', true);
+    dataESPSwitch.prop('checked', false);
+  } else if($('#connection-switch').is(':checked')) {
+    dataESPSwitch.prop('disabled', false);
+  }
+  sendSwitchSettingState();
+}
+
+function sendSwitchSettingState() {
+  var isCheckedConnection = $('#connection-switch').is(':checked');
+  var isCheckedDataESP = $('#data-ESP-switch').is(':checked');
+  var isCheckedDataSIM = $('#data-SIM-switch').is(':checked');
+  var isCheckedAuto = $('#auto-switch').is(':checked');
+
+  $.ajax({
+    type: 'POST',
+    url: '/update-switch-state-setting',
+    data: { connection: isCheckedConnection, dataESP: isCheckedDataESP, dataSIM : isCheckedDataSIM, auto : isCheckedAuto },
+    dataType: 'json',
+    success: function(data) {
+      console.log('Switch state updated successfully');
+    },
+    error: function(xhr, textStatus, errorThrown) {
+      console.log('Error updating switch state');
+    }
+  });
+}

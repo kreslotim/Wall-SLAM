@@ -4,85 +4,154 @@
 {% block content %}
 <div class="container">
     <span class="title m-5" ><h1>WALL-SLAM Interface</h1></span>
-
-    <div class="card m-5">
-        <div class="card-body">
-            <h5 class="card-tile ">Status</h5>
-            <hr>
-            <div class="mx-2">
-                <h6> Connection Status  <span class="badge mx-3" id="badge-status"></span> </h6>
+    <div class="row">
+        <div class="col-5 card m-2">
+            <div class="card-body">
+                <h5 class="card-tile ">Global Setting</h5>
+                <hr>
                 <div class="mx-2">
-                    <p id="host-ip"></p>
-                    <p id="host-name"></p>
+
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="connection-switch" onchange="SettingConnectionState()">
+                        <label class="form-check-label" for="switch">Connection to ESP</label>
+                    </div> 
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="auto-switch" onchange="sendSwitchSettingState()">
+                        <label class="form-check-label" for="switch">Chewbacca Auto Mode</label>
+                    </div> 
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="data-ESP-switch" onchange="SettingDataESP()">
+                        <label class="form-check-label" for="switch">Use Data from ESP</label>
+                    </div>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="data-SIM-switch" onchange="SettingDataSIM()">
+                        <label class="form-check-label" for="switch">Use Data from Simulation</label>
+                    </div>
+
+                    <div class="m-2 mt-4">
+                        <h6 class="my-2"> Chewbacca Setting</h6>
+                        <div class="mx-2 d-flex justify-content-between"> 
+                            <p> Speed </p>
+                            <input type="range" min="0" max="100" value="50" class="slider" id="mySlider">
+                        </div>
+                        <div class="mx-2 d-flex justify-content-between"> 
+                            <p> Frequency of Sensor </p>
+                            <input type="range" min="0" max="100" value="50" class="slider" id="mySlider1">
+                        </div>
+                    </div>
+                      
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="card m-5">
+        <div class="col-5 card m-2">
        
-        <div class="card-body"> 
-            <h5 class="card-tile">Debuging</h5>
-            <hr>
+            <div class="card-body"> 
+                <h5 class="card-tile">Debuging</h5>
+                <hr>
+    
+                <p> This to manually test the command send to the ESP </p>
+                
+               
+                <div class="m-4">
+                    <p class="my-2"> Chewbacca direct input :</p>
 
-            <p> This to manually test the command send to the ESP </p>
-            
-           
-            <div class="m-4">
-                <p class="my-2"> Chewbacca direct input :</p>
-                <button class="btn btn-secondary" onclick="sendStop()">Stop</button>
-                <button class="btn btn-secondary" onclick="sendMoveForward()">Move Forward</button>
-                <button class="btn btn-secondary" onclick="sendMoveBackward()">Move Backward</button>
-                <button class="btn btn-secondary" onclick="sendMoveRight()">Move Right</button>
-                <button class="btn btn-secondary" onclick="sendMoveLeft()">Move Left</button>
-
+                    <div>
+                        <button class="m-1 btn btn-secondary" onclick="sendMoveForward()">Move Forward</button>
+                        <button class="m-1 btn btn-secondary" onclick="sendMoveBackward()">Move Backward</button>
+                    </div>
+                    <div>
+                        <button class="m-1 btn btn-secondary" onclick="sendMoveRight()">Move Right</button>
+                        <button class="m-1 btn btn-secondary" onclick="sendMoveLeft()">Move Left</button>
+                    </div>
+                    <div>
+                        <button class="m-1 btn btn-secondary" onclick="sendStop()">Stop</button>
+                    </div>
+                </div>         
             </div>
+        </div>
+    </div>
 
-            
-            <div class="m-4">
-                <p class="my-2"> Chewbacca Setting</p>
-                <div class="d-flex justify-content-around"> 
-                    <p> Speed </p>
-                    <input type="range" min="0" max="100" value="50" class="slider" id="mySlider">
+    <div class="row">
+        <div class="col-5 card m-2">
+            <div class="card-body">
+                <h5 class="card-tile ">Status</h5>
+                <hr>
+                <div class="mx-2">
+                    <h6> Connection Status </h6>
+                    <div class="m-3">
+                        <div class="mb-3">
+                            <span class="badge" id="badge-status"></span> 
+                        </div>
+
+                        <p id="host-ip"></p>
+                        <p id="host-name"></p>
+                    </div>                     
                 </div>
-                <div class="d-flex justify-content-around"> 
-                    <p> Frequency of Sensor </p>
-                    <input type="range" min="0" max="100" value="50" class="slider" id="mySlider1">
+            </div>
+        </div>
+        <div class="col-5 card m-2">
+            <div class="card-body">
+                <h5 class="card-tile">Communication</h5>
+                <hr>
+                <div class="row">
+                <div id="graph"></div>
                 </div>
             </div>
-            
-            
         </div>
     </div>
 
-    <div class="card m-5">
-        <div class="card-body">
-            <h5 class="card-tile">Communication</h5>
-            <hr>
-            <div class="row">
-              <div id="graph"></div>
+    <div class="row">
+        <div class="col-5 card m-2">  
+            <div class="card-body">
+                <h5 class="card-tile">Chewbacca OutPut</h5>
+                <hr>
+                <div id="graph-scanned"></div>
+            </div>
+        </div>
+
+        <div class="col-5 card m-2">  
+            <div class="card-body">
+                <h5 class="card-tile">Chewbacca Input</h5>
+                <hr>
+                <div id="graph-scanned"></div>
             </div>
         </div>
     </div>
 
-
-    <div class="card m-5">  
-        <div class="card-body">
-            <h5 class="card-tile">Data Point</h5>
-            <hr>
-            <div class="row">
-              <div id="graph-obstacle"></div>
+    <div class="row">
+        <div class="col-5 card m-2">  
+            <div class="card-body">
+                <h5 class="card-tile">Obstacle Encounter with Noise</h5>
+                <hr>
+                <div class="row">
+                <div id="graph-obstacle"></div>
+                </div>
             </div>
         </div>
-    </div>
-
-    <div class="card m-5">  
-        <div class="card-body">
-            <h5 class="card-tile">Mapping</h5>
-            <hr>
-            <button class="btn btn-secondary" onclick="kmean()">Run Kmeans</button>
-            <div class="row">
-              <div id="img"></div>
+        <div class="col-5 card m-2">  
+            <div class="card-body">
+                <h5 class="card-tile">Obstacle Error Corrected with SLAM</h5>
+                <hr>
+                <div class="row">
+                <div id="graph-slam"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-10 card m-2">  
+            <div class="card-body">
+                <h5 class="card-tile">Final Map</h5>
+                <hr>
+                <button class="btn btn-secondary" onclick="kmean()">Run Kmeans on current obstacle</button>
+                <div class="row">
+                    <div id="img">
+                        
+                    </div>
+                </div>
             </div>
         </div>
     </div>

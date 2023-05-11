@@ -16,6 +16,7 @@ startTime= time.time()
 espT = ESP32Connection(send_port=send_port,recv_port=recv_port)
 dataD = DummyData(10)
 
+connectionSetting = False
 
 @main.route('/')
 def index():
@@ -99,5 +100,24 @@ def get_graph_data_obstacle():
 
 @main.route('/get-status-value', methods=['GET'])
 def get_status_value():
-    return jsonify({'status': espT.connected, 'hostIP' : espT.hostIp, 'hostName' : espT.hostName})
+    return jsonify({'setting' : connectionSetting, 'status': espT.connected, 'hostIP' : espT.hostIp, 'hostName' : espT.hostName})
 
+@main.route('/update-switch', methods=['POST'])
+def update_switch():
+    global switch_state
+    switch_state = True if request.form.get('switch') == 'on' else False
+    return 'Switch state updated'
+
+@main.route('/update-switch-state-data', methods=['POST'])
+def update_switch_state_data():
+  switch_state = request.form.get('state')
+  # do something with the switch state]
+  print(switch_state)
+  return jsonify({'success': True})
+
+@main.route('/update-switch-state-connection', methods=['POST'])
+def update_switch_state_connection():
+  switch_state = request.form.get('state')
+  # do something with the switch state]
+  print(switch_state)
+  return jsonify({'success': True})
