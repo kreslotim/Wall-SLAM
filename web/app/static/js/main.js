@@ -330,7 +330,7 @@ function sendSwitchSettingState() {
   $.ajax({
     type: 'POST',
     url: '/update-switch-state-setting',
-    data: { connection: isCheckedConnection, dataESP: isCheckedDataESP, dataSIM : isCheckedDataSIM, auto : isCheckedAuto },
+    data: { 'connection': isCheckedConnection, 'dataESP' : isCheckedDataESP, 'dataSIM' : isCheckedDataSIM, 'auto' : isCheckedAuto },
     dataType: 'json',
     success: function(data) {
       console.log('Switch state updated successfully');
