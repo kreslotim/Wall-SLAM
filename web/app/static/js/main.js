@@ -126,7 +126,7 @@ $(document).ready(function() {
     });
   }
 
-  setInterval(updateGraph, 1000);
+  setInterval(updateGraph, 10000);
 });
 
 $(document).ready(function() {
@@ -214,7 +214,7 @@ $(document).ready(function() {
     
     });
   }
-  setInterval(updateGraph, 1000);
+  setInterval(updateGraph, 10000);
 });
 
 
@@ -228,35 +228,32 @@ setInterval(function() {
       var status = data.status;
       var setting = data.setting;
   
-      var hostIP = $('#host-ip')
-      hostIP.text(data.hostIP)
+      var hostIP = $('#host-ip');
+      hostIP.text(data.hostIP);
 
-      var hostName = $('#host-name')
-      hostName.text( data.hostName)
+      var hostName = $('#host-name');
+      hostName.text( data.hostName);
 
       
       // Use the status to update the badge text and color
-      var badge = $("#badge-status");
-      if(setting){
-        if (status) {
-          badge.text("Connected to ESP");
-          badge.removeClass("bg-danger");
-          badge.removeClass("bg-info")
-          badge.addClass("bg-success");
+      const badges = document.querySelectorAll(".connected-badge");
+      console.log(badges);
+      for (let i = 0; i < badges.length; i++) {
+        badge = badges[i];
+        if(setting){
+          if (status) {
+  
+            badge.innerHTML=  '<span class="p-2 badge bg-success connected-badge">Connected to ESP</span>';
+            
+          } else {
+            badge.innerHTML=  '<span class="p-2 badge bg-danger connected-badge">No ESP found</span>';
+          }
         } else {
-          badge.text("No ESP found");
-          badge.removeClass("bg-success");
-          badge.removeClass("bg-info")
-          badge.addClass("bg-danger");
+          badge.innerHTML=  '<span class="p-2 badge bg-info connected-badge">Connection Setting is off</span>';
+
+  
         }
-      } else {
-        badge.text("Connection Setting is off")
-        badge.removeClass("bg-success");
-        badge.removeClass("bg-danger");
-        badge.addClass("bg-info");
-
       }
-
     },
     error: function(jqXHR, textStatus, errorThrown) {
       console.log("Error: " + textStatus);
@@ -274,7 +271,7 @@ function updateIpAddress() {
     .catch(error => console.error(error));
 }
 
-setInterval(updateIpAddress, 5000);
+setInterval(updateIpAddress, 10000);
 
 
 /* --------------- Setting Switch --------------- */
@@ -284,6 +281,10 @@ function SettingConnectionState() {
   var dataESPSwitch = $('#data-ESP-switch');
   var autoSwitch = $('#auto-switch');
 
+  // Disable the switch and show a message
+  $('#connection-switch').prop('disabled', true);
+  $('#connection-message').text('Please wait...');
+  
   if( !isChecked){
     dataESPSwitch.prop('disabled', true);
     dataESPSwitch.prop('checked', false);
@@ -295,6 +296,14 @@ function SettingConnectionState() {
     dataESPSwitch.prop('disabled', false);
     autoSwitch.prop('disabled', false);
   }
+
+  
+  // Wait for 4 seconds before enabling the switch and hiding the message
+  setTimeout(function() {
+    $('#connection-switch').prop('disabled', false);
+    $('#connection-message').text('');
+  }, 4000);
+
   sendSwitchSettingState();
 }
 
@@ -326,6 +335,7 @@ function sendSwitchSettingState() {
   var isCheckedDataESP = $('#data-ESP-switch').is(':checked');
   var isCheckedDataSIM = $('#data-SIM-switch').is(':checked');
   var isCheckedAuto = $('#auto-switch').is(':checked');
+  
 
   $.ajax({
     type: 'POST',
@@ -340,3 +350,59 @@ function sendSwitchSettingState() {
     }
   });
 }
+
+/* --------------- Stream Data --------------- */
+
+// create a new EventsourceErrors object to listen for server-sent events
+var sourceErrors = new EventSource('/stream-errors');
+
+// add an event listener for when a message is received
+sourceErrors.addEventListener('message', function(e) {
+  // parse the message data as a JSON object
+  var error = JSON.parse(e.data);
+  var time = error[0];
+  var message = error[1];
+  var alertDiv = document.createElement("div");
+  alertDiv.classList.add("alert", "alert-danger", "mt-2");
+  alertDiv.setAttribute("role", "alert");
+  alertDiv.innerHTML = "<strong>" + time + "s </strong>:  " + message;
+  var container = document.getElementById("error-container");
+  container.insertBefore(alertDiv, container.firstChild);
+}, false);
+
+// add an event listener for when the connection is opened
+sourceErrors.addEventListener('open', function(e) {
+  console.log('SSE connection opened');
+}, false);
+
+// add an event listener for when the connection is closed
+sourceErrors.addEventListener('error', function(e) {
+  console.log('SSE connection closed');
+}, false);
+ 
+// create a new EventSource object to listen for server-sent events
+var sourceInfo = new EventSource('/stream-info');
+
+// add an event listener for when a message is received
+sourceInfo.addEventListener('message', function(e) {
+  // parse the message data as a JSON object
+  var error = JSON.parse(e.data);
+  var time = error[0];
+  var message = error[1];
+  var alertDiv = document.createElement("div");
+  alertDiv.classList.add("alert", "alert-info", "mt-2");
+  alertDiv.setAttribute("role", "alert");
+  alertDiv.innerHTML = "<strong>" + time + "s </strong>:  " + message;
+  var container = document.getElementById("info-container");
+  container.insertBefore(alertDiv, container.firstChild);
+}, false);
+
+// add an event listener for when the connection is opened
+sourceInfo.addEventListener('open', function(e) {
+  console.log('SSE connection opened');
+}, false);
+
+// add an event listener for when the connection is closed
+sourceInfo.addEventListener('error', function(e) {
+  console.log('SSE connection closed');
+}, false);

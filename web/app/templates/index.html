@@ -15,6 +15,7 @@
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" id="connection-switch" onchange="SettingConnectionState()">
                         <label class="form-check-label" for="switch">Connection to ESP</label>
+                        <p id="connection-message"></p>
                     </div> 
 
                     <div class="form-check form-switch">
@@ -43,7 +44,6 @@
                             <input type="range" min="0" max="100" value="50" class="slider" id="mySlider1">
                         </div>
                     </div>
-                      
                 </div>
             </div>
         </div>
@@ -71,7 +71,10 @@
                     <div>
                         <button class="m-1 btn btn-secondary" onclick="sendStop()">Stop</button>
                     </div>
-                </div>         
+                </div>  
+                
+                      
+                
             </div>
         </div>
     </div>
@@ -79,18 +82,24 @@
     <div class="row">
         <div class="col-xl-5 card m-2">
             <div class="card-body">
-                <h5 class="card-tile ">Status</h5>
+                <h4 class="card-tile ">Status</h4>
                 <hr>
                 <div class="mx-2">
-                    <h6> Connection Status </h6>
+                    <h5> Connection Status   <span class="badge connected-badge"></span></h5>
                     <div class="m-3">
-                        <div class="mb-3">
-                            <span class="badge" id="badge-status"></span> 
-                        </div>
-
+                       
                         <p id="host-ip"></p>
                         <p id="host-name"></p>
                     </div>                     
+                </div>
+                <hr>
+
+             
+                <div class="container">
+                    <h5>Error Log</h5>
+                    <div id="error-container"  class="scrollable-container" style="max-height: 200px; overflow-y: auto;"></div>
+                      <!-- Error messages will be dynamically added here -->
+                    </ul>
                 </div>
             </div>
         </div>
@@ -98,9 +107,25 @@
             <div class="card-body">
                 <h5 class="card-tile">Communication</h5>
                 <hr>
+
+ 
                 <div class="row">
-                <div id="graph"></div>
+                    <div id="graph"></div>
                 </div>
+                <hr>
+                <div class="container">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                          Info Log
+                        </button>
+                    </h5>
+                    <div id="collapseOne" class="collapse show" ></div>
+                        <div id="info-container"  class="scrollable-container"  aria-labelledby="info-container" style="max-height: 200px; overflow-y: auto;">
+                            <!-- Error messages will be dynamically added here -->
+  
+                        </div>  
+          
+                    </div>
             </div>
         </div>
     </div>
