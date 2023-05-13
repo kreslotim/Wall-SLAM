@@ -279,7 +279,9 @@ setInterval(updateIpAddress, 10000);
 function SettingConnectionState() {
   var isChecked = $('#connection-switch').is(':checked');
   var dataESPSwitch = $('#data-ESP-switch');
-  var autoSwitch = $('#auto-switch');
+  var smartMode = $('#mode-smart-switch');
+  var dumbMode = $('#mode-dumb-switch');
+  
 
   // Disable the switch and show a message
   $('#connection-switch').prop('disabled', true);
@@ -288,23 +290,23 @@ function SettingConnectionState() {
   if( !isChecked){
     dataESPSwitch.prop('disabled', true);
     dataESPSwitch.prop('checked', false);
-    autoSwitch.prop('disabled', true);
-    autoSwitch.prop('checked', false);
-
+    smartMode.prop('disabled', true);
+    smartMode.prop('checked', false);
+    dumbMode.prop('disabled', true);
+    dumbMode.prop('checked', false);
    
   } else {
     dataESPSwitch.prop('disabled', false);
-    autoSwitch.prop('disabled', false);
+    dumbMode.prop('disabled', false);
+    smartMode.prop('disabled', false);
   }
-
-  
+  sendSwitchSettingState();
   // Wait for 4 seconds before enabling the switch and hiding the message
   setTimeout(function() {
     $('#connection-switch').prop('disabled', false);
     $('#connection-message').text('');
   }, 4000);
 
-  sendSwitchSettingState();
 }
 
 function SettingDataESP() {
@@ -328,6 +330,54 @@ function SettingDataSIM() {
     dataESPSwitch.prop('disabled', false);
   }
   sendSwitchSettingState();
+}
+function SettingModeDumb() {
+  var isChecked = $('#mode-dumb-switch').is(':checked');
+  var modeSmart = $('#mode-smart-switch');
+
+  // Disable the switch and show a message
+  $('#mode-dumb-switch').prop('disabled', true);
+  $('#mode-dumb-message').text('Please wait...');
+
+  if( isChecked){
+    modeSmart.prop('disabled', true);
+    modeSmart.prop('checked', false);
+  } else if($('#connection-switch').is(':checked')) {
+    modeSmart.prop('disabled', false);
+  }
+
+  sendSwitchSettingState();
+
+  // Wait for 4 seconds before enabling the switch and hiding the message
+  setTimeout(function() {
+    $('#mode-dumb-switch').prop('disabled', false);
+    $('#mode-smart-switch').prop('disabled', false);
+    $('#mode-dumb-message').text('');
+  }, 2000);
+}
+function SettingModeSmart() {
+  var isChecked = $('#mode-smart-switch').is(':checked');
+  var modeSmart = $('#mode-dumb-switch');
+
+  // Disable the switch and show a message
+  $('#mode-smart-switch').prop('disabled', true);
+  $('#mode-smart-message').text('Please wait...');
+
+  if( isChecked){
+    modeSmart.prop('disabled', true);
+    modeSmart.prop('checked', false);
+  } else if($('#connection-switch').is(':checked')) {
+    modeSmart.prop('disabled', false);
+  }
+
+  sendSwitchSettingState();
+  // Wait for 4 seconds before enabling the switch and hiding the message
+  setTimeout(function() {
+    $('#mode-smart-switch').prop('disabled', false);
+    $('#mode-dumb-switch').prop('disabled', false);
+    $('#mode-smart-message').text('');
+  }, 2000);
+
 }
 
 function sendSwitchSettingState() {

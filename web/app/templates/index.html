@@ -7,34 +7,51 @@
     <div class="row">
         <div class="col-xl-5 card m-2">
             <div class="card-body">
-                <h5 class="card-tile ">Global Setting</h5>
+                <h4 class="card-tile ">Global Setting</h4>
                 <hr>
                 <div class="mx-2">
 
+                    <h5 clas="my-4"> 
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="connection-switch" onchange="SettingConnectionState()">
+                            <label class="form-check-label" for="switch">Connection to ESP</label>
+                            <p id="connection-message"></p>
+                        </div> 
+                    </h5>
+                    <div class='my-4'>
+                        <h5> Data Mode</h5>
 
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="connection-switch" onchange="SettingConnectionState()">
-                        <label class="form-check-label" for="switch">Connection to ESP</label>
-                        <p id="connection-message"></p>
-                    </div> 
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="data-ESP-switch" onchange="SettingDataESP()" disabled>
+                            <label class="form-check-label" for="switch">Use Data from ESP</label>
+                        </div>
 
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="auto-switch" onchange="sendSwitchSettingState()">
-                        <label class="form-check-label" for="switch">Chewbacca Auto Mode</label>
-                    </div> 
-
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="data-ESP-switch" onchange="SettingDataESP()">
-                        <label class="form-check-label" for="switch">Use Data from ESP</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="data-SIM-switch" onchange="SettingDataSIM()">
+                            <label class="form-check-label" for="switch">Use Data from Simulation</label>
+                        </div>
                     </div>
 
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="data-SIM-switch" onchange="SettingDataSIM()">
-                        <label class="form-check-label" for="switch">Use Data from Simulation</label>
+                    <div class='my-4'>
+                        <h5> Chewbacca Mode</h5>
+                    
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="mode-dumb-switch" onchange="SettingModeDumb()" disabled>
+                            <label class="form-check-label" for="switch">Chewbacca Dumb Mode   <span class="mx-2" id="mode-dumb-message"></span></label>
+                            <p class="text-muted"> Consist of advancing till it see a wall, then turn 90 degrees left. Repeat for ever. </p>
+                        </div> 
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="mode-smart-switch" onchange="SettingModeSmart()" disabled>
+                            <label class="form-check-label" for="switch">Chewbacca Smart Mode   <span class="mx-2" id="mode-smart-message"></span></label>
+                            
+                            <p class="text-muted"> Given the previous place, optimize discovering by calculating the area it can cover. </p>
+
+                        </div> 
+
                     </div>
 
-                    <div class="m-2 mt-4">
-                        <h6 class="my-2"> Chewbacca Setting</h6>
+                    <div class="my-4">
+                        <h5 class="my-2"> Chewbacca Setting</h5>
                         <div class="mx-2 d-flex justify-content-between"> 
                             <p> Speed </p>
                             <input type="range" min="0" max="100" value="50" class="slider" id="mySlider">
@@ -51,30 +68,35 @@
         <div class="col-xl-5 card m-2">
        
             <div class="card-body"> 
-                <h5 class="card-tile">Debuging</h5>
+                <h4 class="card-tile">Debuging</h4>
                 <hr>
-    
-                <p> This to manually test the command send to the ESP </p>
-                
-               
-                <div class="m-4">
-                    <p class="my-2"> Chewbacca direct input :</p>
 
-                    <div>
-                        <button class="m-1 btn btn-secondary" onclick="sendMoveForward()">Move Forward</button>
-                        <button class="m-1 btn btn-secondary" onclick="sendMoveBackward()">Move Backward</button>
-                    </div>
-                    <div>
-                        <button class="m-1 btn btn-secondary" onclick="sendMoveRight()">Move Right</button>
-                        <button class="m-1 btn btn-secondary" onclick="sendMoveLeft()">Move Left</button>
-                    </div>
-                    <div>
-                        <button class="m-1 btn btn-secondary" onclick="sendStop()">Stop</button>
+              
+                <div class="mx-2">
+                    <div class="m-2">
+                        <h5 class="my-2"> Chewbacca direct input </h5>
+                        <p> This to manually test the command send to the ESP </p>
+
+                        <div>
+                            <button class="m-1 btn btn-secondary" onclick="sendMoveForward()">Move Forward</button>
+                            <button class="m-1 btn btn-secondary" onclick="sendMoveBackward()">Move Backward</button>
+                        </div>
+                        <div>
+                            <button class="m-1 btn btn-secondary" onclick="sendMoveRight()">Move Right</button>
+                            <button class="m-1 btn btn-secondary" onclick="sendMoveLeft()">Move Left</button>
+                        </div>
+                        <div>
+                            <button class="m-1 btn btn-secondary" onclick="sendStop()">Stop</button>
+                        </div>
+                    </div> 
+                    <hr>
+                    <div class="container">
+                        <h5>Error Log</h5>
+                        <div id="error-container"  class="scrollable-container" style="max-height: 200px; overflow-y: auto;"></div>
+                          <!-- Error messages will be dynamically added here -->
+                        </ul>
                     </div>
                 </div>  
-                
-                      
-                
             </div>
         </div>
     </div>
@@ -86,46 +108,34 @@
                 <hr>
                 <div class="mx-2">
                     <h5> Connection Status   <span class="badge connected-badge"></span></h5>
-                    <div class="m-3">
-                       
-                        <p id="host-ip"></p>
-                        <p id="host-name"></p>
+                    <div class="m-3 d-flex">
+                        <p class="m-2"> Host :  </p>
+                        <p class="m-2" id="host-name"></p>
+                        <p class=" m-2" id="host-ip"></p>
+                        
                     </div>                     
                 </div>
                 <hr>
-
-             
                 <div class="container">
-                    <h5>Error Log</h5>
-                    <div id="error-container"  class="scrollable-container" style="max-height: 200px; overflow-y: auto;"></div>
+                    <h5>Info Log</h5>
+                    <div id="info-container"  class="scrollable-container" style="max-height: 200px; overflow-y: auto;"></div>
                       <!-- Error messages will be dynamically added here -->
-                    </ul>
+               
                 </div>
+
             </div>
         </div>
         <div class="col-xl-5 card m-2">
             <div class="card-body">
-                <h5 class="card-tile">Communication</h5>
+                <h4 class="card-tile">Communication</h4>
                 <hr>
 
  
                 <div class="row">
                     <div id="graph"></div>
                 </div>
-                <hr>
-                <div class="container">
-                    <h5 class="mb-0">
-                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                          Info Log
-                        </button>
-                    </h5>
-                    <div id="collapseOne" class="collapse show" ></div>
-                        <div id="info-container"  class="scrollable-container"  aria-labelledby="info-container" style="max-height: 200px; overflow-y: auto;">
-                            <!-- Error messages will be dynamically added here -->
-  
-                        </div>  
-          
-                    </div>
+               
+                
             </div>
         </div>
     </div>
@@ -133,7 +143,7 @@
     <div class="row">
         <div class="col-xl-5 card m-2">  
             <div class="card-body">
-                <h5 class="card-tile">Chewbacca OutPut</h5>
+                <h4 class="card-tile">Chewbacca OutPut</h4>
                 <hr>
                 <div id="graph-scanned"></div>
             </div>
@@ -141,7 +151,7 @@
 
         <div class="col-xl-5 card m-2">  
             <div class="card-body">
-                <h5 class="card-tile">Chewbacca Input</h5>
+                <h4 class="card-tile">Chewbacca Input</h4>
                 <hr>
                 <div id="graph-scanned"></div>
             </div>
@@ -151,7 +161,7 @@
     <div class="row">
         <div class="col-xl-5 card m-2">  
             <div class="card-body">
-                <h5 class="card-tile">Obstacle Encounter with Noise</h5>
+                <h4 class="card-tile">Obstacle Encounter with Noise</h4>
                 <hr>
                 <div class="row">
                 <div id="graph-obstacle"></div>
@@ -160,7 +170,7 @@
         </div>
         <div class="col-xl-5 card m-2">  
             <div class="card-body">
-                <h5 class="card-tile">Obstacle Error Corrected with SLAM</h5>
+                <h4 class="card-tile">Obstacle Error Corrected with SLAM</h4>
                 <hr>
                 <div class="row">
                 <div id="graph-slam"></div>
@@ -169,7 +179,7 @@
         </div>
         <div class="col-10 card m-2">  
             <div class="card-body">
-                <h5 class="card-tile">Final Map</h5>
+                <h4 class="card-tile">Final Map</h4>
                 <hr>
                 <button class="btn btn-secondary" onclick="kmean()">Run Kmeans on current obstacle</button>
                 <div class="row">

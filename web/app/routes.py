@@ -147,14 +147,13 @@ def stream_errors():
         while True:
             time.sleep(1)
             # Wait for a new error to be added
-            if settingConnection:
-                if len(espT.errors) != 0:
-                    new_error = espT.errors[0]
-                    espT.errors.pop(0)
-                    # If a new error is available, send it to the client as an SSE event
-                    error_time = new_error[0]
-                    error_message = str(new_error[1])
-                    yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
+            if len(espT.errors) != 0:
+                new_error = espT.errors[0]
+                espT.errors.pop(0)
+                # If a new error is available, send it to the client as an SSE event
+                error_time = new_error[0]
+                error_message = str(new_error[1])
+                yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
 
 
     # Return the SSE response
@@ -169,14 +168,13 @@ def stream_info():
         while True:
             time.sleep(1)
             # Wait for a new error to be added
-            if settingConnection:
-                if len(espT.info) != 0:
-                    new_info = espT.info[0]
-                    espT.info.pop(0)
-                    # If a new error is available, send it to the client as an SSE event
-                    error_time = new_info[0]
-                    error_message = str(new_info[1])
-                    yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
+            if len(espT.info) != 0:
+                new_info = espT.info[0]
+                espT.info.pop(0)
+                # If a new error is available, send it to the client as an SSE event
+                error_time = new_info[0]
+                error_message = str(new_info[1])
+                yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
 
 
     # Return the SSE response
