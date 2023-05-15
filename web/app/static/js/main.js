@@ -456,3 +456,57 @@ sourceInfo.addEventListener('open', function(e) {
 sourceInfo.addEventListener('error', function(e) {
   console.log('SSE connection closed');
 }, false);
+
+// create a new EventSource object to listen for server-sent events
+var sourceoutput = new EventSource('/stream-output');
+
+// add an event listener for when a message is received
+sourceoutput.addEventListener('message', function(e) {
+  // parse the message data as a JSON object
+  var error = JSON.parse(e.data);
+  var time = error[0];
+  var message = error[1];
+  var alertDiv = document.createElement("div");
+  alertDiv.classList.add("alert", "alert-info", "mt-2");
+  alertDiv.setAttribute("role", "alert");
+  alertDiv.innerHTML = "<strong>" + time + "s </strong>:  " + message;
+  var container = document.getElementById("output-container");
+  container.insertBefore(alertDiv, container.firstChild);
+}, false);
+
+// add an event listener for when the connection is opened
+sourceoutput.addEventListener('open', function(e) {
+  console.log('SSE connection opened');
+}, false);
+
+// add an event listener for when the connection is closed
+sourceoutput.addEventListener('error', function(e) {
+  console.log('SSE connection closed');
+}, false);
+
+// create a new EventSource object to listen for server-sent events
+var sourceinput = new EventSource('/stream-input');
+
+// add an event listener for when a message is received
+sourceinput.addEventListener('message', function(e) {
+  // parse the message data as a JSON object
+  var error = JSON.parse(e.data);
+  var time = error[0];
+  var message = error[1];
+  var alertDiv = document.createElement("div");
+  alertDiv.classList.add("alert", "alert-info", "mt-2");
+  alertDiv.setAttribute("role", "alert");
+  alertDiv.innerHTML = "<strong>" + time + "s </strong>:  " + message;
+  var container = document.getElementById("input-container");
+  container.insertBefore(alertDiv, container.firstChild);
+}, false);
+
+// add an event listener for when the connection is opened
+sourceinput.addEventListener('open', function(e) {
+  console.log('SSE connection opened');
+}, false);
+
+// add an event listener for when the connection is closed
+sourceinput.addEventListener('error', function(e) {
+  console.log('SSE connection closed');
+}, false);
