@@ -25,8 +25,8 @@ int goToOrientation = 0;
 
 
 const float ACCELERATION_STEPPER = 250.0;
-const float MAX_SPEED_STEPPER = 2000;
-const float CONST_SPEED_STEPPER = 500;
+const float MAX_SPEED_STEPPER = 1000;
+const float CONST_SPEED_STEPPER = 900;
 const int STEPS_PER_REV = 2038;
 const int STEPS_90_DEG = 1740;
 const int16_t  MIN_LIDAR_DISTANCE = 150;  // in mm
@@ -45,15 +45,15 @@ const int MAX_DISTANCE_SONAR = 400;
 #define XSHUT_PIN 3
 
 // Servo settings
-#define servoPin 16
+#define servoPin 15
 
 // Gyro Accel Mag (GAM)
-#define SDA_2 26 // New I2C Data Pin
-#define SCL_2 27 // New I2C Clock Pin
+#define SDA_2 33 // New I2C Data Pin
+#define SCL_2 25 // New I2C Clock Pin
 
 // Pins for left motor
 #define L_IN1 2
-#define L_IN2 0
+#define L_IN2 23
 #define L_IN3 4
 #define L_IN4 16
 
@@ -150,7 +150,6 @@ void setup() {
 }
 
 void setupLidar() {
-  //Serial.begin(115200);
   while (!Serial) delay(10);
 
   Serial.println(F("Adafruit VL53L1X sensor demo"));
@@ -177,11 +176,6 @@ void setupLidar() {
   vl53.setTimingBudget(50);
   Serial.print(F("Timing budget (ms): "));
   Serial.println(vl53.getTimingBudget());
-
-  /*
-  vl.VL53L1X_SetDistanceThreshold(100, 300, 3, 1);
-  vl.VL53L1X_SetInterruptPolarity(0);
-  */
 }
 
 void setupGAM() {
@@ -192,8 +186,7 @@ void setupGAM() {
 
   /* Initialise the sensor */
   if (!gyro.begin(0x21, &Wire1)) {
-    /* There was a problem detecting the FXAS21002C ... check your connections
-     */
+    /* There was a problem detecting the FXAS21002C ... check your connections */
     Serial.println("Ooops, no FXAS21002C detected ... Check your wiring!");
     while (1)
       ;
@@ -255,7 +248,7 @@ void updateSensors() {
   distanceSonarFront = frontUltrasonic.ping_cm();
 
   // Lidar Update
-  rotateServo();
+  //rotateServo();
   readLidar();
 
   // IMU Update
@@ -367,4 +360,5 @@ void Task1code(void* pvParameters) {
 void loop() {
   sendData();
   readData();
+
 }
