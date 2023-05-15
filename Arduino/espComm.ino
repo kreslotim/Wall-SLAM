@@ -360,7 +360,7 @@ void moveLeft() {
 
 void Task1code(void* pvParameters) {
   for (;;) {
-    //action(actionNumber);
+    action(actionNumber);
   }
 }
 
