@@ -71,9 +71,21 @@ class ESP32Connection:
 
                 if data:
                     self.recv_socket.send("200".encode())
+
+                    # TODO INACURATE. ESP OUTPUT UNCLEAR.
+                    orientation= data_decoded[3]
+                    distance = data_decoded[2]
+                    x_car = data_decoded[9]
+                    y_car= data_decoded[10]
+                    obs = self._dataToObstacle(x_car,y_car,distance,orientation)
+                    self.obstacle[obs[0]]= obs[1]
+
+                    # Log it
+                    
                     self.recv_stat.append([1, time.time()-self.time])
                     # Print the received data
                     print(f"Received data: {data_decoded}")
+
         timeOfRep = round( time.time() - self.time, 2)
         self.info.append((timeOfRep, "Listen Thread stopped"))           
 
@@ -174,3 +186,21 @@ class ESP32Connection:
             return False
         err = self.send_socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
         return err == 0
+    
+
+############ DATA METHOD ############
+
+    def _dataToObstacle(self,x_car,y_car, distance,orientation):    
+        # Calculate the x and y coordinates of the obstacle
+        orientation = math.radians(orientation)
+        point_x = x_car + distance * math.cos(orientation)
+        point_y = y_car + distance * math.sin(orientation)
+        obstacle_position = (point_x, point_y)
+        
+        # Check if the obstacle position is already in the dictionary
+        if obstacle_position in self.obstacles:
+            self.obstacles[obstacle_position].add((x_car, y_car))
+        else:
+            self.obstacles[obstacle_position] = {(x_car, y_car)}
+
+        return((x_car,y_car), obstacle_position)
