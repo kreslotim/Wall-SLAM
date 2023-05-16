@@ -23,8 +23,12 @@ class ESP32Connection:
         self.send_socket = None
         self.recv_socket = None
         self.running = False
+
+        # Logging
         self.errors = []
         self.info=[]
+        self.output = []
+        self.input = []
 
         # OUTPUT
         self.obstacle = {}
@@ -67,13 +71,30 @@ class ESP32Connection:
                 # Receive data from the client socket
                 data = self.recv_socket.recv(48)
                 data_decoded = struct.unpack('ffffffffffff', data)
-                print(data)
 
                 if data:
                     self.recv_socket.send("200".encode())
-                    self.recv_stat.append([1, time.time()-self.time])
+
+                    # TODO INACURATE. ESP OUTPUT UNCLEAR.
+                    orientation= data_decoded[3]
+                    distance = data_decoded[2]
+                    x_car = data_decoded[9]
+                    y_car= data_decoded[10]
+                    obs = self._dataToObstacle(x_car,y_car,distance,orientation)
+                    self.obstacle[obs[0]]= obs[1]
+
+                    # Log it
+                    timeOfRep = round( time.time() - self.time, 2)
+                    self.input.append(timeOfRep, " orientation : {orientation}")
+                    self.input.append(timeOfRep, " distance : {distance}")
+                    self.input.append(timeOfRep, " x_car : {x_car}")
+                    self.input.append(timeOfRep, " y_car : {y_car}")
+                    
+                    self.recv_stat.append([1, timeOfRep])
+
                     # Print the received data
                     print(f"Received data: {data_decoded}")
+
         timeOfRep = round( time.time() - self.time, 2)
         self.info.append((timeOfRep, "Listen Thread stopped"))           
 
@@ -85,7 +106,7 @@ class ESP32Connection:
             recv_socket = socket.socket()
             recv_socket.bind(('0.0.0.0', self.recv_port))  # bind to a local address and port
             recv_socket.listen(0)  # start listening for incoming connections
-            recv_socket.settimeout(2.0)  # set a timeout of 10 seconds
+            recv_socket.settimeout(5.0)  # set a timeout of 10 seconds
 
             # wait for a client to connect
             self.recv_socket, client_address = recv_socket.accept()
@@ -97,7 +118,7 @@ class ESP32Connection:
             self.espIP = client_address[0]
 
             self.send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.send_socket.settimeout(2)  # set a timeout of 2 seconds
+            self.send_socket.settimeout(5)  # set a timeout of 2 seconds
             self.send_socket.connect((self.espIP, self.send_port))
             
             timeOfRep = round( time.time() - self.time, 2)
@@ -114,6 +135,7 @@ class ESP32Connection:
 
             self.connected = False
             time.sleep(1)
+    
 
 
     def _send_actionNumber(self, actionNumber):
@@ -138,34 +160,68 @@ class ESP32Connection:
                     self.send_socket.close()
                     self._connect() 
                     self._send_actionNumber(actionNumber)
+                    return 410
+               
 
             except Exception as e:
                 print("Connection error :", e)
                 timeOfRep = round( time.time() - self.time, 2)
                 self.errors.append((timeOfRep, e))
+                return 400
                 
 
             timeOfRep = round( time.time() - self.time, 2)
-            self.info.append((timeOfRep, 'Sent successful : 200')) 
             self.send_stat.append([1,timeOfRep]) # To make a graph about the number of packet send
+            return 200
+        return 400
 
 
 ############ ESP DIRECT COMMAND METHOD ############
 
     def _sendStop(self):
-        self._send_actionNumber(0)
-    
+        repStatut = self._send_actionNumber(0)
+        timeOfRep = round( time.time() - self.time, 2)
+        if repStatut == 200 :
+            self.output.append((timeOfRep, 'Sent stop successful :' + str(repStatut))) 
+        else :
+            self.output.append((timeOfRep, 'Sent Move fail : ' + str(repStatut))) 
+ 
     def _sendMove_Forward(self):
-        self._send_actionNumber(1)
+        repStatut = self._send_actionNumber(1)
+        timeOfRep = round( time.time() - self.time, 2)
+        if repStatut == 200 :
+            self.output.append((timeOfRep, 'Sent Move Forward successful :' + str(repStatut))) 
+        else :
+            self.output.append((timeOfRep, 'Sent Move Forward fail : ' + str(repStatut))) 
+ 
+    
     
     def _sendMove_Backward(self):
-        self._send_actionNumber(2)
+        repStatut = self._send_actionNumber(2)
+        timeOfRep = round( time.time() - self.time, 2)
+        if repStatut == 200 :
+            self.output.append((timeOfRep, 'Sent Move Forward successful :' + str(repStatut))) 
+        else :
+            self.output.append((timeOfRep, 'Sent Move Forward fail  : ' + str(repStatut))) 
+ 
 
     def _sendMove_Right(self):
-        self._send_actionNumber(3)
+        repStatut = self._send_actionNumber(3)
+        timeOfRep = round( time.time() - self.time, 2)
+        if repStatut == 200 :
+            self.output.append((timeOfRep, 'Sent Move Forward successful :' + str(repStatut))) 
+        else :
+            self.output.append((timeOfRep, 'Sent Move Forward fail  : ' + str(repStatut))) 
+ 
 
     def _sendMove_Left(self):
-        self._send_actionNumber(4)
+        repStatut = self._send_actionNumber(4)
+        timeOfRep = round( time.time() - self.time, 2)
+        if repStatut == 200 :
+            self.output.append((timeOfRep, 'Sent Move Forward successful : ' + str(repStatut))) 
+        else :
+            self.output.append((timeOfRep, 'Sent Move Forward fail  : ' +str(repStatut))) 
+ 
 
 ############ HELPER METHOD ############
 
@@ -174,3 +230,21 @@ class ESP32Connection:
             return False
         err = self.send_socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
         return err == 0
+    
+
+############ DATA METHOD ############
+
+    def _dataToObstacle(self,x_car,y_car, distance,orientation):    
+        # Calculate the x and y coordinates of the obstacle
+        orientation = math.radians(orientation)
+        point_x = x_car + distance * math.cos(orientation)
+        point_y = y_car + distance * math.sin(orientation)
+        obstacle_position = (point_x, point_y)
+        
+        # Check if the obstacle position is already in the dictionary
+        if obstacle_position in self.obstacles:
+            self.obstacle[obstacle_position].add((x_car, y_car))
+        else:
+            self.obstacle[obstacle_position] = {(x_car, y_car)}
+
+        return((x_car,y_car), obstacle_position)

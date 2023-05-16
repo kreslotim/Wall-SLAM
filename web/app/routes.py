@@ -91,6 +91,7 @@ def my_python_function(slider):
 
 @main.route('/get-graph-data-com', methods=['POST'])
 def get_graph_data_com():
+    print( "GRAPH " + str(espT.connected))
     if espT.connected:
         rec =espT.recv_stat
         send=  espT.send_stat
@@ -180,7 +181,42 @@ def stream_info():
     # Return the SSE response
     return Response(event_stream(), mimetype='text/event-stream')
 
-# This function simulates adding a new error to the list
-def get_new_error():
-    # In this example, we'll just return a dummy error
-    return {'timestamp': '2023-05-12 14:30:00', 'message': 'Error message'}
+# This route generates a stream of SSE events
+@main.route('/stream-output')
+def stream_output():
+    def event_stream():
+        # Loop indefinitely
+        while True:
+            time.sleep(1)
+            # Wait for a new error to be added
+            if len(espT.output) != 0:
+                new_info = espT.output[0]
+                espT.output.pop(0)
+                # If a new error is available, send it to the client as an SSE event
+                error_time = new_info[0]
+                error_message = str(new_info[1])
+                yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
+
+
+    # Return the SSE response
+    return Response(event_stream(), mimetype='text/event-stream')
+
+# This route generates a stream of SSE events
+@main.route('/stream-input')
+def stream_input():
+    def event_stream():
+        # Loop indefinitely
+        while True:
+            time.sleep(1)
+            # Wait for a new error to be added
+            if len(espT.input) != 0:
+                new_info = espT.input[0]
+                espT.input.pop(0)
+                # If a new error is available, send it to the client as an SSE event
+                error_time = new_info[0]
+                error_message = str(new_info[1])
+                yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
+
+
+    # Return the SSE response
+    return Response(event_stream(), mimetype='text/event-stream')
