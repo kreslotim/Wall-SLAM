@@ -15,23 +15,26 @@ TaskHandle_t Task1;
 sensors_event_t event;
 sensors_event_t aevent, mevent;
 int distanceSonarFront = 0;
-int16_t lidarDistance;
+int16_t lidarDistanceFront;
 float dataSend[12];
 int servoAngle;
 int numberOfConnectionOld = 0;
 float actionNumber = 0;
 float orientation = 0;
 int goToOrientation = 0;
+float x = 0;
+float y = 0;
 
 
 const float ACCELERATION_STEPPER = 250.0;
-const float MAX_SPEED_STEPPER = 1000;
-const float CONST_SPEED_STEPPER = 900;
+const float MAX_SPEED_STEPPER = 2000;
+const float CONST_SPEED_STEPPER = 500;
 const int STEPS_PER_REV = 2038;
 const int STEPS_90_DEG = 1740;
 const int16_t  MIN_LIDAR_DISTANCE = 150;  // in mm
 const int SERVO_INIT_POS = 84;
 const int MAX_DISTANCE_SONAR = 400;
+const float DIST_PER_STEP = 0.06; // in mm per step
 
 #define FULLSTEP 4
 #define HALFSTEP 8
@@ -81,7 +84,7 @@ AccelStepper stepperLeft(FULLSTEP, L_IN1, L_IN3, L_IN2, L_IN4);
 AccelStepper stepperRight(FULLSTEP, R_IN1, R_IN3, R_IN2, R_IN4);
 
 // SSID and password of Wifi connection:
-const char* password = "0123456789";
+const char* password = "0123456789A";
 const char* ssid = "espWifi2";
 
 // Port to send data
@@ -150,6 +153,7 @@ void setup() {
 }
 
 void setupLidar() {
+  //Serial.begin(115200);
   while (!Serial) delay(10);
 
   Serial.println(F("Adafruit VL53L1X sensor demo"));
@@ -176,6 +180,11 @@ void setupLidar() {
   vl53.setTimingBudget(50);
   Serial.print(F("Timing budget (ms): "));
   Serial.println(vl53.getTimingBudget());
+
+  /*
+  vl.VL53L1X_SetDistanceThreshold(100, 300, 3, 1);
+  vl.VL53L1X_SetInterruptPolarity(0);
+  */
 }
 
 void setupGAM() {
@@ -186,7 +195,8 @@ void setupGAM() {
 
   /* Initialise the sensor */
   if (!gyro.begin(0x21, &Wire1)) {
-    /* There was a problem detecting the FXAS21002C ... check your connections */
+    /* There was a problem detecting the FXAS21002C ... check your connections
+     */
     Serial.println("Ooops, no FXAS21002C detected ... Check your wiring!");
     while (1)
       ;
@@ -202,7 +212,7 @@ void setupGAM() {
 
 void readLidar() {
   if (vl53.dataReady()) {
-    lidarDistance = vl53.distance();
+    lidarDistanceFront = vl53.distance();
   }
 }
 
@@ -256,17 +266,17 @@ void updateSensors() {
   accelmag.getEvent(&aevent, &mevent);
   
   // Orientation Update
-  orientation = 180 * atan2(mevent.magnetic.y, mevent.magnetic.x) / PI;
+  orientation = atan2(mevent.magnetic.y, mevent.magnetic.x) * 180 / PI;
 }
 
 void packData() {
   updateSensors();
   dataSend[0] = servo.read();
   dataSend[1] = distanceSonarFront;
-  dataSend[2] = lidarDistance;
-  dataSend[3] = orientation;
-  dataSend[4] = event.gyro.y;
-  dataSend[5] = event.gyro.z;
+  dataSend[2] = lidarDistanceFront;
+  dataSend[3] = orientation + servo.read();
+  dataSend[4] = x;
+  dataSend[5] = y;
   dataSend[6] = aevent.acceleration.x;
   dataSend[7] = aevent.acceleration.y;
   dataSend[8] = aevent.acceleration.z;
@@ -308,6 +318,36 @@ void action(float actionNumber) {
   }
   stepperLeft.runSpeed();
   stepperRight.runSpeed();
+
+    if (goToOrientation == 0) {
+      if(actionNumber == 1){
+        y +=  DIST_PER_STEP; // move north
+      }else if (actionNumber == 2){
+        y -=  DIST_PER_STEP; // move north
+      }
+
+    } else if (goToOrientation == 90) {
+      if(actionNumber == 1){
+        x +=  DIST_PER_STEP; // move west
+      }else if (actionNumber == 2){
+        x -=   DIST_PER_STEP; // move west
+      }
+
+    } else if (goToOrientation == 180) {
+      if(actionNumber == 1){
+        y -=   DIST_PER_STEP; // move south
+      }else if (actionNumber == 2){
+        y +=   DIST_PER_STEP; // move south
+      }
+
+    } else if (goToOrientation == 270){
+      if(actionNumber == 1){
+        x -=  DIST_PER_STEP; // move east
+      }else if (actionNumber == 2){
+        x +=  DIST_PER_STEP; // move east
+
+      }    
+    }
 }
 
 void stopMotors() {
@@ -360,5 +400,4 @@ void Task1code(void* pvParameters) {
 void loop() {
   sendData();
   readData();
-
 }
