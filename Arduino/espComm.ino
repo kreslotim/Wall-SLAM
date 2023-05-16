@@ -256,7 +256,7 @@ void updateSensors() {
   accelmag.getEvent(&aevent, &mevent);
   
   // Orientation Update
-  orientation = atan2(event.gyro.y, event.gyro.x) * 180 / PI;
+  orientation = 180 * atan2(mevent.magnetic.y, mevent.magnetic.x) / PI;
 }
 
 void packData() {
