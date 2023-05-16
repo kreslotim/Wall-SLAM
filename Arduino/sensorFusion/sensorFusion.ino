@@ -22,7 +22,10 @@ float dataSend[12];
 int servoAngle;
 int numberOfConnectionOld = 0;
 float actionNumber = 0;
+float actionData = 0;
+
 float orientationGyro = 0;
+float orientationMag = 0;
 int goToOrientation = 0;
 
 // Position Estimation Using Acceleration
@@ -124,6 +127,7 @@ double theta2;  // Orientation measurement 2
 // State variables
 double x;   // Estimated x position
 double y;   // Estimated y position
+double orientation; // Estimated orientation
 double P;   // Estimated position variance
 
 
@@ -173,26 +177,28 @@ void setup() {
   // Initialize state variables
   x = 0.0;
   y = 0.0;
+  orientation = 0.0;
   P = 1.0;
 
   // Setup core to Move
   xTaskCreatePinnedToCore(
-    Task1code, /* Task function. */
+    threadSteppers, /* Task function. */
     "Task1",   /* name of task. */
     10000,     /* Stack size of task */
     NULL,      /* parameter of the task */
     1,         /* priority of the task */
     &Task1,    /* Task handle to keep track of created task */
     1);        /* pin task to core 0 */
+
   delay(500);
 }
 
 
 void loop() {
-  packData();
+  updateData();
   sendData();
   readData();
-
+  delay(50) // Wait 50ms 
 }
 
 void setupLidar() {
@@ -260,11 +266,12 @@ void readData() {
     Serial.println("New client connected (Recieve)");
     if (recieveClient.connected() && recieveClient.available()) {
       // Read the packed dataRecievd from the socket
-      float dataRecievd[1];
+      float dataRecievd[2];
       recieveClient.read((byte*)dataRecievd, sizeof(dataRecievd));
 
       // Unpack the dataRecievd
       actionNumber = dataRecievd[0];
+      actionData = dataRecievd[1];
 
       // Do something with the decoded angles
       Serial.print("Action recieved: ");
@@ -278,8 +285,6 @@ void readData() {
 }
 
 void sendData() {
-  
-
   if (!sendClient.connected() && sendClient.connect(user_IP, SEND_DATA_PORT)) {
     Serial.println("Connected to server");
   }else {  
@@ -312,35 +317,42 @@ void updateSensors() {
   accelmag.getEvent(&aevent, &mevent);
 
     // Orientation Update Mag
-  headingAngle = atan2(mevent.magnetic.y, mevent.magnetic.x) * 180.0 / PI;
+  orientationMag = atan2(mevent.magnetic.y, mevent.magnetic.x) * 180.0 / PI;
 
   // Adjust the heading angle to the range of 0 to 360 degrees
-  if (headingAngle < 0) {
-    headingAngle += 360.0;
+  if (orientationMag < 0) {
+    orientationMag += 360.0;
   }
   
   // Orientation Update Gyro
   orientationGyro = atan2(event.gyro.y, event.gyro.x) * 180 / PI;
 }
 
-void packData() {
+void updateData() {
   updateSensors();
-  dataSend[0] = servo.read();
-  dataSend[1] = distanceSonarFront;
-  dataSend[2] = lidarDistance;
-  dataSend[3] = orientationGyro;
-  dataSend[4] = event.gyro.y;
-  dataSend[5] = event.gyro.z;
-  dataSend[6] = aevent.acceleration.x;
-  dataSend[7] = aevent.acceleration.y;
-  dataSend[8] = aevent.acceleration.z;
-  dataSend[9] = mevent.magnetic.x;
-  dataSend[10] = mevent.magnetic.y;
-  dataSend[11] = mevent.magnetic.z;
+
+  // Kalman Stuff
   z1 = sqrt(pow(acceleration[0], 2) + pow(acceleration[1], 2) + pow(acceleration[2], 2));
   z2 = (stepperLeft.distanceMoved() + stepperLeft.distanceMoved())/2 ; // Assuming we reset those value after each turn.
   theta1 = orientationGyro;
+  theta2 = orientationMag;
+  
+  // Perform EKF update step with the distance and orientation measurements
+  double z[4] = {z1, z2, theta1, theta2};  // Measurement vector
+  kf.update(z);
 
+  // Get the updated state estimate and variance
+  double state[3];
+  kf.getState(state);
+  x = state[0];
+  y = state[1];
+  orientation = state[2];
+  P = kf.getP();
+
+  dataSend[0] = x;
+  dataSend[1] = y;
+  dataSend[2] = orientation;
+  dataSend[3] = lidarDistance;
 }
 
 void rotateServo(){
@@ -350,78 +362,43 @@ void rotateServo(){
 
 void action(float actionNumber) {
   switch ((int) actionNumber) {
-    case 0:
-      stopMotors();
+    case 0:  // Restart the ESP32 board
+      ESP.restart();
       break;
 
-    case 1:
-      moveForward();
+    case 1: // Movement, take a speed
+      move(actionData);
       break;
 
-    case 2:
-      moveBackward();
-      break;
+    case 2: // Turn, take an angle
+      break;  // TODO 
 
-    case 3:
-      moveRight();
-      break;
+    case 3: // Algorithm to use for auto movement  
+      break; // TODO Implement it
 
-    case 4:
-      moveLeft();
+    case 4: // Move Servo at certain angle
+      // TODO Implement it
       break;
 
     default:
       Serial.println("No output for the actionNumber");
       break;
   }
-  stepperLeft.runSpeed();
-  stepperRight.runSpeed();
 }
 
-void stopMotors() {
-  stepperLeft.setSpeed(0);   
-  stepperRight.setSpeed(0);
+
+void move(int speed) {
+  float speedScaled = speed % 1000;
+  stepperLeft.setSpeed(speedScaled); 
+  stepperRight.setSpeed(speedScaled);
 }
 
-void moveForward() {
-  stepperLeft.setSpeed(-CONST_SPEED_STEPPER); 
-  stepperRight.setSpeed(CONST_SPEED_STEPPER);
-}
-
-void moveBackward() {
-  stepperLeft.setSpeed(CONST_SPEED_STEPPER); 
-  stepperRight.setSpeed(-CONST_SPEED_STEPPER);
-}
-
-void moveRight() {
-  goToOrientation = (int)(orientationGyro + 90) % 360;
-  Serial.println("goToOrientation : ");
-  Serial.println(goToOrientation);
-  while( goToOrientation !=  (int) orientationGyro) {
-    updateSensors();
-    Serial.println("Orientation : ");
-    Serial.println(orientationGyro);
-    stepperLeft.setSpeed(-CONST_SPEED_STEPPER); 
-    stepperRight.setSpeed(-CONST_SPEED_STEPPER);
-    stepperLeft.runSpeed();
-    stepperRight.runSpeed();    
-  }
-}
-
-void moveLeft() {
-  goToOrientation = (int) (orientationGyro - 90) % 360;
-  while(goToOrientation !=  (int) orientationGyro) {
-    updateSensors();
-    stepperLeft.setSpeed(CONST_SPEED_STEPPER); 
-    stepperRight.setSpeed(CONST_SPEED_STEPPER);
-    stepperLeft.runSpeed();
-    stepperRight.runSpeed();
-  }
-}
-
-void Task1code(void* pvParameters) {
+void threadSteppers(void* pvParameters) {
   for (;;) {
     action(actionNumber);
+
+    stepperLeft.runSpeed();
+    stepperRight.runSpeed();
   }
 }
 
