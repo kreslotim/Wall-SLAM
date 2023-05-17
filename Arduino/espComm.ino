@@ -370,7 +370,27 @@ void action(float actionNumber) {
 }
 
 void mapping(){
-
+    if (sonar.ping_cm() < minSonarDistance) {
+    turnLeft();
+    orientation = (orientation + 90) % 360;
+    servo.write(0);
+    stepperRight.setCurrentPosition(0);
+    // constantly plot 
+    while (sonar.ping_cm() < minSonarDistance && vl53.distance() < 20) {
+      moveForward();
+        if (orientation == 0) {
+        y +=  stepperRight.currentPosition() * DIST_PER_STEP; // move north
+      } else if (orientation == 90) {
+        x -= stepperRight.currentPosition() * DIST_PER_STEP; // move west
+      } else if (orientation == 180) {
+        y -= stepperRight.currentPosition() * DIST_PER_STEP; // move south
+      } else {
+        x += stepperRight.currentPosition() * DIST_PER_STEP; // move east
+      }  
+    String output = String((int) 0 + orientation) + "," + String((int)vl53.distance()) + "," + String((int)x) +","+ String((int)y);
+    }
+    turnRight();
+  }
 }
 
 void stopMotors() {
