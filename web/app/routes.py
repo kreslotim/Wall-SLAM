@@ -143,7 +143,7 @@ def stream_errors():
         error = []
         # Loop indefinitely
         while True:
-            time.sleep(1)
+            
             # Wait for a new error to be added
             if len(espT.errors) != 0:
                 new_error = espT.errors[0]
@@ -241,17 +241,7 @@ def stream_noisy_obstacle():
                     if not (distance == -1):
                         yield 'data: {}\n\n'.format(json.dumps((x_car, y_car,x_obs,y_obs)))
     
-            else:
-                print("Adding data")
-                new_info = dataD._randomlyFill()
-                timeOfObs = new_info[0]
-                x_car = new_info[1]
-                y_car = new_info[2]
-                distance = new_info[3]
-                orientation = new_info[4]
-                x_obs,y_obs = _dataToObstacle(x_car,y_car,distance,orientation)
-                if not (distance == -1):
-                    yield 'data: {}\n\n'.format(json.dumps((x_car, y_car,x_obs,y_obs)))
+
                 
 
     # Return the SSE response

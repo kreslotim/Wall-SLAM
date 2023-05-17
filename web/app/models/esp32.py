@@ -81,16 +81,13 @@ class ESP32Connection:
                     x_car = data_decoded[5]
                     y_car= data_decoded[6]
                     timeOfReading= data_decoded[1]
-                    self.obstacle.append[timeOfReading,x_car,y_car,distance,orientation]
+                    print(data_decoded)
+                    self.obstacle.append((timeOfReading,x_car,y_car,distance,orientation))
 
                     # Log it
                     timeOfRep = round( time.time() - self.time, 2)
-                    self.input.append(timeOfRep, " orientation : {orientation}")
-                    self.input.append(timeOfRep, " distance : {distance}")
-                    self.input.append(timeOfRep, " x_car : {x_car}")
-                    self.input.append(timeOfRep, " y_car : {y_car}")
-                    
-                    self.recv_stat.append([1, timeOfRep])
+        
+                    #self.recv_stat.append([1, timeOfRep])
 
                     # Print the received data
                     print(f"Received data: {data_decoded}")
