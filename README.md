@@ -1,10 +1,7 @@
 # Wall-SLAM - Simultaneous Localization And Mapping
 Timofey Kreslo, Sylvain Pichot, Finn Mac Namara, Alonso Coaguila, Florian Dejean
-## Description of the project & overview
+June 2023
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/e592ad42-2deb-4919-802d-11c624c35482" width = 600 />
-
-
-March 2023
 
 ## Contents
     • 0.1 Description and motivation of the project  . . . . . . . . . . . . . . . . . . . . . . 1
@@ -17,7 +14,7 @@ March 2023
     • 0.8 Progress documentation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
     • 0.9 References . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
 
-## 0.1 Description and motivation of the project
+## 0.1 Description of the project and overview
 Our project involves building a robot that will perform Simultaneous Localization and Mapping
 (SLAM). SLAM is a crucial technology for robotic systems that need to move in dynamic and
 unknown environments. Robots equipped with SLAM can map and navigate their surroundings
