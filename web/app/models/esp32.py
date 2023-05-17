@@ -82,9 +82,10 @@ class ESP32Connection:
                     y_car= data_decoded[6]
                     timeOfReading= data_decoded[1]
                     print(data_decoded)
+                    
                     self.obstacle.append((timeOfReading,x_car,y_car,distance,orientation))
-                    self.output.append((timeOfRep, 'Position ', x_car, y_car))  
-                    self.output.append((timeOfRep, 'Obstacle found at ', distance, ' mm, looking at ', orientation)) 
+                    self.output.append((timeOfReading, 'Position ', x_car, y_car))  
+                    self.output.append((timeOfReading, 'Obstacle found at ', distance, ' mm, looking at ', orientation)) 
                     # Log it
                     timeOfRep = round( time.time() - self.time, 2)
         
