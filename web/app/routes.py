@@ -3,6 +3,8 @@ from flask import Response, render_template, jsonify, request
 from flask import Blueprint
 import time
 import json
+import random
+import math
 
 from app.models.esp32 import ESP32Connection
 from app.models.dummyData import DummyData
@@ -105,10 +107,6 @@ def get_graph_data_com():
         return jsonify(x_sent=x_sent, y_sent=y_sent, x_received=x_received,y_received=y_received)
     
     return jsonify()
-@main.route('/get-graph-data-obstacle', methods=['POST'])
-def get_graph_data_obstacle():
-    data = {}
-    return jsonify(data)
 
 @main.route('/get-status-value', methods=['GET'])
 def get_status_value():
@@ -136,7 +134,6 @@ def update_switch_state_data():
     settingConnection = (sSettingConnection == "true")
 
     return jsonify({'success': True})
-
 
 
 # This route generates a stream of SSE events
@@ -220,3 +217,50 @@ def stream_input():
 
     # Return the SSE response
     return Response(event_stream(), mimetype='text/event-stream')
+
+
+# This route generates a stream of SSE events
+@main.route('/stream-noisy-obstacle')
+def stream_noisy_obstacle():
+    def event_stream():
+        # Loop indefinitely
+        while True:
+            time.sleep(1)
+            # Wait for a new error to be added
+            if espT.connected:
+                if len(espT.obstacle) != 0:
+                    new_info = espT.obstacle[0]
+                    espT.obstacle.pop(0)
+                    # If a new error is available, send it to the client as an SSE event
+                    timeOfObs = new_info[0]
+                    x_car = new_info[1]
+                    y_car = new_info[2]
+                    distance = new_info[3]
+                    orientation = new_info[4]
+                    x_obs,y_obs = _dataToObstacle(x_car,y_car,distance,orientation)
+                    if not (distance == -1):
+                        yield 'data: {}\n\n'.format(json.dumps((x_car, y_car,x_obs,y_obs)))
+    
+            else:
+                print("Adding data")
+                new_info = dataD._randomlyFill()
+                timeOfObs = new_info[0]
+                x_car = new_info[1]
+                y_car = new_info[2]
+                distance = new_info[3]
+                orientation = new_info[4]
+                x_obs,y_obs = _dataToObstacle(x_car,y_car,distance,orientation)
+                if not (distance == -1):
+                    yield 'data: {}\n\n'.format(json.dumps((x_car, y_car,x_obs,y_obs)))
+                
+
+    # Return the SSE response
+    return Response(event_stream(), mimetype='text/event-stream')
+
+
+def _dataToObstacle(x_car,y_car, distance,orientation):    
+    # Calculate the x and y coordinates of the obstacle
+    orientation = math.radians(orientation)
+    point_x = x_car + distance * math.cos(orientation)
+    point_y = y_car + distance * math.sin(orientation)
+    return(point_x,point_y)

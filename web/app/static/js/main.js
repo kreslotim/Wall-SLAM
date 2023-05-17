@@ -168,7 +168,7 @@ $(document).ready(function() {
   };
 
   var data = [carTrace, obstacleTrace];
-  Plotly.newPlot('graph-obstacle', data, layout);
+  Plotly.newPlot('graph-obstacle1', data, layout);
 
   function updateGraph() {
     $.ajax({
@@ -185,7 +185,7 @@ $(document).ready(function() {
         var obstacleY = obstacleData.map(function(obstacle) {
           return obstacle[1];
         });
-        Plotly.extendTraces('graph-obstacle', {x: [obstacleX], y: [obstacleY]}, [1]);
+        Plotly.extendTraces('graph-obstacle1', {x: [obstacleX], y: [obstacleY]}, [1]);
 
         // Update the layout with the obstacle shapes
         layout.shapes = obstacleData.map(function(obstacle) {
@@ -209,13 +209,60 @@ $(document).ready(function() {
         // Update the car trace data
         carTrace.x = [carPosition[0]];
         carTrace.y = [carPosition[1]];
-        Plotly.update('graph-obstacle', data, layout);
+        Plotly.update('graph-obstacle1', data, layout);
       }
     
     });
   }
-  setInterval(updateGraph, 10000);
+  setInterval(updateGraph, 1000);
 });
+
+     // EventSource for receiving SSE events
+     var eventSource = new EventSource('/stream-noisy-obstacle');
+
+     // Plotly graph initialization
+     var data = [{
+       x: [],
+       y: [],
+       mode: 'markers+lines',
+       type: 'scatter',
+       marker: {
+         size: 5,
+         color: 'red',
+         symbol: 'circle'
+       }
+     }, {
+       x: [],
+       y: [],
+       mode: 'markers',
+       type: 'scatter',
+       marker: {
+         size: 10,
+         color: 'blue',
+         symbol: 'circle-open'
+       }
+     }];
+ 
+     var layout = {
+       title: 'Obstacle Graph',
+       xaxis: { title: 'X Coordinate' },
+       yaxis: { title: 'Y Coordinate' }
+     };
+ 
+     Plotly.newPlot('graph-obstacle', data, layout);
+ 
+     // Event listener for SSE events
+     eventSource.onmessage = function(event) {
+       var eventData = JSON.parse(event.data);
+       var x_car = eventData[0];
+       var y_car = eventData[1];
+       var x_obs = eventData[2];
+       var y_obs = eventData[3];
+ 
+       // Update graph data
+       Plotly.extendTraces('graph-obstacle', { x: [[x_car], [x_obs]], y: [[y_car], [y_obs]] }, [0, 1]);
+     };
+   
 
 
 /* --------------- Connection Status Checker --------------- */
