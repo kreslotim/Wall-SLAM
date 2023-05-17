@@ -45,12 +45,9 @@ def run_python_function():
     result = my_python_function(slider_value)
     return jsonify(result=result)
 
-
 @main.route('/map-kmean', methods=['POST'])
 def map_kmean():
-    print("generate Kmean")
-    
-    
+    print("generate Kmean")    
 
 @main.route('/move-forward', methods=['POST'])
 def move_forward():
@@ -143,7 +140,7 @@ def stream_errors():
         error = []
         # Loop indefinitely
         while True:
-            
+            time.sleep(1)
             # Wait for a new error to be added
             if len(espT.errors) != 0:
                 new_error = espT.errors[0]
@@ -164,7 +161,7 @@ def stream_info():
         error = []
         # Loop indefinitely
         while True:
-            time.sleep(1)
+            time.sleep(0.1)
             # Wait for a new error to be added
             if len(espT.info) != 0:
                 new_info = espT.info[0]
@@ -184,7 +181,7 @@ def stream_output():
     def event_stream():
         # Loop indefinitely
         while True:
-            time.sleep(1)
+            time.sleep(0.1)
             # Wait for a new error to be added
             if len(espT.output) != 0:
                 new_info = espT.output[0]
@@ -204,7 +201,7 @@ def stream_input():
     def event_stream():
         # Loop indefinitely
         while True:
-            time.sleep(1)
+            time.sleep(0.1)
             # Wait for a new error to be added
             if len(espT.input) != 0:
                 new_info = espT.input[0]
@@ -218,14 +215,13 @@ def stream_input():
     # Return the SSE response
     return Response(event_stream(), mimetype='text/event-stream')
 
-
 # This route generates a stream of SSE events
 @main.route('/stream-noisy-obstacle')
 def stream_noisy_obstacle():
     def event_stream():
         # Loop indefinitely
         while True:
-            time.sleep(1)
+            time.sleep(0.1)
             # Wait for a new error to be added
             if espT.connected:
                 if len(espT.obstacle) != 0:
@@ -241,12 +237,21 @@ def stream_noisy_obstacle():
                     if not (distance == -1):
                         yield 'data: {}\n\n'.format(json.dumps((x_car, y_car,x_obs,y_obs)))
     
-
+            elif settingDataSIM:
+                print("Adding data")
+                new_info = dataD._randomlyFill()
+                timeOfObs = new_info[0]
+                x_car = new_info[1]
+                y_car = new_info[2]
+                distance = new_info[3]
+                orientation = new_info[4]
+                x_obs,y_obs = _dataToObstacle(x_car,y_car,distance,orientation)
+                if not (distance == -1):
+                    yield 'data: {}\n\n'.format(json.dumps((x_car, y_car,x_obs,y_obs)))
                 
 
     # Return the SSE response
     return Response(event_stream(), mimetype='text/event-stream')
-
 
 def _dataToObstacle(x_car,y_car, distance,orientation):    
     # Calculate the x and y coordinates of the obstacle
