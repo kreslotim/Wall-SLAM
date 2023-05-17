@@ -418,4 +418,5 @@ void Task1code(void* pvParameters) {
 void loop() {
   sendData();
   readData();
+  delay(10)
 }
