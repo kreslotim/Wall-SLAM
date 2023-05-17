@@ -1,6 +1,10 @@
-# CS-358 Making Intelligent Things
-## Project : Wall-SLAM - Simultaneous Localization And Mapping
+# Wall-SLAM - Simultaneous Localization And Mapping
 Timofey Kreslo, Sylvain Pichot, Finn Mac Namara, Alonso Coaguila, Florian Dejean
+## Overview
+![photo_2023-05-17_14-54-05](https://github.com/kreslotim/Wall-SLAM/assets/56829239/e592ad42-2deb-4919-802d-11c624c35482)
+
+
+
 
 March 2023
 
