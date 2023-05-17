@@ -1,6 +1,6 @@
 # Wall-SLAM - Simultaneous Localization And Mapping
 Timofey Kreslo, Sylvain Pichot, Finn Mac Namara, Alonso Coaguila, Florian Dejean
-## Overview
+## Description & Overview
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/e592ad42-2deb-4919-802d-11c624c35482" width = 600 />
 
 
@@ -32,8 +32,6 @@ as the motor control system, the ultrasonic sensor system, and the Wi-Fi communi
 
 Overall, the project consists of deploying an autonomous robot that will map its surrounding
 area using SLAM algorithm with an end goal of displaying a cohesive 2D-map of the area.
-
-<img align = "center" src = "https://user-images.githubusercontent.com/56829239/232311084-90cc7f72-1b31-460a-8c03-257f2a87a241.png" width = 400 />
 
 ## 0.2 How are we going to build it ?
 ### Obstacle detection
