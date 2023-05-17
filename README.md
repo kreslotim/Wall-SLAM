@@ -17,6 +17,11 @@ June 2023
     • 0.9 References . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
 
 ## 0.1 Description of the project and overview
+Wall-SLAM is a project that we have elaborated within the course CS-358 Making Intelligent Things, 
+under the direction Prof. Koch, and under the supervision of Federico Stella and Anirudhh Ramesh.
+
+It is recommended to read our [project proposal](https://github.com/kreslotim/Wall-SLAM/blob/main/proposal/proposal.md), before diving into the description. 
+
 Our project involves building a robot that will perform Simultaneous Localization and Mapping
 (SLAM). SLAM is a crucial technology for robotic systems that need to move in dynamic and
 unknown environments. Robots equipped with SLAM can map and navigate their surroundings
