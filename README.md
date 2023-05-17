@@ -1,6 +1,9 @@
 # Wall-SLAM - Simultaneous Localization And Mapping
 Timofey Kreslo, Sylvain Pichot, Finn Mac Namara, Alonso Coaguila, Florian Dejean
 ## Overview
+![photo_2023-05-17_14-54-05](https://github.com/kreslotim/Wall-SLAM/assets/56829239/502561f9-7e10-4d10-91e3-ae0a18ecaca6)
+
+
 
 March 2023
 
