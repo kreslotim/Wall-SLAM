@@ -9,8 +9,6 @@
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 #include <AccelStepper.h>
-#include <WiFiUdp.h>
-
 
 TaskHandle_t Task1;
 
@@ -311,6 +309,9 @@ void rotateServo() {
 
 void action(float actionNumber) {
   switch ((int)actionNumber) {
+    case -1:
+      mapping();
+      return;
     case 0:
       stopMotors();
       break;
@@ -368,6 +369,10 @@ void action(float actionNumber) {
   }
 }
 
+void mapping(){
+
+}
+
 void stopMotors() {
   stepperLeft.setSpeed(0);
   stepperRight.setSpeed(0);
@@ -418,5 +423,5 @@ void Task1code(void* pvParameters) {
 void loop() {
   sendData();
   readData();
-  delay(10)
+  delay(10);
 }
