@@ -4,16 +4,19 @@ import struct
 import threading
 import math
 import random
-
+import serial
+import time
 
 
 class ESP32Connection:
-    def __init__(self, send_port, recv_port):
+    def __init__(self, com_port, baud_port):
         print("Establishing Connection")
 
+        self.ser = serial.Serial(com_port, baud_port, timeout=1)
+
         # INPUT
-        self.send_port = send_port
-        self.recv_port = recv_port
+        self.com_port = com_port
+        self.baud_port = baud_port
 
         # Connection variable
         self.espIP = None
