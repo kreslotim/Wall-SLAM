@@ -9,6 +9,8 @@
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 #include <AccelStepper.h>
+#include <WiFiUdp.h>
+
 
 TaskHandle_t Task1;
 
@@ -18,7 +20,7 @@ int distanceSonarFront = 0;
 int16_t lidarDistanceFront;
 int16_t lidarDistanceBack;
 float dataSend[12];
-int servoAngle;
+int servoAngle=1;
 int numberOfConnectionOld = 0;
 float actionNumber = 0;
 float orientation = 0;
@@ -27,6 +29,7 @@ float x = 0;
 float y = 0;
 unsigned long startTime; // Variable to store the start time
 unsigned long elapsedTime;
+int direction = 1;
 
 const float ACCELERATION_STEPPER = 250.0;
 const float MAX_SPEED_STEPPER = 2000;
@@ -34,6 +37,7 @@ const float CONST_SPEED_STEPPER = 500;
 const int STEPS_PER_REV = 2038;
 const int STEPS_90_DEG = 1740;
 const int16_t MIN_LIDAR_DISTANCE = 150;  // in mm
+const int16_t MIN_SONAR_DISTANCE = 15;  // in cm
 const int SERVO_INIT_POS = 84;
 const int MAX_DISTANCE_SONAR = 400;
 const float DIST_PER_STEP = 0.06;  // in mm per step
@@ -92,6 +96,7 @@ NewPing frontUltrasonic(TRIG_PIN, ECHO_PIN, MAX_DISTANCE_SONAR);
 // Create instances of stepper motors
 AccelStepper stepperLeft(FULLSTEP, L_IN1, L_IN3, L_IN2, L_IN4);
 AccelStepper stepperRight(FULLSTEP, R_IN1, R_IN3, R_IN2, R_IN4);
+
 
 // SSID and password of Wifi connection:
 const char* password = "0123456789A";
@@ -303,19 +308,20 @@ void packData() {
 }
 
 void rotateServo() {
-  servoAngle = (servoAngle + 1) % 180;
+  if (servoAngle >= 180 || servoAngle <= 0) direction = -direction;
+  servoAngle += direction;
   servo.write(servoAngle);
+
 }
 
 void action(float actionNumber) {
   switch ((int)actionNumber) {
     case -1:
-      mapping();
-      return;
+      dumbMapping();
+      break;
     case 0:
       stopMotors();
       break;
-
     case 1:
       moveForward();
       break;
@@ -336,101 +342,75 @@ void action(float actionNumber) {
       Serial.println("No output for the actionNumber");
       break;
   }
-  stepperLeft.runSpeed();
-  stepperRight.runSpeed();
-
-  if (goToOrientation == 0) {
-    if (actionNumber == 1) {
-      y += DIST_PER_STEP;  // move north
-    } else if (actionNumber == 2) {
-      y -= DIST_PER_STEP;  // move north
-    }
-
-  } else if (goToOrientation == 90) {
-    if (actionNumber == 1) {
-      x += DIST_PER_STEP;  // move west
-    } else if (actionNumber == 2) {
-      x -= DIST_PER_STEP;  // move west
-    }
-
-  } else if (goToOrientation == 180) {
-    if (actionNumber == 1) {
-      y -= DIST_PER_STEP;  // move south
-    } else if (actionNumber == 2) {
-      y += DIST_PER_STEP;  // move south
-    }
-
-  } else if (goToOrientation == 270) {
-    if (actionNumber == 1) {
-      x -= DIST_PER_STEP;  // move east
-    } else if (actionNumber == 2) {
-      x += DIST_PER_STEP;  // move east
-    }
-  }
 }
 
-void mapping(){
-    if (sonar.ping_cm() < minSonarDistance) {
-    turnLeft();
-    orientation = (orientation + 90) % 360;
-    servo.write(0);
-    stepperRight.setCurrentPosition(0);
-    // constantly plot 
-    while (sonar.ping_cm() < minSonarDistance && vl53.distance() < 20) {
-      moveForward();
-        if (orientation == 0) {
-        y +=  stepperRight.currentPosition() * DIST_PER_STEP; // move north
-      } else if (orientation == 90) {
-        x -= stepperRight.currentPosition() * DIST_PER_STEP; // move west
-      } else if (orientation == 180) {
-        y -= stepperRight.currentPosition() * DIST_PER_STEP; // move south
-      } else {
-        x += stepperRight.currentPosition() * DIST_PER_STEP; // move east
-      }  
-    String output = String((int) 0 + orientation) + "," + String((int)vl53.distance()) + "," + String((int)x) +","+ String((int)y);
-    }
-    turnRight();
+void dumbMapping(){
+  moveForward();
+  if (distanceSonarFront < MIN_SONAR_DISTANCE) {
+      moveLeft();
   }
 }
 
 void stopMotors() {
   stepperLeft.setSpeed(0);
   stepperRight.setSpeed(0);
+  stepperLeft.runSpeed();
+  stepperRight.runSpeed();
 }
 
 void moveForward() {
   stepperLeft.setSpeed(-CONST_SPEED_STEPPER);
   stepperRight.setSpeed(CONST_SPEED_STEPPER);
+   if (goToOrientation == 0) {
+      y += DIST_PER_STEP;  // move north
+  } else if (goToOrientation == 90) {
+      x += DIST_PER_STEP;  // move west
+  } else if (goToOrientation == 180) {
+      y -= DIST_PER_STEP;  // move south
+  } else if (goToOrientation == 270) {
+      x -= DIST_PER_STEP;  // move east
+  }
+  stepperLeft.runSpeed();
+  stepperRight.runSpeed();
 }
 
 void moveBackward() {
   stepperLeft.setSpeed(CONST_SPEED_STEPPER);
   stepperRight.setSpeed(-CONST_SPEED_STEPPER);
+  if (goToOrientation == 0) {
+      y -= DIST_PER_STEP;  // move north
+  } else if (goToOrientation == 90) {
+      x -= DIST_PER_STEP;  // move west
+  } else if (goToOrientation == 180) {
+      y += DIST_PER_STEP;  // move south
+  } else if (goToOrientation == 270) {
+      x += DIST_PER_STEP;  // move east
+  }
+  stepperLeft.runSpeed();
+  stepperRight.runSpeed();
 }
 
 void moveRight() {
-  goToOrientation = (int)(orientation + 90) % 360;
-  Serial.println("goToOrientation : ");
-  Serial.println(goToOrientation);
-  while (goToOrientation != (int)orientation) {
-    updateSensors();
-    Serial.println("Orientation : ");
-    Serial.println(orientation);
-    stepperLeft.setSpeed(-CONST_SPEED_STEPPER);
-    stepperRight.setSpeed(-CONST_SPEED_STEPPER);
-    stepperLeft.runSpeed();
-    stepperRight.runSpeed();
+  goToOrientation = (int)(goToOrientation + 90) % 360;
+  stepperLeft.setCurrentPosition(0);
+  stepperRight.setCurrentPosition(0);
+  stepperLeft.move(-STEPS_90_DEG);  // turn right 90 degrees
+  stepperRight.move(-STEPS_90_DEG);
+  while (stepperLeft.distanceToGo() != 0 || stepperRight.distanceToGo() != 0) {
+    stepperLeft.run();
+    stepperRight.run();
   }
 }
 
 void moveLeft() {
-  goToOrientation = (int)(orientation - 90) % 360;
-  while (goToOrientation != (int)orientation) {
-    updateSensors();
-    stepperLeft.setSpeed(CONST_SPEED_STEPPER);
-    stepperRight.setSpeed(CONST_SPEED_STEPPER);
-    stepperLeft.runSpeed();
-    stepperRight.runSpeed();
+  goToOrientation = (int)(goToOrientation - 90) % 360;
+  stepperLeft.setCurrentPosition(0);
+  stepperRight.setCurrentPosition(0);
+  stepperLeft.move(STEPS_90_DEG);  // turn right 90 degrees
+  stepperRight.move(STEPS_90_DEG);
+  while (stepperLeft.distanceToGo() != 0 || stepperRight.distanceToGo() != 0) {
+    stepperLeft.run();
+    stepperRight.run();
   }
 }
 
