@@ -8,12 +8,18 @@ import math
 
 from app.models.esp32 import ESP32Connection
 from app.models.dummyData import DummyData
+from app.models.mapK import ClusterChart
 
 main = Blueprint('main', __name__)
 
 ip="168.20.13.1"
 recv_port = 8888
 send_port = 8889
+
+# Initial robot position and obstacle data
+robotX = 0
+robotY = 0
+obstacles = []
 
 startTime= time.time()
 espT = ESP32Connection(send_port=send_port,recv_port=recv_port)
@@ -253,9 +259,81 @@ def stream_noisy_obstacle():
     # Return the SSE response
     return Response(event_stream(), mimetype='text/event-stream')
 
+# This route generates a stream of SSE events
+@main.route('/stream-map')
+def stream_map():
+    def event_stream():
+        # Loop indefinitely
+        while True:
+            time.sleep(0.1)
+            # Wait for a new error to be added
+            if espT.connected:
+                if len(espT.obstacle) != 0:
+                    new_info = espT.obstacle[0]
+                    espT.obstacle.pop(0)
+                    # If a new error is available, send it to the client as an SSE event
+                    timeOfObs = new_info[0]
+                    x_car = new_info[1]
+                    y_car = new_info[2]
+                    distance = new_info[3]
+                    orientation = new_info[4]
+                    x_obs,y_obs = _dataToObstacle(x_car,y_car,distance,orientation)
+                    if not (distance == -1):
+                        yield 'data: {}\n\n'.format(json.dumps((x_car, y_car,x_obs,y_obs)))
+    
+            elif settingDataSIM:
+                print("Adding data")
+                new_info = dataD._randomlyFill()
+                timeOfObs = new_info[0]
+                x_car = new_info[1]
+                y_car = new_info[2]
+                distance = new_info[3]
+                orientation = new_info[4]
+                x_obs,y_obs = _dataToObstacle(x_car,y_car,distance,orientation)
+                if not (distance == -1):
+                    yield 'data: {}\n\n'.format(json.dumps((x_car, y_car,x_obs,y_obs)))
+                
+
+    # Return the SSE response
+    return Response(event_stream(), mimetype='text/event-stream')
+
+
+@main.route('/navigate', methods=['POST'])
+def navigate():
+    global robotX, robotY, obstacles
+    print("ubhhhh")
+
+    destination = request.json
+
+    # Update the robot position
+    robotX = destination['x']
+    robotY = destination['y']
+
+    # Update the obstacle data
+    obstacles = destination['obstacles']
+
+    # Prepare the response
+    response = {
+        'robotX': robotX,
+        'robotY': robotY,
+        'obstacles': obstacles
+    }
+
+    return jsonify(response)
+
+
 def _dataToObstacle(x_car,y_car, distance,orientation):    
     # Calculate the x and y coordinates of the obstacle
     orientation = math.radians(orientation)
     point_x = x_car + distance * math.cos(orientation)
     point_y = y_car + distance * math.sin(orientation)
     return(point_x,point_y)
+
+
+@main.route('/refresh_map',methods=['GET'])
+def refresh_map():
+    print("rannn")
+    # Code to generate or fetch the updated SVG map
+    # Replace the following line with your logic to generate the updated map
+    cluster_chart  =  ClusterChart(num_clusters=2)
+    return cluster_chart.generate_chart_json()

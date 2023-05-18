@@ -92,7 +92,8 @@ function sendMoveLeft() {
 
 
 /* --------------- Graph Function --------------- */
-   
+  
+// Com graph TODO FIX ME
 $(document).ready(function() {
   
   var layout = {
@@ -129,94 +130,8 @@ $(document).ready(function() {
   setInterval(updateGraph, 10000);
 });
 
+// Noise Obstacle Map
 $(document).ready(function() {
-
-  var layout = {
-    width: 500,
-    height: 500,
-    xaxis: {
-      title: 'X position',
-      autorange: true,
-    },
-    yaxis: {
-      title: 'Y position',
-      autorange: true,
-    },
-    shapes: []
-  };
-
-  // Define the data trace for the car position
-  var carTrace = {
-    x: [0],
-    y: [0],
-    mode: 'markers',
-    marker: {
-      size: 10,
-      color: 'red'
-    }
-  };
-
-  // Define the data trace for the obstacles
-  var obstacleTrace = {
-    x: [],
-    y: [],
-    mode: 'markers',
-    marker: {
-      size: 7,
-      color: 'blue'
-    }
-  };
-
-  var data = [carTrace, obstacleTrace];
-  Plotly.newPlot('graph-obstacle1', data, layout);
-
-  function updateGraph() {
-    $.ajax({
-      url: '/get-graph-data-obstacle',
-      type: 'POST',
-      success: function(response) {
-             // Extract the obstacle data from the response
-        var obstacleData = response.obstacles;
-        
-        // Update the obstacle trace data
-        var obstacleX = obstacleData.map(function(obstacle) {
-          return obstacle[0];
-        });
-        var obstacleY = obstacleData.map(function(obstacle) {
-          return obstacle[1];
-        });
-        Plotly.extendTraces('graph-obstacle1', {x: [obstacleX], y: [obstacleY]}, [1]);
-
-        // Update the layout with the obstacle shapes
-        layout.shapes = obstacleData.map(function(obstacle) {
-          return {
-            type: 'circle',
-            xref: 'x',
-            yref: 'y',
-            x0: obstacle[0] - obstacle[2],
-            y0: obstacle[1] - obstacle[2],
-            x1: obstacle[0] + obstacle[2],
-            y1: obstacle[1] + obstacle[2],
-            line: {
-              color: 'blue'
-            }
-          };
-        });
-
-        // Extract the car position data from the response
-        var carPosition = response.carPosition;
-
-        // Update the car trace data
-        carTrace.x = [carPosition[0]];
-        carTrace.y = [carPosition[1]];
-        Plotly.update('graph-obstacle1', data, layout);
-      }
-    
-    });
-  }
-  setInterval(updateGraph, 1000);
-});
-
      // EventSource for receiving SSE events
      var eventSource = new EventSource('/stream-noisy-obstacle');
 
@@ -263,7 +178,7 @@ $(document).ready(function() {
        Plotly.extendTraces('graph-obstacle', { x: [[x_car], [x_obs]], y: [[y_car], [y_obs]] }, [0, 1]);
      };
    
-
+});
 
 /* --------------- Connection Status Checker --------------- */
 setInterval(function() {
@@ -557,3 +472,65 @@ sourceinput.addEventListener('open', function(e) {
 sourceinput.addEventListener('error', function(e) {
   console.log('SSE connection closed');
 }, false);
+
+$(document).ready(function() {
+  var layout = {
+      hovermode: 'closest',
+      clickmode: 'event+select',
+  };
+
+  $.ajax({
+      url: '/refresh_map',
+      type: 'GET',
+      success: function(data) {
+          var chartData = JSON.parse(data);
+          var config = { responsive: true };
+
+          Plotly.newPlot('map', chartData, layout, config).then(function(gd) {
+              var clickEventFired = true; // Flag to check if click event is fired
+
+              gd.addEventListener('click', function(eventData) {
+                  var xaxis = gd._fullLayout.xaxis;
+                  var yaxis = gd._fullLayout.yaxis;
+                  var x = xaxis.p2l(eventData.x);
+                  var y = yaxis.p2l(eventData.y);
+                  console.log('Clicked on x:', x, 'y:', y);
+
+                  clickEventFired = false; // Set the flag to true when click event is fired
+                                // Check if click event is fired after a short delay
+                  setTimeout(function() {
+                    if (!clickEventFired) {
+                        console.log('Success');
+                    }
+                }, 100);
+              });
+
+              gd.on('plotly_click', function(eventData) {
+                setTimeout(function() {
+                    var clickedData = eventData.points[0];
+                    if (clickedData) {
+                      
+                        clickEventFired = true; // Set the flag to true when click event is fired
+                        // Check if click event is fired after a short delay
+                        var traceIndex = clickedData.curveNumber;
+                        console.log('Clicked on trace index:', traceIndex);
+            
+                        // Perform any actions you want when a point on the map is clicked
+                        // You can access the clickedData object to retrieve the x and y coordinates
+            
+                        // Example: Send the clicked coordinates to the server
+                        var x = clickedData.x;
+                        var y = clickedData.y;
+                        console.log('Clicked on x:', x, 'y:', y);
+                    } else {
+                        console.log('Clicked point is outside any trace');
+                    }
+                }, 50); // Delay of 100 milliseconds
+            });
+            
+
+
+          });
+      }
+  });
+});
