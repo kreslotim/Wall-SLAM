@@ -16,6 +16,7 @@ sensors_event_t event;
 sensors_event_t aevent, mevent;
 int distanceSonarFront = 0;
 int16_t lidarDistanceFront;
+int16_t lidarDistanceBack;
 float dataSend[12];
 int servoAngle;
 int numberOfConnectionOld = 0;
@@ -24,17 +25,18 @@ float orientation = 0;
 int goToOrientation = 0;
 float x = 0;
 float y = 0;
-
+unsigned long startTime; // Variable to store the start time
+unsigned long elapsedTime;
 
 const float ACCELERATION_STEPPER = 250.0;
 const float MAX_SPEED_STEPPER = 2000;
 const float CONST_SPEED_STEPPER = 500;
 const int STEPS_PER_REV = 2038;
 const int STEPS_90_DEG = 1740;
-const int16_t  MIN_LIDAR_DISTANCE = 150;  // in mm
+const int16_t MIN_LIDAR_DISTANCE = 150;  // in mm
 const int SERVO_INIT_POS = 84;
 const int MAX_DISTANCE_SONAR = 400;
-const float DIST_PER_STEP = 0.06; // in mm per step
+const float DIST_PER_STEP = 0.06;  // in mm per step
 
 #define FULLSTEP 4
 #define HALFSTEP 8
@@ -47,12 +49,15 @@ const float DIST_PER_STEP = 0.06; // in mm per step
 #define IRQ_PIN 2
 #define XSHUT_PIN 3
 
+#define SDA 26  // New I2C Data Pin
+#define SCL 27  // New I2C Clock Pin
+
 // Servo settings
 #define servoPin 15
 
 // Gyro Accel Mag (GAM)
-#define SDA_2 33 // New I2C Data Pin
-#define SCL_2 25 // New I2C Clock Pin
+#define SDA_2 33  // New I2C Data Pin
+#define SCL_2 25  // New I2C Clock Pin
 
 // Pins for left motor
 #define L_IN1 2
@@ -70,13 +75,18 @@ const float DIST_PER_STEP = 0.06; // in mm per step
 Servo servo;
 
 // Create instance of Lidar
-Adafruit_VL53L1X vl53 = Adafruit_VL53L1X(XSHUT_PIN, IRQ_PIN);
+Adafruit_VL53L1X vl53Front = Adafruit_VL53L1X(XSHUT_PIN, IRQ_PIN);
+Adafruit_VL53L1X vl53Back = Adafruit_VL53L1X(XSHUT_PIN, IRQ_PIN);
+TwoWire wireOne = TwoWire(0);
+TwoWire wireTwo = TwoWire(1);
+TwoWire wireThree = TwoWire(2);
+
 
 // Create intance of Gyro, Accel and Mag
 Adafruit_FXAS21002C gyro = Adafruit_FXAS21002C(0x0021002C);
 Adafruit_FXOS8700 accelmag = Adafruit_FXOS8700(0x8700A, 0x8700B);
 
-// Create instance of ultrasonic 
+// Create instance of ultrasonic
 NewPing frontUltrasonic(TRIG_PIN, ECHO_PIN, MAX_DISTANCE_SONAR);
 
 // Create instances of stepper motors
@@ -111,7 +121,7 @@ void setup() {
 
   // Access Point SetUp
   WiFi.softAPConfig(local_IP, gateway, subnet);
-  WiFi.softAP(ssid, password, 1); //limit connection to 1 user
+  WiFi.softAP(ssid, password, 1);  //limit connection to 1 user
   Serial.print("IP address = ");
   Serial.println(WiFi.softAPIP());
 
@@ -150,6 +160,10 @@ void setup() {
     &Task1,    /* Task handle to keep track of created task */
     1);        /* pin task to core 0 */
   delay(500);
+
+  // Setup Timer
+  startTime = millis(); // Record the start time
+
 }
 
 void setupLidar() {
@@ -159,32 +173,30 @@ void setupLidar() {
   Serial.println(F("Adafruit VL53L1X sensor demo"));
 
   Wire.begin();
-  if (!vl53.begin(0x29, &Wire)) {
-    Serial.print(F("Error on init of VL sensor: "));
-    Serial.println(vl53.vl_status);
+
+  if (!vl53Front.begin(0x29, &Wire)) {
+    Serial.print(F("Error on init of Front VL sensor: "));
+    Serial.println(vl53Front.vl_status);
     while (1) delay(10);
   }
+
   Serial.println(F("VL53L1X sensor OK!"));
 
-  Serial.print(F("Sensor ID: 0x"));
-  Serial.println(vl53.sensorID(), HEX);
+  Serial.print(F("Left Sensor ID: 0x"));
+  Serial.println(vl53Front.sensorID(), HEX);
 
-  if (!vl53.startRanging()) {
-    Serial.print(F("Couldn't start ranging: "));
-    Serial.println(vl53.vl_status);
+  if (!vl53Front.startRanging()) {
+    Serial.print(F("Left Couldn't start ranging: "));
+    Serial.println(vl53Front.vl_status);
     while (1) delay(10);
   }
+
   Serial.println(F("Ranging started"));
 
   // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms!
-  vl53.setTimingBudget(50);
+  vl53Front.setTimingBudget(50);
   Serial.print(F("Timing budget (ms): "));
-  Serial.println(vl53.getTimingBudget());
-
-  /*
-  vl.VL53L1X_SetDistanceThreshold(100, 300, 3, 1);
-  vl.VL53L1X_SetInterruptPolarity(0);
-  */
+  Serial.println(vl53Front.getTimingBudget());
 }
 
 void setupGAM() {
@@ -198,21 +210,19 @@ void setupGAM() {
     /* There was a problem detecting the FXAS21002C ... check your connections
      */
     Serial.println("Ooops, no FXAS21002C detected ... Check your wiring!");
-    while (1)
-      ;
+    while (1);
   }
 
   if (!accelmag.begin(0x1F, &Wire1)) {
     /* There was a problem detecting the FXOS8700 ... check your connections */
     Serial.println("Ooops, no FXOS8700 detected ... Check your wiring!");
-    while (1)
-      ;
+    while (1);
   }
 }
 
 void readLidar() {
-  if (vl53.dataReady()) {
-    lidarDistanceFront = vl53.distance();
+  if (vl53Front.dataReady()) {
+    lidarDistanceFront = vl53Front.distance();
   }
 }
 
@@ -223,12 +233,12 @@ void readData() {
   } else {
     Serial.println("New client connected (Recieve)");
     if (recieveClient.connected() && recieveClient.available()) {
-      // Read the packed dataRecievd from the socket
-      float dataRecievd[1];
-      recieveClient.read((byte*)dataRecievd, sizeof(dataRecievd));
+      // Read the packed dataRecieved from the socket
+      float dataRecieved[1];
+      recieveClient.read((byte*)dataRecieved, sizeof(dataRecieved));
 
-      // Unpack the dataRecievd
-      actionNumber = dataRecievd[0];
+      // Unpack the dataRecieved
+      actionNumber = dataRecieved[0];
 
       // Do something with the decoded angles
       Serial.print("Action recieved: ");
@@ -244,9 +254,13 @@ void readData() {
 void sendData() {
   packData();
 
-  if (!sendClient.connected() && sendClient.connect(user_IP, SEND_DATA_PORT)) {
-    Serial.println("Connected to server");
-  }else {  
+  if (!sendClient.connected()){
+    if(sendClient.connect(user_IP, SEND_DATA_PORT)) {
+      Serial.println("Connected to server");
+    } else{
+      Serial.println("Non connection");
+    }
+  } else {
     sendClient.flush();
     sendClient.write((byte*)dataSend, sizeof(dataSend));
     Serial.println("Data Sent");
@@ -258,15 +272,18 @@ void updateSensors() {
   distanceSonarFront = frontUltrasonic.ping_cm();
 
   // Lidar Update
-  //rotateServo();
+  rotateServo();
   readLidar();
 
   // IMU Update
   gyro.getEvent(&event);
   accelmag.getEvent(&aevent, &mevent);
-  
+
   // Orientation Update
   orientation = atan2(mevent.magnetic.y, mevent.magnetic.x) * 180 / PI;
+
+  //Update Timer
+  elapsedTime = (float)(millis() - startTime);
 }
 
 void packData() {
@@ -274,24 +291,27 @@ void packData() {
   dataSend[0] = servo.read();
   dataSend[1] = distanceSonarFront;
   dataSend[2] = lidarDistanceFront;
-  dataSend[3] = orientation + servo.read();
-  dataSend[4] = x;
-  dataSend[5] = y;
-  dataSend[6] = aevent.acceleration.x;
-  dataSend[7] = aevent.acceleration.y;
-  dataSend[8] = aevent.acceleration.z;
-  dataSend[9] = mevent.magnetic.x;
-  dataSend[10] = mevent.magnetic.y;
-  dataSend[11] = mevent.magnetic.z;
+  dataSend[3] = lidarDistanceBack;
+  dataSend[4] = servo.read();
+  dataSend[5] = x;
+  dataSend[6] = y;
+  dataSend[7] = elapsedTime;
+  dataSend[8] = aevent.acceleration.y;
+  dataSend[9] = aevent.acceleration.z;
+  dataSend[10] = mevent.magnetic.x;
+  dataSend[11] = mevent.magnetic.y;
 }
 
-void rotateServo(){
+void rotateServo() {
   servoAngle = (servoAngle + 1) % 180;
   servo.write(servoAngle);
 }
 
 void action(float actionNumber) {
-  switch ((int) actionNumber) {
+  switch ((int)actionNumber) {
+    case -1:
+      mapping();
+      return;
     case 0:
       stopMotors();
       break;
@@ -319,49 +339,72 @@ void action(float actionNumber) {
   stepperLeft.runSpeed();
   stepperRight.runSpeed();
 
-    if (goToOrientation == 0) {
-      if(actionNumber == 1){
-        y +=  DIST_PER_STEP; // move north
-      }else if (actionNumber == 2){
-        y -=  DIST_PER_STEP; // move north
-      }
-
-    } else if (goToOrientation == 90) {
-      if(actionNumber == 1){
-        x +=  DIST_PER_STEP; // move west
-      }else if (actionNumber == 2){
-        x -=   DIST_PER_STEP; // move west
-      }
-
-    } else if (goToOrientation == 180) {
-      if(actionNumber == 1){
-        y -=   DIST_PER_STEP; // move south
-      }else if (actionNumber == 2){
-        y +=   DIST_PER_STEP; // move south
-      }
-
-    } else if (goToOrientation == 270){
-      if(actionNumber == 1){
-        x -=  DIST_PER_STEP; // move east
-      }else if (actionNumber == 2){
-        x +=  DIST_PER_STEP; // move east
-
-      }    
+  if (goToOrientation == 0) {
+    if (actionNumber == 1) {
+      y += DIST_PER_STEP;  // move north
+    } else if (actionNumber == 2) {
+      y -= DIST_PER_STEP;  // move north
     }
+
+  } else if (goToOrientation == 90) {
+    if (actionNumber == 1) {
+      x += DIST_PER_STEP;  // move west
+    } else if (actionNumber == 2) {
+      x -= DIST_PER_STEP;  // move west
+    }
+
+  } else if (goToOrientation == 180) {
+    if (actionNumber == 1) {
+      y -= DIST_PER_STEP;  // move south
+    } else if (actionNumber == 2) {
+      y += DIST_PER_STEP;  // move south
+    }
+
+  } else if (goToOrientation == 270) {
+    if (actionNumber == 1) {
+      x -= DIST_PER_STEP;  // move east
+    } else if (actionNumber == 2) {
+      x += DIST_PER_STEP;  // move east
+    }
+  }
+}
+
+void mapping(){
+    if (sonar.ping_cm() < minSonarDistance) {
+    turnLeft();
+    orientation = (orientation + 90) % 360;
+    servo.write(0);
+    stepperRight.setCurrentPosition(0);
+    // constantly plot 
+    while (sonar.ping_cm() < minSonarDistance && vl53.distance() < 20) {
+      moveForward();
+        if (orientation == 0) {
+        y +=  stepperRight.currentPosition() * DIST_PER_STEP; // move north
+      } else if (orientation == 90) {
+        x -= stepperRight.currentPosition() * DIST_PER_STEP; // move west
+      } else if (orientation == 180) {
+        y -= stepperRight.currentPosition() * DIST_PER_STEP; // move south
+      } else {
+        x += stepperRight.currentPosition() * DIST_PER_STEP; // move east
+      }  
+    String output = String((int) 0 + orientation) + "," + String((int)vl53.distance()) + "," + String((int)x) +","+ String((int)y);
+    }
+    turnRight();
+  }
 }
 
 void stopMotors() {
-  stepperLeft.setSpeed(0);   
+  stepperLeft.setSpeed(0);
   stepperRight.setSpeed(0);
 }
 
 void moveForward() {
-  stepperLeft.setSpeed(-CONST_SPEED_STEPPER); 
+  stepperLeft.setSpeed(-CONST_SPEED_STEPPER);
   stepperRight.setSpeed(CONST_SPEED_STEPPER);
 }
 
 void moveBackward() {
-  stepperLeft.setSpeed(CONST_SPEED_STEPPER); 
+  stepperLeft.setSpeed(CONST_SPEED_STEPPER);
   stepperRight.setSpeed(-CONST_SPEED_STEPPER);
 }
 
@@ -369,22 +412,22 @@ void moveRight() {
   goToOrientation = (int)(orientation + 90) % 360;
   Serial.println("goToOrientation : ");
   Serial.println(goToOrientation);
-  while( goToOrientation !=  (int) orientation) {
+  while (goToOrientation != (int)orientation) {
     updateSensors();
     Serial.println("Orientation : ");
     Serial.println(orientation);
-    stepperLeft.setSpeed(-CONST_SPEED_STEPPER); 
+    stepperLeft.setSpeed(-CONST_SPEED_STEPPER);
     stepperRight.setSpeed(-CONST_SPEED_STEPPER);
     stepperLeft.runSpeed();
-    stepperRight.runSpeed();    
+    stepperRight.runSpeed();
   }
 }
 
 void moveLeft() {
-  goToOrientation = (int) (orientation - 90) % 360;
-  while(goToOrientation !=  (int) orientation) {
+  goToOrientation = (int)(orientation - 90) % 360;
+  while (goToOrientation != (int)orientation) {
     updateSensors();
-    stepperLeft.setSpeed(CONST_SPEED_STEPPER); 
+    stepperLeft.setSpeed(CONST_SPEED_STEPPER);
     stepperRight.setSpeed(CONST_SPEED_STEPPER);
     stepperLeft.runSpeed();
     stepperRight.runSpeed();
@@ -400,4 +443,5 @@ void Task1code(void* pvParameters) {
 void loop() {
   sendData();
   readData();
+  delay(10);
 }

@@ -1,9 +1,8 @@
-# Wall-SLAM - Simultaneous Localization And Mapping
-Timofey Kreslo, Sylvain Pichot, Finn Mac Namara, Alonso Coaguila, Florian Dejean.
+# CS-358 Making Intelligent Things
+## Project : Wall-SLAM - Simultaneous Localization And Mapping
+Timofey Kreslo, Sylvain Pichot, Finn Mac Namara, Alonso Coaguila, Florian Dejean
 
-June 2023
-
-<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/e592ad42-2deb-4919-802d-11c624c35482" width = 600 />
+March 2023
 
 ## Contents
     • 0.1 Description and motivation of the project  . . . . . . . . . . . . . . . . . . . . . . 1
@@ -16,12 +15,7 @@ June 2023
     • 0.8 Progress documentation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
     • 0.9 References . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
 
-## 0.1 Description & Overview
-Wall-SLAM is a project that we have elaborated within the course CS-358 Making Intelligent Things, 
-under the direction Prof. Koch, and under the supervision of Federico Stella and Anirudhh Ramesh.
-
-Our [project proposal](https://github.com/kreslotim/Wall-SLAM/blob/main/proposal/proposal.md), can be useful to witness some deviations in our project from our expectations.
-
+## 0.1 Description and motivation of the project
 Our project involves building a robot that will perform Simultaneous Localization and Mapping
 (SLAM). SLAM is a crucial technology for robotic systems that need to move in dynamic and
 unknown environments. Robots equipped with SLAM can map and navigate their surroundings
@@ -36,6 +30,8 @@ as the motor control system, the ultrasonic sensor system, and the Wi-Fi communi
 
 Overall, the project consists of deploying an autonomous robot that will map its surrounding
 area using SLAM algorithm with an end goal of displaying a cohesive 2D-map of the area.
+
+<img align = "center" src = "https://user-images.githubusercontent.com/56829239/232311084-90cc7f72-1b31-460a-8c03-257f2a87a241.png" width = 400 />
 
 ## 0.2 How are we going to build it ?
 ### Obstacle detection
