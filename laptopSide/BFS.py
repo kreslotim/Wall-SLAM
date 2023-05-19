@@ -33,9 +33,8 @@ grid = [
 def shortest_path(current_position, destination, grid):
     rows = len(grid)
     cols = len(grid[0])
-
-    # Check for trivial case: the current position is the destination
-    if current_position == destination:
+    
+    if current_position == destination or grid[destination[0]][destination[1]] == 1:
         return []
 
     # Create a queue for BFS algo (decided against Dijkstra) and initialize with  current position
