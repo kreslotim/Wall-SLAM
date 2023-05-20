@@ -17,7 +17,7 @@ class ESP32Connection:
         # INPUT
         self.com_port = com_port
         self.baud_port = baud_port
-
+        
         # Connection variable
         self.espIP = None
         self.hostName = socket.gethostname()

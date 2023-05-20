@@ -2,6 +2,7 @@ import numpy as np
 
 
 
+
 #global functions
 def compute_distance(data, centers):
     """
@@ -176,15 +177,19 @@ class KMeans(object):
             self.K = i+1
             self.centers, cluster_assignments, sse = self.k_means(training_data, self.max_iters)
             centers.append(self.centers)
-            ssd.append(sse)
+           
+            ssd.append( np.sum(sse))
+            if (ssd[i-1]**2 + (i-1)**2) < (ssd[i]**2 + (i)**2) :
+                print(f"optimal is  k : {i}")
+                return centers[i], (i+1)
 
 
         # find the value of k where the elbow curve is optimal
         optimal_K = self.K-1  # add 1 because of zero-based indexing and we skipped k=0
-        print(f"The optimal value of k is {optimal_K}")
+        
 
 
-        return centers[self.K-1]
+        return centers[self.K-1], optimal_K
 
 
     def predict(self, data):

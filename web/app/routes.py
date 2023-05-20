@@ -19,6 +19,10 @@ send_port = 8889
 # Initial robot position and obstacle data
 robotX = 0
 robotY = 0
+global togoX 
+togoX = 1
+global togoY
+togoY = 0
 obstacles = []
 
 startTime= time.time()
@@ -37,6 +41,8 @@ settingDataESP = False
 global settingDataSIM
 settingDataSIM = False
 
+cluster_chart  =  ClusterChart(num_clusters=10)
+mapJson = cluster_chart.generate_chart_json()
 
 @main.route('/')
 def index():
@@ -335,5 +341,24 @@ def refresh_map():
     print("rannn")
     # Code to generate or fetch the updated SVG map
     # Replace the following line with your logic to generate the updated map
-    cluster_chart  =  ClusterChart(num_clusters=2)
-    return cluster_chart.generate_chart_json()
+
+    return mapJson
+@main.route('/get_new_trace_data', methods=['GET'])
+def get_new_trace_data():
+    num_points = 3
+    points = [(random.random(), random.random()) for _ in range(num_points)]
+    print(f"sending togo {togoX}")
+    return jsonify({'points': points, 'robot' : (2,1), 'togo' : (togoX,togoY)})
+
+@main.route('/process_coordinates', methods=['POST'])
+def process_coordinates():
+    global togoX,togoY
+    togoX = request.form.get('x')
+    togoY = request.form.get('y')
+    print(togoX,togoY)
+
+    # Process the received coordinates
+    # ... Your code to handle the coordinates ...
+
+    # Return a response to the AJAX request if needed
+    return 'Coordinates processed successfully'

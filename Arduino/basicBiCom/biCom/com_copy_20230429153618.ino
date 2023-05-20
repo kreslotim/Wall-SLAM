@@ -1,91 +1,80 @@
-#include <WiFi.h>
+#include <math.h>
 
-const char* ssid = "OccuPi";
-const char* password = "rkuf4617Qwe12$ReD";
+// State variables
+double x_hat1 = 0.0;  // Estimated position of object 1
+double x_hat2 = 0.0;  // Estimated position of object 2
+double P1 = 1.0;     // State covariance of object 1
+double P2 = 1.0;     // State covariance of object 2
 
-const uint16_t send_port = 8090;
-const uint16_t recv_port = 8091;
-const char * host = "192.168.28.39";
-WiFiServer wifiServer(recv_port);
+// Process noise and measurement noise
+double Q = 0.1;      // Process noise covariance
+double R = 1.0;      // Measurement noise covariance
 
-WiFiClient recieve_client;
-WiFiClient send_client;
+// Kalman gain
+double K1, K2;
+
+// Measurement variables
+double z1 = 0.0;     // Measured position of object 1
+double z2 = 0.0;     // Measured position of object 2
 
 void setup() {
-  Serial.begin(115200);
-
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.print("Connected to WiFi network with IP: ");
-  Serial.println(WiFi.localIP());
-  wifiServer.begin();
-
+  // Initialize any required hardware or variables
+  Serial.begin(9600);
 }
-
 
 void loop() {
-  connect();
-  recv();
-  delay(500);
+  // Simulate measurements (replace these with your own measurements)
+  z1 = sin(millis() / 1000.0);
+  z2 = cos(millis() / 1000.0);
+
+  // Perform the EKF steps
+  predictState();
+  updateState();
+
+  // Print the estimated positions
+  Serial.print("Object 1: ");
+  Serial.print(x_hat1);
+  Serial.print(" | Object 2: ");
+  Serial.println(x_hat2);
+
+  // Wait for a brief moment before the next iteration
+  delay(100);
 }
 
-void recv(){
-  if(recieve_client.available()){
-    Serial.println(recieve_client.readString());
-    recieve_client.print("200");
-  }
+// Update the state estimate based on the measurements
+void updateState() {
+  // Step 1: Calculate the innovations
+  double y1 = z1 - x_hat1;
+  double y2 = z2 - x_hat2;
+
+  // Step 2: Calculate the Kalman gains
+  K1 = P1 / (P1 + R);
+  K2 = P2 / (P2 + R);
+
+  // Step 3: Update the state estimates
+  x_hat1 += K1 * y1;
+  x_hat2 += K2 * y2;
+
+  // Step 4: Update the state covariances
+  P1 = (1 - K1) * P1;
+  P2 = (1 - K2) * P2;
 }
-void send(){
-  while(send_client.connect(host, send_port)){
-  send_client.print("Hello from ESP32!");
-  if(send_client.readString() == "200") {
-    Serial.println(" Got 200 back");
-    break;
-  }
-  }
-}
 
-void connect(){
-  if(!recieve_client.connected() ){
-    disconnect();
+// Predict the next state estimate based on system dynamics
+void predictState() {
+  // Step 1: Predict the state estimates
+  double x_pred1 = x_hat1;
+  double x_pred2 = x_hat2;
 
-    
+  // Step 2: Predict the state covariances
+  double P_pred1 = P1 + Q;
+  double P_pred2 = P2 + Q;
 
-    if (!send_client.connect(host, send_port)) {
-          Serial.println("Send Socket failed !");
-          return;
-      }
-
-    Serial.println("Send Socket connected !");
-    
-    delay(200);
-
-    recieve_client = wifiServer.available();
-
-    if (recieve_client.connected()) {
-
-      Serial.print("Recieve Socket from IP:");
-      Serial.println(recieve_client.remoteIP());
-      
-    
-    } else {
-      Serial.println("Recieve Socket fail!");
-
-  }
-  }
+  // Step 3: Update the state estimates and covariances
+  x_hat1 = x_pred1;
+  x_hat2 = x_pred2;
+  P1 = P_pred1;
+  P2 = P_pred2;
 }
 
 
-void disconnect(){
-
-  Serial.println("Connection fail...");
-
-  send_client.stop();
-  recieve_client.stop();
-  delay(2000);
-
-}
