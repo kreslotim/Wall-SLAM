@@ -76,8 +76,17 @@ class ESP32Connection:
                     self.recv_socket.send("200".encode())
 
                     # TODO INACURATE. ESP OUTPUT UNCLEAR.
-                    distanceBack = data_decoded[3]+1
-                    distanceFront = -data_decoded[2]-1
+                    distanceBack = data_decoded[3]
+                    distanceFront = data_decoded[2]
+                    if (distanceFront == -1) :
+                        distanceFront = 0
+                    else :
+                        distanceFront +=1
+
+                    if (distanceBack == -1) :
+                        distanceBack = 0
+                    else :
+                        distanceBack = -distanceBack-1
                     orientation= data_decoded[4]
 
                     x_car = data_decoded[5]
