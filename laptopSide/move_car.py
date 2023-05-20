@@ -2,28 +2,29 @@ def move_car(start_pos, suggested_path):
     x, y = start_pos
     nodes = [(x, y)]
     direction = None
+    scale_factor=10;
 
     for move in suggested_path:
         if move == 'right':
             if direction != 'right':
-                nodes.append((x + 10, y))
+                nodes.append((x + scale_factor, y))
                 direction = 'right'
-            x += 10
+            x += scale_factor
         elif move == 'down':
             if direction != 'down':
-                nodes.append((x, y - 10))
+                nodes.append((x, y -scale_factor))
                 direction = 'down'
-            y -= 10
+            y -= scale_factor
         elif move == 'left':
             if direction != 'left':
-                nodes.append((x - 10, y))
+                nodes.append((x - scale_factor, y))
                 direction = 'left'
-            x -= 10
+            x -= scale_factor
         elif move == 'up':
             if direction != 'up':
-                nodes.append((x, y + 10))
+                nodes.append((x, y + scale_factor))
                 direction = 'up'
-            y += 10
+            y += scale_factor
 
     return nodes
 
