@@ -247,7 +247,7 @@ def stream_noisy_obstacle():
                     distance = new_info[3]
                     orientation = new_info[4]
                     x_obs,y_obs = _dataToObstacle(x_car,y_car,distance,orientation)
-                    if not (distance == -1):
+                    if not (distance == 0):
                         list_of_obs.append([x_obs,y_obs])
                         list_of_100_x_obs.append(x_obs)
                         list_of_100_y_obs.append(y_obs)
@@ -281,3 +281,41 @@ def _dataToObstacle(x_car,y_car, distance,orientation):
     point_y = y_car + distance * math.sin(orientation)
     return(point_x,point_y)
 
+def find_points_within_radius(orientation, r):
+    # Convert the orientation from degrees to radians
+    angle_rad = math.radians(orientation)
+
+    # Calculate the slope of the line with the given orientation
+    slope = math.tan(angle_rad)
+
+    # Calculate the y-intercept of the line
+    intercept = 0
+
+    # Determine the sign of the intercept
+    if math.cos(angle_rad) != 0:
+        intercept = -r * math.sin(angle_rad) / math.cos(angle_rad)
+    else:
+        intercept = -r if math.sin(angle_rad) > 0 else r
+
+    # Find the closest points in list_of_obs that lie on the linear equation
+    closest_points = []
+
+    for point in list_of_obs:
+        x_obs, y_obs = point
+
+        # Check if the point lies on the linear equation
+        if math.isclose(y_obs, slope * x_obs + intercept):
+            closest_points.append(point)
+
+    # Find the closest point to the origin among the identified points
+    closest_point = min(closest_points, key=lambda p: math.sqrt(p[0]**2 + p[1]**2))
+
+    # Find the points within a radius r around the closest point
+        # Find the points within a radius r around the closest point
+    points_within_radius = [point for point in list_of_obs if math.sqrt((point[0] - closest_point[0])**2 + (point[1] - closest_point[1])**2) <= r]
+
+    # Separate the x-coordinates and y-coordinates into separate lists
+    x_coordinates = [point[0] for point in points_within_radius]
+    y_coordinates = [point[1] for point in points_within_radius]
+
+    return x_coordinates, y_coordinates
