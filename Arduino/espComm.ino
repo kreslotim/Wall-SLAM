@@ -42,6 +42,7 @@ const int SERVO_INIT_POS = 84;
 const int MAX_DISTANCE_SONAR = 400;
 const float DIST_PER_STEP = 0.06;  // in mm per step
 
+
 #define FULLSTEP 4
 #define HALFSTEP 8
 
@@ -53,15 +54,12 @@ const float DIST_PER_STEP = 0.06;  // in mm per step
 #define IRQ_PIN 2
 #define XSHUT_PIN 3
 
-#define SDA 26  // New I2C Data Pin
-#define SCL 27  // New I2C Clock Pin
-
 // Servo settings
 #define servoPin 15
 
-// Gyro Accel Mag (GAM)
-#define SDA_2 33  // New I2C Data Pin
-#define SCL_2 25  // New I2C Clock Pin
+// Pins for Front lidar
+#define SDA_1 26
+#define SCL_1 27
 
 // Pins for left motor
 #define L_IN1 2
@@ -143,11 +141,8 @@ void setup() {
   servo.attach(servoPin);
   servo.write(SERVO_INIT_POS);  // Put servo to initial position (looking forward)
 
-  // Gyro Accel Mag (GAM) Setup
-  setupGAM();
-
-  // Lidar Setup
-  setupLidar();
+  // Setup Front/Back lidars and IMU
+  setupLidarsAndIMU();
 
   // Motors Setup
   stepperLeft.setMaxSpeed(MAX_SPEED_STEPPER);
@@ -171,31 +166,53 @@ void setup() {
 
 }
 
-void setupLidar() {
-  //Serial.begin(115200);
+void setupLidarsAndIMU() {
   while (!Serial) delay(10);
-
-  Serial.println(F("Adafruit VL53L1X sensor demo"));
 
   Wire.begin();
 
-  if (!vl53Front.begin(0x29, &Wire)) {
+  Wire1.begin(SDA_1,SCL_1);
+
+  /* Initialise the sensor */
+  if (!gyro.begin(0x21, &Wire)) {
+    /* There was a problem detecting the FXAS21002C ... check your connections
+     */
+    Serial.println("Ooops, no FXAS21002C detected ... Check your wiring!");
+    while (1)
+      ;
+  }
+  if (!accelmag.begin(0x1F, &Wire)) {
+    /* There was a problem detecting the FXOS8700 ... check your connections */
+    Serial.println("Ooops, no FXOS8700 detected ... Check your wiring!");
+    while (1)
+      ;
+  }
+
+  if (! vl53Front.begin(0x29, &Wire1)) {
     Serial.print(F("Error on init of Front VL sensor: "));
     Serial.println(vl53Front.vl_status);
-    while (1) delay(10);
+    while (1)       delay(10);
   }
-
+  if (! vl53Back.begin(0x29, &Wire)) {
+    Serial.print(F("Error on init of Back VL sensor: "));
+    Serial.println(vl53Back.vl_status);
+    while (1)       delay(10);
+  }
   Serial.println(F("VL53L1X sensor OK!"));
 
-  Serial.print(F("Left Sensor ID: 0x"));
+  Serial.print(F("Sensor ID: 0x"));
   Serial.println(vl53Front.sensorID(), HEX);
 
-  if (!vl53Front.startRanging()) {
-    Serial.print(F("Left Couldn't start ranging: "));
+  if (! vl53Front.startRanging()) {
+    Serial.print(F("Front lidar Couldn't start ranging: "));
     Serial.println(vl53Front.vl_status);
-    while (1) delay(10);
+    while (1)       delay(10);
   }
-
+  if (! vl53Back.startRanging()) {
+    Serial.print(F("Back lidar Couldn't start ranging: "));
+    Serial.println(vl53Back.vl_status);
+    while (1)       delay(10);
+  }
   Serial.println(F("Ranging started"));
 
   // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms!
@@ -204,30 +221,14 @@ void setupLidar() {
   Serial.println(vl53Front.getTimingBudget());
 }
 
-void setupGAM() {
-  Wire1.begin(SDA_2, SCL_2);
-
-  Serial.println("Gyroscope Accel Mag Test");
-  Serial.println("");
-
-  /* Initialise the sensor */
-  if (!gyro.begin(0x21, &Wire1)) {
-    /* There was a problem detecting the FXAS21002C ... check your connections
-     */
-    Serial.println("Ooops, no FXAS21002C detected ... Check your wiring!");
-    while (1);
-  }
-
-  if (!accelmag.begin(0x1F, &Wire1)) {
-    /* There was a problem detecting the FXOS8700 ... check your connections */
-    Serial.println("Ooops, no FXOS8700 detected ... Check your wiring!");
-    while (1);
-  }
-}
 
 void readLidar() {
   if (vl53Front.dataReady()) {
     lidarDistanceFront = vl53Front.distance();
+  }
+
+  if (vl53Back.dataReady()) {
+    lidarDistanceBack = vl53Back.distance();
   }
 }
 
@@ -423,5 +424,5 @@ void Task1code(void* pvParameters) {
 void loop() {
   sendData();
   readData();
-  delay(10);
+  delay(100);
 }
