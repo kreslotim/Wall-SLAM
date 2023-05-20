@@ -175,7 +175,7 @@ $(document).ready(function() {
        var y_obs = eventData[3];
  
        // Update graph data
-       Plotly.extendTraces('graph-obstacle', { x: [[x_car], [x_obs]], y: [[y_car], [y_obs]] }, [0, 1]);
+       Plotly.extendTraces('graph-obstacle', { x: [[x_car], x_obs], y: [[y_car], y_obs] }, [0, 1]);
      };
    
 });

@@ -76,16 +76,20 @@ class ESP32Connection:
                     self.recv_socket.send("200".encode())
 
                     # TODO INACURATE. ESP OUTPUT UNCLEAR.
+                    distanceBack = data_decoded[3]+1
+                    distanceFront = -data_decoded[2]-1
                     orientation= data_decoded[4]
-                    distance = data_decoded[2]
+
                     x_car = data_decoded[5]
                     y_car= data_decoded[6]
-                    timeOfReading= data_decoded[1]
+                    timeOfReading= data_decoded[7]
+
+                   
                     print(data_decoded)
-                    
-                    self.obstacle.append((timeOfReading,x_car,y_car,distance,orientation))
+                    self.obstacle.append((timeOfReading,x_car,y_car,distanceFront,orientation))
+                    self.obstacle.append((timeOfReading,x_car,y_car,distanceBack,orientation))
                     self.output.append((timeOfReading, 'Position ', x_car, y_car))  
-                    self.output.append((timeOfReading, 'Obstacle found at ', distance, ' mm, looking at ', orientation)) 
+                    self.output.append((timeOfReading, 'Obstacle found at ', distanceFront, ' mm, looking at ', orientation)) 
                     # Log it
                     timeOfRep = round( time.time() - self.time, 2)
         
