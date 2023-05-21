@@ -29,8 +29,10 @@ dataD = DummyData(10)
 list_of_obs = []
 list_of_100_x_obs = []
 list_of_100_y_obs = []
+list_of_100_x_del = []
+list_of_100_y_del = []
 numberOfObsInOneGo = 50
-
+delete_distance = 30
 
 
 global settingConnection
@@ -246,16 +248,15 @@ def stream_noisy_obstacle():
                     y_car = new_info[2]
                     distance = new_info[3]
                     orientation = new_info[4]
-                    x_obs,y_obs = _dataToObstacle(x_car,y_car,distance,orientation)
-                    if not (distance == 0):
-                        list_of_obs.append([x_obs,y_obs])
-                        list_of_100_x_obs.append(x_obs)
-                        list_of_100_y_obs.append(y_obs)
+                    
+                    _add_and_delete_obstacle(x_car, y_car, distance, orientation)
 
                     if len(list_of_100_x_obs) > numberOfObsInOneGo :
-                        yield 'data: {}\n\n'.format(json.dumps((x_car, y_car,list_of_100_x_obs,list_of_100_y_obs)))
+                        yield 'data: {}\n\n'.format(json.dumps((x_car, y_car, list_of_100_x_obs,list_of_100_y_obs, list_of_100_x_del, list_of_100_y_del)))
                         list_of_100_x_obs.clear()
                         list_of_100_y_obs.clear()
+                        list_of_100_x_del.clear()
+                        list_of_100_y_del.clear()
 
     
             elif settingDataSIM:
@@ -268,7 +269,7 @@ def stream_noisy_obstacle():
                 orientation = new_info[4]
                 x_obs,y_obs = _dataToObstacle(x_car,y_car,distance,orientation)
                 if not (distance == -1):
-                    yield 'data: {}\n\n'.format(json.dumps((x_car, y_car,x_obs,y_obs)))
+                    yield 'data: {}\n\n'.format(json.dumps((x_car, y_car, x_obs, y_obs)))
                 
 
     # Return the SSE response
@@ -279,43 +280,69 @@ def _dataToObstacle(x_car,y_car, distance,orientation):
     orientation = math.radians(orientation)
     point_x = x_car + distance * math.cos(orientation)
     point_y = y_car + distance * math.sin(orientation)
+
     return(point_x,point_y)
 
-def find_points_within_radius(orientation, r):
+def _add_and_delete_obstacle(x_car, y_car, obs_distance, orientation):    
+    # Calculate the x and y coordinates of the obstacle and add to list of obstacles
+    if obs_distance != 0: 
+        x_obs, y_obs = _dataToObstacle(x_car,y_car, obs_distance,orientation)   
+        list_of_obs.append([x_obs,y_obs])
+        list_of_100_x_obs.append(x_obs)
+        list_of_100_y_obs.append(y_obs)
+    else :
+        obs_distance = delete_distance
+
+    # Calculate the distance of each existing obstacle from the origin
+    distances = [math.sqrt(x**2 + y**2) for x, y in list_of_obs]
+
+    # Find the obstacles that are between the new obstacle and the origin
+    obstacles_to_delete = [obs for obs, distance in zip(list_of_obs, distances) if distance < obs_distance - 10]
+
+    # Remove the obstacles that are between the new obstacle and the origin
+    for obstacle in obstacles_to_delete:
+        list_of_obs.remove(obstacle)
+        x_del , y_del = obstacle[0],obstacle[1]
+        list_of_100_x_del.append(x_del)
+        list_of_100_y_del.append(y_del)
+    return
+
+def add_and_delete_obstacles(x_car, y_car, obs_distance, orientation):
     # Convert the orientation from degrees to radians
     angle_rad = math.radians(orientation)
+
+
+    if obs_distance != 0: 
+        x_new, y_new = _dataToObstacle(x_car,y_car, obs_distance,orientation)   
+        list_of_obs.append([x_new,y_new])
+        list_of_100_x_obs.append(x_new)
+        list_of_100_y_obs.append(y_new)
+        x_new -= x_car
+        y_new -= y_car
+    else :
+        obs_distance = delete_distance
+        x_new = obs_distance * math.cos(angle_rad)
+        y_new = obs_distance * math.sin(angle_rad)
 
     # Calculate the slope of the line with the given orientation
     slope = math.tan(angle_rad)
 
-    # Calculate the y-intercept of the line
-    intercept = 0
+    # Find the obstacles that lie on the linear equation between the new obstacle and the origin
+    obstacles_to_delete = []
 
-    # Determine the sign of the intercept
-    if math.cos(angle_rad) != 0:
-        intercept = -r * math.sin(angle_rad) / math.cos(angle_rad)
-    else:
-        intercept = -r if math.sin(angle_rad) > 0 else r
+    for obstacle in list_of_obs:
+        x_obs, y_obs = obstacle
 
-    # Find the closest points in list_of_obs that lie on the linear equation
-    closest_points = []
+        # Check if the obstacle lies on the linear equation
+        if math.isclose(y_obs, slope * x_obs, abs_tol = 10):
+            # Check if the obstacle lies between the new obstacle and the origin
+            if 0 < x_obs < x_new-10 or 0 > x_obs > x_new-10:
+                obstacles_to_delete.append(obstacle)
 
-    for point in list_of_obs:
-        x_obs, y_obs = point
+    # Remove the obstacles that lie on the linear equation between the new obstacle and the origin
+    for obstacle in obstacles_to_delete:
+        list_of_obs.remove(obstacle)
+        list_of_100_x_del.append(obstacle[0])
+        list_of_100_y_del.append(obstacle[1])
 
-        # Check if the point lies on the linear equation
-        if math.isclose(y_obs, slope * x_obs + intercept):
-            closest_points.append(point)
-
-    # Find the closest point to the origin among the identified points
-    closest_point = min(closest_points, key=lambda p: math.sqrt(p[0]**2 + p[1]**2))
-
-    # Find the points within a radius r around the closest point
-        # Find the points within a radius r around the closest point
-    points_within_radius = [point for point in list_of_obs if math.sqrt((point[0] - closest_point[0])**2 + (point[1] - closest_point[1])**2) <= r]
-
-    # Separate the x-coordinates and y-coordinates into separate lists
-    x_coordinates = [point[0] for point in points_within_radius]
-    y_coordinates = [point[1] for point in points_within_radius]
-
-    return x_coordinates, y_coordinates
+    return list_of_obs

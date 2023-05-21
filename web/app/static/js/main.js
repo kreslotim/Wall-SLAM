@@ -152,7 +152,7 @@ $(document).ready(function() {
        mode: 'markers',
        type: 'scatter',
        marker: {
-         size: 10,
+         size: 1,
          color: 'blue',
          symbol: 'circle-open'
        }
@@ -173,9 +173,14 @@ $(document).ready(function() {
        var y_car = eventData[1];
        var x_obs = eventData[2];
        var y_obs = eventData[3];
- 
-       // Update graph data
+       var x_del = eventData[4];
+       var y_del = eventData[5];
+
+
        Plotly.extendTraces('graph-obstacle', { x: [[x_car], x_obs], y: [[y_car], y_obs] }, [0, 1]);
+       //Plotly.extendTraces('graph-obstacle', { x: [x_del], y: [y_del] }, [0, 1]);
+
+
      };
    
 });

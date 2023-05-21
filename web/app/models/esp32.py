@@ -78,15 +78,16 @@ class ESP32Connection:
                     # TODO INACURATE. ESP OUTPUT UNCLEAR.
                     distanceBack = data_decoded[3]
                     distanceFront = data_decoded[2]
+
                     if (distanceFront == -1) :
                         distanceFront = 0
                     else :
-                        distanceFront +=1
+                        distanceFront += 20
 
                     if (distanceBack == -1) :
                         distanceBack = 0
                     else :
-                        distanceBack = -distanceBack-1
+                        distanceBack = -distanceBack-20
                     orientation= data_decoded[4]
 
                     x_car = data_decoded[5]
