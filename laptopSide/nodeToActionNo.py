@@ -5,7 +5,7 @@ def move_to_target(nodes):
     sequence = []
     current_x = 0
     current_y = 0
-    current_angle = 90
+    current_angle = 90 # Corresponds to our standart def
 
     for node in nodes:
         target_x, target_y = node
