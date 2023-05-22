@@ -119,6 +119,11 @@ def get_graph_data_com():
     
     return jsonify()
 
+@main.route('/get-graph-data-slam', methods=['POST'])
+def get_graph_data_slam():
+
+    return jsonify(x_sent=x_sent, y_sent=y_sent, x_received=x_received,y_received=y_received)
+
 @main.route('/get-status-value', methods=['GET'])
 def get_status_value():
     return jsonify({'setting' : settingConnection, 'status': espT.connected, 'hostIP' : espT.hostIp, 'hostName' : espT.hostName})
