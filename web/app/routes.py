@@ -26,12 +26,14 @@ espT = ESP32Connection(send_port=send_port,recv_port=recv_port)
 
 dataD = DummyData(10)
 
-list_of_obs = []
 list_of_100_x_obs = []
 list_of_100_y_obs = []
 numberOfObsInOneGo = 50
 delete_distance = 30
 max_distance_detection = 2000
+number_min_of_obstacle = 1
+in_radius = 10
+
 
 
 global settingConnection
@@ -45,6 +47,16 @@ settingDataESP = False
 
 global settingDataSIM
 settingDataSIM = False
+
+global list_of_obs
+list_of_obs = []
+
+global curr_x_car
+curr_x_car = 0
+
+global curr_y_car
+curr_y_car = 0
+
 
 
 @main.route('/')
@@ -120,10 +132,22 @@ def get_graph_data_com():
     
     return jsonify()
 
-@main.route('/get-graph-data-slam', methods=['POST'])
+@main.route('/get-graph-data-slam', methods=['GET'])
 def get_graph_data_slam():
+    global list_of_obs
+    _filter_obstacles(number_min_of_obstacle, in_radius)
+    x_obs = [point[0] for point in list_of_obs]
+    y_obs = [point[1] for point in list_of_obs]
+   
+    response_data = {
+        'x_car': curr_x_car,
+        'y_car': curr_y_car,
+        'x_obs': x_obs,
+        'y_obs': y_obs
+    }
 
-    return jsonify(x_sent=x_sent, y_sent=y_sent, x_received=x_received,y_received=y_received)
+    return jsonify(data=json.dumps(response_data))
+
 
 @main.route('/get-status-value', methods=['GET'])
 def get_status_value():
@@ -151,7 +175,6 @@ def update_switch_state_data():
     settingConnection = (sSettingConnection == "true")
 
     return jsonify({'success': True})
-
 
 # This route generates a stream of SSE events
 @main.route('/stream-errors')
@@ -238,6 +261,7 @@ def stream_input():
 # This route generates a stream of SSE events
 @main.route('/stream-noisy-obstacle')
 def stream_noisy_obstacle():
+    global curr_x_car, curr_y_car
     def event_stream():
         # Loop indefinitely
         while True:
@@ -248,15 +272,15 @@ def stream_noisy_obstacle():
                     espT.obstacle.pop(0)
                     # If a new error is available, send it to the client as an SSE event
                     timeOfObs = new_info[0]
-                    x_car = new_info[1]
-                    y_car = new_info[2]
+                    curr_x_car = new_info[1]
+                    curr_y_car = new_info[2]
                     distance = new_info[3]
                     orientation = new_info[4]
                     
-                    _add_and_delete_obstacle(x_car, y_car, distance, orientation)
+                    _add_and_delete_obstacle(curr_x_car, curr_y_car, distance, orientation)
 
                     if len(list_of_100_x_obs) > numberOfObsInOneGo :
-                        yield 'data: {}\n\n'.format(json.dumps((x_car, y_car, list_of_100_x_obs,list_of_100_y_obs)))
+                        yield 'data: {}\n\n'.format(json.dumps((curr_x_car, curr_y_car, list_of_100_x_obs,list_of_100_y_obs)))
                         list_of_100_x_obs.clear()
                         list_of_100_y_obs.clear()
 
@@ -287,6 +311,7 @@ def _dataToObstacle(x_car,y_car, distance,orientation):
     return(point_x,point_y)
 
 def _add_and_delete_obstacle(x_car, y_car, obs_distance, orientation):
+    global list_of_obs
     # Convert the orientation from degrees to radians
     angle_rad = math.radians(orientation)
 
@@ -295,6 +320,7 @@ def _add_and_delete_obstacle(x_car, y_car, obs_distance, orientation):
         list_of_obs.append([x_new,y_new])
         list_of_100_x_obs.append(x_new)
         list_of_100_y_obs.append(y_new)
+        print("real data")
         x_new -= x_car
         y_new -= y_car
     else :
@@ -323,7 +349,9 @@ def _add_and_delete_obstacle(x_car, y_car, obs_distance, orientation):
         
     return list_of_obs
 
-def filter_obstacles(number_min_of_obstacle, radius):
+def _filter_obstacles(number_min_of_obstacle, radius):
+    global list_of_obs
+
     filtered_obs = []
 
     for obstacle in list_of_obs:

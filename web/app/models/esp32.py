@@ -95,7 +95,7 @@ class ESP32Connection:
                     timeOfReading= data_decoded[7]
 
                    
-                    print(data_decoded)
+                   
                     self.obstacle.append((timeOfReading,x_car,y_car,distanceFront,orientation))
                     self.obstacle.append((timeOfReading,x_car,y_car,distanceBack,orientation))
                     self.output.append((timeOfReading, 'Position ', x_car, y_car))  
@@ -105,8 +105,7 @@ class ESP32Connection:
         
                     #self.recv_stat.append([1, timeOfRep])
 
-                    # Print the received data
-                    print(f"Received data: {data_decoded}")
+
 
         timeOfRep = round( time.time() - self.time, 2)
         self.info.append((timeOfRep, "Listen Thread stopped"))           
