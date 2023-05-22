@@ -526,64 +526,245 @@ sourceinput.addEventListener('error', function(e) {
   console.log('SSE connection closed');
 }, false);
 
+/*
 $(document).ready(function() {
   var layout = {
       hovermode: 'closest',
       clickmode: 'event+select',
   };
 
-  $.ajax({
-      url: '/refresh_map',
-      type: 'GET',
-      success: function(data) {
-          var chartData = JSON.parse(data);
-          var config = { responsive: true };
-
-          Plotly.newPlot('map', chartData, layout, config).then(function(gd) {
-              var clickEventFired = true; // Flag to check if click event is fired
-
-              gd.addEventListener('click', function(eventData) {
-                  var xaxis = gd._fullLayout.xaxis;
-                  var yaxis = gd._fullLayout.yaxis;
-                  var x = xaxis.p2l(eventData.x);
-                  var y = yaxis.p2l(eventData.y);
-                  console.log('Clicked on x:', x, 'y:', y);
-
-                  clickEventFired = false; // Set the flag to true when click event is fired
-                                // Check if click event is fired after a short delay
-                  setTimeout(function() {
-                    if (!clickEventFired) {
-                        console.log('Success');
-                    }
-                }, 100);
-              });
-
-              gd.on('plotly_click', function(eventData) {
-                setTimeout(function() {
-                    var clickedData = eventData.points[0];
-                    if (clickedData) {
-                      
-                        clickEventFired = true; // Set the flag to true when click event is fired
-                        // Check if click event is fired after a short delay
-                        var traceIndex = clickedData.curveNumber;
-                        console.log('Clicked on trace index:', traceIndex);
-            
-                        // Perform any actions you want when a point on the map is clicked
-                        // You can access the clickedData object to retrieve the x and y coordinates
-            
-                        // Example: Send the clicked coordinates to the server
-                        var x = clickedData.x;
-                        var y = clickedData.y;
-                        console.log('Clicked on x:', x, 'y:', y);
-                    } else {
-                        console.log('Clicked point is outside any trace');
-                    }
-                }, 50); // Delay of 100 milliseconds
-            });
-            
-
-
-          });
+  var x = [0,0]
+  var y = [0,0]
+  // Initialize the new trace with initial data
+  var path = {
+    x: x,  // Example x-coordinates
+    y: y,  // Example y-coordinates
+    mode: 'lines+markers',
+    type: 'scatter',
+    name: 'New Trace',
+    marker: {
+      color: 'red',
+      size: 10
       }
-  });
+    };
+
+    // Function to update the new trace data
+    function updateNewTraceData() {
+      $.ajax({
+        url: '/get_new_trace_data',
+        type: 'GET',
+        success: function(data) {
+          // TODO add a new trace, a single point from data.robot. 
+          var newPoints = data.points;
+          var robotPosition = data.robot;
+          
+     
+          x = newPoints.map(point => point[0]);
+          y = newPoints.map(point => point[1]);
+        
+          var upPath = {
+            x: x,
+            y: y,
+            mode: 'lines',
+            type: 'scatter'
+          };
+
+          var robot = {
+            x: [robotPosition[0]],
+            y:  [robotPosition[1]],
+            mode: 'markers',
+            name: 'robot',
+            marker: {
+              color: 'red',
+              size: 20
+              }
+          };
+          console.log(robot)
+         
+          // Add the new trace to the plot
+          Plotly.addTraces('map', upPath);
+          
+          Plotly.addTraces('map', robot);
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+    function updateMap() {
+    $.ajax({
+        url: '/refresh_map',
+        type: 'GET',
+        success: function(data) {
+            var chartData = JSON.parse(data);
+            var config = { responsive: true };
+
+            
+
+
+            // Add the new trace to the chart data
+            if (chartData.hasOwnProperty('data')) {
+              chartData.data.push(newTrace);
+            } else {
+              chartData = { data: [newTrace], layout: layout };
+            }
+            Plotly.newPlot('map', chartData, layout, config).then(function(gd) {
+                var clickEventFired = true; // Flag to check if click event is fired
+
+                gd.addEventListener('click', function(eventData) {
+                    var xaxis = gd._fullLayout.xaxis;
+                    var yaxis = gd._fullLayout.yaxis;
+                    var x = xaxis.p2l(eventData.x);
+                    var y = yaxis.p2l(eventData.y);
+                    console.log('Clicked on x:', x, 'y:', y);
+
+                    clickEventFired = false; // Set the flag to true when click event is fired
+                    // Check if inside a tracer after a short delay
+                    setTimeout(function() {
+                      if (!clickEventFired) {
+                          console.log('Success');
+                          //TODO SEND X,Y to the server
+                      }
+                  }, 100);
+                });
+
+                gd.on('plotly_click', function(eventData) {
+                  setTimeout(function() {
+                      var clickedData = eventData.points[0];
+                      if (clickedData) {
+                          // Work only if we are inside a trace.
+                          clickEventFired = true; // Set the flag to true when click event is fired
+                      } 
+                  }, 50); // Delay of 100 milliseconds
+              });
+              
+
+
+            });
+        }
+
+      });
+    }
+    updateMap();
+    setInterval(updateNewTraceData,1000)
+});
+*/
+
+$(document).ready(function() {
+
+    var config = { responsive: true };
+    var layout = {
+      hovermode: 'closest',
+      clickmode: 'event+select',
+    }; 
+    var path = {
+      x: [1, 2, 3, 4, 5],   // X-axis data
+      y: [1, 2, 3, 4, 5],  // Y-axis data
+      type: 'scatter',   // Chart type (e.g., scatter, bar, etc.)
+      mode: 'lines',     // Display mode (e.g., lines, markers, etc.)
+      name: 'New Trace'  // Trace name (for legend)
+    };
+    var robot = {
+      x: [0],
+      y:  [0],
+      mode: 'markers',
+      name: 'robot',
+      marker: {
+        color: 'red',
+        size: 20
+        }
+    };
+    var togo = {
+      x: [1],
+      y:  [1],
+      mode: 'markers',
+      name: 'to go',
+      marker: {
+        color: 'blue',
+        size: 20
+        }
+    };
+    var chartData =  { data: [robot,path, togo], layout: layout };
+
+  
+      
+    Plotly.newPlot('map', chartData, layout, config).then(function(gd) {
+
+  
+      gd.addEventListener('click', function(eventData) {
+        var xaxis = gd._fullLayout.xaxis;
+        var yaxis = gd._fullLayout.yaxis;
+        var x = xaxis.p2l(eventData.x);
+        var y = yaxis.p2l(eventData.y);
+        console.log('Clicked on x:', x, 'y:', y);
+
+            $.ajax({
+              url: '/process_coordinates',
+              type: 'POST',
+              data: { x: x, y: y },
+              success: function(response) {
+                console.log('Coordinates sent to the server successfully.');
+                // Handle the response from the server if needed
+              },
+              error: function(xhr, status, error) {
+                console.error('Error sending coordinates to the server:', error);
+                // Handle the error if needed
+              }
+            });
+          });
+        });
+
+        
+      
+    
+    
+    // Function to update the new trace data
+    function updatePath() {
+      $.ajax({
+        url: '/get_new_trace_data',
+        type: 'GET',
+        success: function(data) {
+          // TODO add a new trace, a single point from data.robot. 
+          var newPoints = data.points;
+          robot.x = [data.robot[0]];
+          robot.y = [data.robot[1]];
+          togo.x = [data.togo[0]];
+          togo.y = [data.togo[1]];
+          console.log(togo.x, togo.y)
+          path.x = newPoints.map(point => point[0]);
+          path.y = newPoints.map(point => point[1]);
+        
+
+          Plotly.newPlot('map', chartData.data, chartData.layout);
+        
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+    
+    function updateMap() {
+      $.ajax({
+        url: '/refresh_map',
+        type: 'GET',
+        success: function(data) {
+          var newChartData = JSON.parse(data);
+    
+          // Add the new trace to the chart data
+          if (newChartData.hasOwnProperty('data')) {
+            chartData = newChartData;
+            chartData.data.push(path);
+            chartData.data.push(robot);
+            chartData.data.push(togo);
+          } 
+          Plotly.newPlot('map', chartData.data, chartData.layout);
+        }
+      });
+    }
+
+    // Call updateMap() at an interval
+    setInterval(updateMap, 1000);
+    setInterval(updatePath, 1000);
+
 });

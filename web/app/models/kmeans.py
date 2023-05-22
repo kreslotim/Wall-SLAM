@@ -2,6 +2,7 @@ import numpy as np
 
 
 
+
 #global functions
 def compute_distance(data, centers):
     """
@@ -93,6 +94,31 @@ def compute_centers(data, cluster_assignments, K):
             centers[k] = np.sum(cluster_points, axis=0) / len(cluster_points)
     return centers
 
+    
+def filter_clusters(data, cluster_assignments, min_points=5):
+    """
+    Filter out clusters with less than min_points data points.
+    
+    Arguments:
+        data: array of shape (N, D) where N is the number of data points, D is the number of features.
+        cluster_assignments: array of shape (N,) with the cluster assignment of each data point.
+        min_points: minimum number of points required for a cluster to be valid (default: 5).
+    Returns:
+        filtered_data: array of shape (M, D) with the filtered data points.
+        filtered_cluster_assignments: array of shape (M,) with the filtered cluster assignments.
+    """
+    unique_clusters, cluster_counts = np.unique(cluster_assignments, return_counts=True)
+    print(cluster_counts)
+    valid_clusters = unique_clusters[cluster_counts >= min_points]
+
+    filtered_indices = np.isin(cluster_assignments, valid_clusters)
+    filtered_data = data[filtered_indices]
+    filtered_cluster_assignments = cluster_assignments[filtered_indices]
+
+    return filtered_data, filtered_cluster_assignments
+
+
+
 
 class KMeans(object):
 
@@ -103,7 +129,7 @@ class KMeans(object):
     We also use it to make prediction by attributing labels to clusters.
     """
 
-    def __init__(self, K, max_iters=100):
+    def __init__(self, K, max_iters=100, filter = 5 ):
         """
         Initialize the new object (see dummy_methods.py)
         and set its arguments.
@@ -111,9 +137,11 @@ class KMeans(object):
         Arguments:
             K (int): number of clusters
             max_iters (int): maximum number of iterations
+            filter (int): minium number of data needed to make a cluster
         """
         self.K = K
         self.max_iters = max_iters
+        self.filter = filter
 
     def k_means(self, data, max_iter):
         """
@@ -161,7 +189,9 @@ class KMeans(object):
         Arguments:
             training_data (array): training data of shape (N,D)
         Returns:
-            pred_labels (array): labels of shape (N,)
+            filtered_data: array of shape (M, D) with the filtered data points.
+            filtered_cluster_assignments: array of shape (M,) with the filtered cluster: 
+            optimal_K : the optimal number of cluster  
         """
 
         ##
@@ -176,15 +206,24 @@ class KMeans(object):
             self.K = i+1
             self.centers, cluster_assignments, sse = self.k_means(training_data, self.max_iters)
             centers.append(self.centers)
-            ssd.append(sse)
+           
+            ssd.append( np.sum(sse))
+            if (ssd[i-1]**2 + (i-1)**2) < (ssd[i]**2 + (i)**2) :
+                print(f"optimal is  k : {i}")
+                
+                
+                # Filter clusters with less than 5 points
+                data, filtered_cluster_assignments = filter_clusters(training_data, cluster_assignments, self.filter)
+
+                return  data, filtered_cluster_assignments, (i+1)
 
 
         # find the value of k where the elbow curve is optimal
         optimal_K = self.K-1  # add 1 because of zero-based indexing and we skipped k=0
-        print(f"The optimal value of k is {optimal_K}")
+        
 
 
-        return centers[self.K-1]
+        return centers[self.K-1],cluster_assignments, optimal_K
 
 
     def predict(self, data):
@@ -200,6 +239,5 @@ class KMeans(object):
         labels = find_closest_cluster(distances)
         return labels
         
-
 
 

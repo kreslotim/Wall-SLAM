@@ -17,8 +17,15 @@ ip="168.20.13.1"
 recv_port = 8888
 send_port = 8889
 
-com_port = "COM7"
-baud_port = 115200
+# Initial robot position and obstacle data
+robotX = 0
+robotY = 0
+global togoX 
+togoX = 1
+global togoY
+togoY = 0
+obstacles = []
+
 
 startTime= time.time()
 #espT = ESP32ConnectionBluetooth(com_port=com_port,baud_port=baud_port)
@@ -47,6 +54,10 @@ settingDataESP = False
 
 global settingDataSIM
 settingDataSIM = False
+
+
+cluster_chart  =  ClusterChart(num_clusters=10)
+mapJson = cluster_chart.generate_chart_json()
 
 global list_of_obs
 list_of_obs = []
@@ -310,6 +321,34 @@ def _dataToObstacle(x_car,y_car, distance,orientation):
 
     return(point_x,point_y)
 
+
+@main.route('/refresh_map',methods=['GET'])
+def refresh_map():
+    print("rannn")
+    # Code to generate or fetch the updated SVG map
+    # Replace the following line with your logic to generate the updated map
+
+    return mapJson
+@main.route('/get_new_trace_data', methods=['GET'])
+def get_new_trace_data():
+    num_points = 3
+    points = [(random.random(), random.random()) for _ in range(num_points)]
+    print(f"sending togo {togoX}")
+    return jsonify({'points': points, 'robot' : (2,1), 'togo' : (togoX,togoY)})
+
+@main.route('/process_coordinates', methods=['POST'])
+def process_coordinates():
+    global togoX,togoY
+    togoX = request.form.get('x')
+    togoY = request.form.get('y')
+    print(togoX,togoY)
+
+    # Process the received coordinates
+    # ... Your code to handle the coordinates ...
+
+    # Return a response to the AJAX request if needed
+    return 'Coordinates processed successfully'
+
 def _add_and_delete_obstacle(x_car, y_car, obs_distance, orientation):
     global list_of_obs
     # Convert the orientation from degrees to radians
@@ -371,3 +410,4 @@ def _filter_obstacles(number_min_of_obstacle, radius):
     list_of_obs = filtered_obs.copy()
 
     return list_of_obs
+
