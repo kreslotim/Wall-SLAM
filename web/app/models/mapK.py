@@ -4,6 +4,8 @@ from app.models.kmeans import KMeans
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import plotly
+from scipy.spatial import Delaunay
+from alphashape import alphashape
 import json
 
 class ClusterChart:
@@ -62,39 +64,40 @@ class ClusterChart:
    
         labels = kmeans1.predict(data_filter)
         labels_str = labels.astype(str)  # convert to string array
-        print(data_filter.shape)
-        print(X.shape)
-        print("label")
-        print(labels.shape)
-        cmap = plt.get_cmap('Set1')
-        colors = cmap(np.arange(len(np.unique(labels_str)))).tolist()
-        print(colors)
-        label_color = [colors[i] for i in labels]
 
-
-        # Create a scatter plot
+            # Create the scatter plot with circle markers for each cluster
+       # Create the scatter plot with cluster shapes
         fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            x=data_filter[:, 0],
-            y=data_filter[:, 1],
-            mode='markers',
-            marker=dict(color=label_color)
-        ))
-        print(data_filter)
 
-      # Find the convex hull for each cluster
-        for i in range(self.num_clusters):
-            cluster_points = data_filter[labels == i]
-            if cluster_points.size != 0 :
-                hull = ConvexHull(cluster_points)
-                fig.add_trace(go.Scatter(
-                    x=data_filter[hull.vertices, 0],
-                    y=data_filter[hull.vertices, 1],
-                    fill='toself',
-                    fillcolor=f'rgb({int(colors[i][0]*255)},{int(colors[i][1]*255)},{int(colors[i][2]*255)})',
-                    line=dict(color=f'rgb({int(colors[i][0]*255)},{int(colors[i][1]*255)},{int(colors[i][2]*255)})'),
-                    opacity=0.5
-                ))
+        for label in np.unique(labels):
+            mask = labels == label
+            cluster_data = data_filter[mask]
+            
+            # Calculate the Delaunay triangulation of the cluster
+            tri = Delaunay(cluster_data)
+            
+            # Define the alpha value to control the shape flexibility (smaller value for more flexibility)
+            alpha = 1
+            
+            # Calculate the alpha shape of the cluster
+            alpha_shape = alphashape(cluster_data, alpha)
+            alpha_points = np.array(alpha_shape.exterior.coords)
+            
+            # Add the cluster shape to the plot
+            fig.add_trace(go.Scatter(x=alpha_points[:, 0], y=alpha_points[:, 1], mode='lines', name=f'Cluster {label}'))
+
+            # Add the cluster data points as scatter markers
+            fig.add_trace(go.Scatter(x=cluster_data[:, 0], y=cluster_data[:, 1], mode='markers', name=f'Cluster {label}'))
+
+        fig.update_layout(title='K-means Clustering with Cluster Shapes (Alpha Shapes)',
+                        xaxis_title='X',
+                        yaxis_title='Y',
+                        showlegend=True)
+
+ 
+        
+
+
 
         chart_json = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
         return chart_json
