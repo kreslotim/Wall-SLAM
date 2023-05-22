@@ -31,6 +31,7 @@ list_of_100_x_obs = []
 list_of_100_y_obs = []
 numberOfObsInOneGo = 50
 delete_distance = 30
+max_distance_detection = 2000
 
 
 global settingConnection
@@ -284,8 +285,7 @@ def _add_and_delete_obstacle(x_car, y_car, obs_distance, orientation):
     # Convert the orientation from degrees to radians
     angle_rad = math.radians(orientation)
 
-
-    if obs_distance != 0: 
+    if obs_distance != 0 and obs_distance < max_distance_detection and obs_distance > -max_distance_detection: 
         x_new, y_new = _dataToObstacle(x_car,y_car, obs_distance,orientation)   
         list_of_obs.append([x_new,y_new])
         list_of_100_x_obs.append(x_new)
@@ -318,7 +318,7 @@ def _add_and_delete_obstacle(x_car, y_car, obs_distance, orientation):
         
     return list_of_obs
 
-def filter_obstacles(n, r):
+def filter_obstacles(number_min_of_obstacle, radius):
     filtered_obs = []
 
     for obstacle in list_of_obs:
@@ -328,11 +328,11 @@ def filter_obstacles(n, r):
         for point in list_of_obs:
             if obstacle != point:
                 distance = math.sqrt((obstacle[0] - point[0])**2 + (obstacle[1] - point[1])**2)
-                if distance <= r:
+                if distance <= radius:
                     count += 1
 
         # If the count is greater than or equal to n, keep the obstacle
-        if count >= n:
+        if count >= number_min_of_obstacle:
             filtered_obs.append(obstacle)
 
     list_of_obs = filtered_obs.copy()
