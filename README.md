@@ -18,7 +18,7 @@ June 2023
 
 ## 0.1 Description & Overview
 Wall-SLAM is a project that we have elaborated within the course CS-358 Making Intelligent Things, 
-under the direction Prof. Koch, and under the supervision of Federico Stella and Anirudhh Ramesh.
+under the direction of Prof. Koch, and under the supervision of Federico Stella and Anirudhh Ramesh.
 
 Our [project proposal](https://github.com/kreslotim/Wall-SLAM/blob/main/proposal/proposal.md), can be useful to witness some deviations in our project from our expectations.
 
