@@ -10,6 +10,7 @@ from app.models.esp32 import ESP32Connection
 from app.models.esp32Bluetooth import ESP32ConnectionBluetooth
 
 from app.models.dummyData import DummyData
+from app.models.mapK import ClusterChart
 
 main = Blueprint('main', __name__)
 
@@ -56,8 +57,6 @@ global settingDataSIM
 settingDataSIM = False
 
 
-cluster_chart  =  ClusterChart(num_clusters=10)
-mapJson = cluster_chart.generate_chart_json()
 
 global list_of_obs
 list_of_obs = []
@@ -146,7 +145,7 @@ def get_graph_data_com():
 @main.route('/get-graph-data-slam', methods=['GET'])
 def get_graph_data_slam():
     global list_of_obs
-    _filter_obstacles(number_min_of_obstacle, in_radius)
+   
     x_obs = [point[0] for point in list_of_obs]
     y_obs = [point[1] for point in list_of_obs]
    
@@ -324,9 +323,12 @@ def _dataToObstacle(x_car,y_car, distance,orientation):
 
 @main.route('/refresh_map',methods=['GET'])
 def refresh_map():
+    global list_of_obs
     print("rannn")
     # Code to generate or fetch the updated SVG map
     # Replace the following line with your logic to generate the updated map
+    cluster_chart  =  ClusterChart(list_of_obs)
+    mapJson = cluster_chart.generate_chart_json()
 
     return mapJson
 @main.route('/get_new_trace_data', methods=['GET'])
@@ -359,7 +361,6 @@ def _add_and_delete_obstacle(x_car, y_car, obs_distance, orientation):
         list_of_obs.append([x_new,y_new])
         list_of_100_x_obs.append(x_new)
         list_of_100_y_obs.append(y_new)
-        print("real data")
         x_new -= x_car
         y_new -= y_car
     else :

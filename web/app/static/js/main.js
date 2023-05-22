@@ -179,7 +179,7 @@ $(document).ready(function() {
     });
   }
 
-  setInterval(updateGraph, 2000);
+  setInterval(updateGraph, 10000);
 });
 
 // Noise Obstacle Map
@@ -764,7 +764,7 @@ $(document).ready(function() {
     }
 
     // Call updateMap() at an interval
-    setInterval(updateMap, 1000);
-    setInterval(updatePath, 1000);
+    setInterval(updateMap, 40000);
+    setInterval(updatePath, 40000);
 
 });

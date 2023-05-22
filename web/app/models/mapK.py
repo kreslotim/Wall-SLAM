@@ -7,10 +7,13 @@ import plotly
 from scipy.spatial import Delaunay
 from alphashape import alphashape
 import json
+from shapely.geometry import MultiPolygon
+
 
 class ClusterChart:
-    def __init__(self, num_clusters=2):
-        self.num_clusters = num_clusters
+    def __init__(self, data=[]):
+        self.num_clusters = 100
+        self.data = data
     def generate_shapes(self,num_shapes):
         X = []
         shape_names = ['Triangle', 'Circle', 'Square', 'Pentagon', 'Hexagon', 'Octagon']
@@ -56,49 +59,54 @@ class ClusterChart:
         # Example usage
         num_shapes = 50
         filter = 10
-        X = self.generate_shapes(num_shapes)
 
+        if self.data:
+            X = self.data
+            print("no random")
+        else:
+            X = self.generate_shapes(num_shapes)
+            print("random")
+
+        X = np.array(X)
         # Apply K-means clustering
-        kmeans1 = KMeans(2*self.num_clusters, X, filter)
+        kmeans1 = KMeans( 2*self.num_clusters, filter)
         data_filter,cluster_assignment, self.num_clusters = kmeans1.fit(X)
    
         labels = kmeans1.predict(data_filter)
         labels_str = labels.astype(str)  # convert to string array
 
-            # Create the scatter plot with circle markers for each cluster
-       # Create the scatter plot with cluster shapes
+                            # Create the scatter plot with circle markers for each cluster
+                    # Create the scatter plot with cluster shapes
+                    
+            
+        # Create the scatter plot with rectangle markers for each cluster
         fig = go.Figure()
 
         for label in np.unique(labels):
             mask = labels == label
             cluster_data = data_filter[mask]
             
-            # Calculate the Delaunay triangulation of the cluster
-            tri = Delaunay(cluster_data)
+            # Calculate the bounding box of the cluster
+            min_x = np.min(cluster_data[:, 0])
+            max_x = np.max(cluster_data[:, 0])
+            min_y = np.min(cluster_data[:, 1])
+            max_y = np.max(cluster_data[:, 1])
             
-            # Define the alpha value to control the shape flexibility (smaller value for more flexibility)
-            alpha = 1
+            # Add the rectangle marker to the plot
+            fig.add_shape(type="rect",
+                        x0=min_x, y0=min_y,
+                        x1=max_x, y1=max_y,
+                        line=dict(color=f'rgb({label * 50}, {label * 100}, {label * 150})'),
+                        fillcolor=f'rgba({label * 50}, {label * 100}, {label * 150}, 0.2)',
+                        name=f'Cluster {label}')
             
-            # Calculate the alpha shape of the cluster
-            alpha_shape = alphashape(cluster_data, alpha)
-            alpha_points = np.array(alpha_shape.exterior.coords)
-            
-            # Add the cluster shape to the plot
-            fig.add_trace(go.Scatter(x=alpha_points[:, 0], y=alpha_points[:, 1], mode='lines', name=f'Cluster {label}'))
-
             # Add the cluster data points as scatter markers
             fig.add_trace(go.Scatter(x=cluster_data[:, 0], y=cluster_data[:, 1], mode='markers', name=f'Cluster {label}'))
 
-        fig.update_layout(title='K-means Clustering with Cluster Shapes (Alpha Shapes)',
+        fig.update_layout(title='K-means Clustering with Geometrical Shapes',
                         xaxis_title='X',
                         yaxis_title='Y',
                         showlegend=True)
-
- 
-        
-
-
-
         chart_json = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
         return chart_json
 
