@@ -130,6 +130,56 @@ $(document).ready(function() {
   setInterval(updateGraph, 10000);
 });
 
+$(document).ready(function() {
+  
+  var data = [{
+    x: [],
+    y: [],
+    mode: 'markers+lines',
+    type: 'scatter',
+    marker: {
+      size: 5,
+      color: 'red',
+      symbol: 'circle'
+    }
+  }, {
+    x: [],
+    y: [],
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      size: 1,
+      color: 'blue',
+      symbol: 'circle-open'
+    }
+  }];
+
+  var layout = {
+    title: 'Obstacle Graph',
+    xaxis: { title: 'X Coordinate' },
+    yaxis: { title: 'Y Coordinate' }
+  };
+  Plotly.newPlot('graph-slam', data, layout);
+
+  function updateGraph() {
+    $.ajax({
+      url: '/get-graph-data-slam',
+      type: 'POST',
+      success: function(response) {
+        var eventData = JSON.parse(response.data);
+        var x_car = eventData[0];
+        var y_car = eventData[1];
+        var x_obs = eventData[2];
+        var y_obs = eventData[3];
+
+        Plotly.update('graph-slam', { x: [x_car, y_car], y: [x_obs, y_obs] });
+      }
+    });
+  }
+
+  setInterval(updateGraph, 200);
+});
+
 // Noise Obstacle Map
 $(document).ready(function() {
      // EventSource for receiving SSE events
