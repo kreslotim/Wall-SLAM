@@ -280,7 +280,7 @@ def _dataToObstacle(x_car,y_car, distance,orientation):
 
     return(point_x,point_y)
 
-def add_and_delete_obstacles(x_car, y_car, obs_distance, orientation):
+def _add_and_delete_obstacle(x_car, y_car, obs_distance, orientation):
     # Convert the orientation from degrees to radians
     angle_rad = math.radians(orientation)
 
