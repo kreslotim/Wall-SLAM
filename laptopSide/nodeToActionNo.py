@@ -37,7 +37,7 @@ def move_to_target(nodes):
 nodes = [(0, 10), (0, 20), (0, 30), (10, 30), (20, 30), (30, 30), (30, 20), (30, 10), (30, 0), (30, -10)]
 encoded_sequence = move_to_target(nodes)
 
-print(encoded_sequence)  # Print the encoded sequence of function calls
+print(encoded_sequence) 
 
 # forward() -> 1
 # orientateLeft() -> 2
