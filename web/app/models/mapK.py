@@ -53,41 +53,48 @@ class ClusterChart:
     def generate_chart_json(self):
         # Example usage
         num_shapes = 50
+        filter = 10
         X = self.generate_shapes(num_shapes)
 
         # Apply K-means clustering
-        kmeans1 = KMeans(2*self.num_clusters, X)
-        result = kmeans1.fit(X)
-        self.num_clusters = result[1]
-        print(result[1])
-        labels = kmeans1.predict(X)
+        kmeans1 = KMeans(2*self.num_clusters, X, filter)
+        data_filter,cluster_assignment, self.num_clusters = kmeans1.fit(X)
+   
+        labels = kmeans1.predict(data_filter)
         labels_str = labels.astype(str)  # convert to string array
-
+        print(data_filter.shape)
+        print(X.shape)
+        print("label")
+        print(labels.shape)
         cmap = plt.get_cmap('Set1')
         colors = cmap(np.arange(len(np.unique(labels_str)))).tolist()
+        print(colors)
         label_color = [colors[i] for i in labels]
+
 
         # Create a scatter plot
         fig = go.Figure()
         fig.add_trace(go.Scatter(
-            x=X[:, 0],
-            y=X[:, 1],
+            x=data_filter[:, 0],
+            y=data_filter[:, 1],
             mode='markers',
             marker=dict(color=label_color)
         ))
+        print(data_filter)
 
       # Find the convex hull for each cluster
         for i in range(self.num_clusters):
-            cluster_points = X[labels == i]
-            hull = ConvexHull(cluster_points)
-            fig.add_trace(go.Scatter(
-                x=cluster_points[hull.vertices, 0],
-                y=cluster_points[hull.vertices, 1],
-                fill='toself',
-                fillcolor=f'rgb({int(colors[i][0]*255)},{int(colors[i][1]*255)},{int(colors[i][2]*255)})',
-                line=dict(color=f'rgb({int(colors[i][0]*255)},{int(colors[i][1]*255)},{int(colors[i][2]*255)})'),
-                opacity=0.5
-            ))
+            cluster_points = data_filter[labels == i]
+            if cluster_points.size != 0 :
+                hull = ConvexHull(cluster_points)
+                fig.add_trace(go.Scatter(
+                    x=data_filter[hull.vertices, 0],
+                    y=data_filter[hull.vertices, 1],
+                    fill='toself',
+                    fillcolor=f'rgb({int(colors[i][0]*255)},{int(colors[i][1]*255)},{int(colors[i][2]*255)})',
+                    line=dict(color=f'rgb({int(colors[i][0]*255)},{int(colors[i][1]*255)},{int(colors[i][2]*255)})'),
+                    opacity=0.5
+                ))
 
         chart_json = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
         return chart_json
