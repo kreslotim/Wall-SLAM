@@ -29,8 +29,6 @@ dataD = DummyData(10)
 list_of_obs = []
 list_of_100_x_obs = []
 list_of_100_y_obs = []
-list_of_100_x_del = []
-list_of_100_y_del = []
 numberOfObsInOneGo = 50
 delete_distance = 30
 
@@ -252,11 +250,10 @@ def stream_noisy_obstacle():
                     _add_and_delete_obstacle(x_car, y_car, distance, orientation)
 
                     if len(list_of_100_x_obs) > numberOfObsInOneGo :
-                        yield 'data: {}\n\n'.format(json.dumps((x_car, y_car, list_of_100_x_obs,list_of_100_y_obs, list_of_100_x_del, list_of_100_y_del)))
+                        yield 'data: {}\n\n'.format(json.dumps((x_car, y_car, list_of_100_x_obs,list_of_100_y_obs)))
                         list_of_100_x_obs.clear()
                         list_of_100_y_obs.clear()
-                        list_of_100_x_del.clear()
-                        list_of_100_y_del.clear()
+
 
     
             elif settingDataSIM:
@@ -282,30 +279,6 @@ def _dataToObstacle(x_car,y_car, distance,orientation):
     point_y = y_car + distance * math.sin(orientation)
 
     return(point_x,point_y)
-
-def _add_and_delete_obstacle(x_car, y_car, obs_distance, orientation):    
-    # Calculate the x and y coordinates of the obstacle and add to list of obstacles
-    if obs_distance != 0: 
-        x_obs, y_obs = _dataToObstacle(x_car,y_car, obs_distance,orientation)   
-        list_of_obs.append([x_obs,y_obs])
-        list_of_100_x_obs.append(x_obs)
-        list_of_100_y_obs.append(y_obs)
-    else :
-        obs_distance = delete_distance
-
-    # Calculate the distance of each existing obstacle from the origin
-    distances = [math.sqrt(x**2 + y**2) for x, y in list_of_obs]
-
-    # Find the obstacles that are between the new obstacle and the origin
-    obstacles_to_delete = [obs for obs, distance in zip(list_of_obs, distances) if distance < obs_distance - 10]
-
-    # Remove the obstacles that are between the new obstacle and the origin
-    for obstacle in obstacles_to_delete:
-        list_of_obs.remove(obstacle)
-        x_del , y_del = obstacle[0],obstacle[1]
-        list_of_100_x_del.append(x_del)
-        list_of_100_y_del.append(y_del)
-    return
 
 def add_and_delete_obstacles(x_car, y_car, obs_distance, orientation):
     # Convert the orientation from degrees to radians
@@ -342,7 +315,26 @@ def add_and_delete_obstacles(x_car, y_car, obs_distance, orientation):
     # Remove the obstacles that lie on the linear equation between the new obstacle and the origin
     for obstacle in obstacles_to_delete:
         list_of_obs.remove(obstacle)
-        list_of_100_x_del.append(obstacle[0])
-        list_of_100_y_del.append(obstacle[1])
+        
+    return list_of_obs
+
+def filter_obstacles(n, r):
+    filtered_obs = []
+
+    for obstacle in list_of_obs:
+        count = 0
+
+        # Check the distance between each point and the obstacle
+        for point in list_of_obs:
+            if obstacle != point:
+                distance = math.sqrt((obstacle[0] - point[0])**2 + (obstacle[1] - point[1])**2)
+                if distance <= r:
+                    count += 1
+
+        # If the count is greater than or equal to n, keep the obstacle
+        if count >= n:
+            filtered_obs.append(obstacle)
+
+    list_of_obs = filtered_obs.copy()
 
     return list_of_obs
