@@ -117,17 +117,69 @@ $(document).ready(function() {
       url: '/get-graph-data-com',
       type: 'POST',
       success: function(response) {
-        var x_sent = response.x_sent;
-        var y_sent = response.y_sent;
-        var x_received = response.x_received;
-        var y_received = response.y_received;
+        var eventData = JSON.parse(response);
+        var x_car = eventData.x_car;
+        var y_car = eventData.y_car;
+        var x_obs = eventData.x_obs;
+        var y_obs = eventData.y_obs;
+      
+        Plotly.update('g', { x: [[x_car], y_car], y: [[x_obs], y_obs]},[0, 1]);
+      }
+    });
+  }
+});
 
-        Plotly.update('graph', { x: [x_sent, x_received], y: [y_sent, y_received] });
+$(document).ready(function() {
+  
+  var data = [{
+    x: [],
+    y: [],
+    mode: 'markers+lines',
+    type: 'scatter',
+    marker: {
+      size: 5,
+      color: 'red',
+      symbol: 'circle'
+    }
+  }, {
+    x: [],
+    y: [],
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      size: 1,
+      color: 'blue',
+      symbol: 'circle-open'
+    }
+  }];
+
+  var layout = {
+    title: 'Obstacle Graph',
+    xaxis: { title: 'X Coordinate' },
+    yaxis: { title: 'Y Coordinate' }
+  };
+  Plotly.newPlot('graph-slam', data, layout);
+
+  function updateGraph() {
+    $.ajax({
+      url: '/get-graph-data-slam',
+      type: 'GET',
+      success: function(response) {
+        console.log(response.data);
+        var eventData = JSON.parse(response.data);
+        
+        var x_car = eventData.x_car;
+        var y_car = eventData.y_car;
+        var x_obs = eventData.x_obs;
+        var y_obs = eventData.y_obs;
+        console.log(x_obs);
+
+        Plotly.update('graph-slam', { x: [[x_car], x_obs], y: [[y_car], y_obs]},[0, 1]);
       }
     });
   }
 
-  setInterval(updateGraph, 10000);
+  setInterval(updateGraph, 2000);
 });
 
 // Noise Obstacle Map
@@ -152,7 +204,7 @@ $(document).ready(function() {
        mode: 'markers',
        type: 'scatter',
        marker: {
-         size: 10,
+         size: 1,
          color: 'blue',
          symbol: 'circle-open'
        }
@@ -173,9 +225,10 @@ $(document).ready(function() {
        var y_car = eventData[1];
        var x_obs = eventData[2];
        var y_obs = eventData[3];
- 
-       // Update graph data
-       Plotly.extendTraces('graph-obstacle', { x: [[x_car], [x_obs]], y: [[y_car], [y_obs]] }, [0, 1]);
+
+
+       Plotly.extendTraces('graph-obstacle', { x: [[x_car], x_obs], y: [[y_car], y_obs] }, [0, 1]);
+
      };
    
 });

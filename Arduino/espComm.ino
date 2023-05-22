@@ -124,7 +124,7 @@ void setup() {
 
   // Access Point SetUp
   WiFi.softAPConfig(local_IP, gateway, subnet);
-  WiFi.softAP(ssid, password, 1);  //limit connection to 1 user
+  WiFi.softAP(ssid, password);
   Serial.print("IP address = ");
   Serial.println(WiFi.softAPIP());
 
@@ -362,32 +362,34 @@ void stopMotors() {
 void moveForward() {
   stepperLeft.setSpeed(-CONST_SPEED_STEPPER);
   stepperRight.setSpeed(CONST_SPEED_STEPPER);
-   if (goToOrientation == 0) {
-      y += DIST_PER_STEP;  // move north
-  } else if (goToOrientation == 90) {
-      x += DIST_PER_STEP;  // move west
-  } else if (goToOrientation == 180) {
-      y -= DIST_PER_STEP;  // move south
-  } else if (goToOrientation == 270) {
-      x -= DIST_PER_STEP;  // move east
+  if(stepperLeft.runSpeed()){
+    if (goToOrientation == 0) {
+        y += DIST_PER_STEP;  // move north
+    } else if (goToOrientation == 90) {
+        x += DIST_PER_STEP;  // move west
+    } else if (goToOrientation == 180) {
+        y -= DIST_PER_STEP;  // move south
+    } else if (goToOrientation == 270) {
+        x -= DIST_PER_STEP;  // move east
+    }
   }
-  stepperLeft.runSpeed();
   stepperRight.runSpeed();
 }
 
 void moveBackward() {
   stepperLeft.setSpeed(CONST_SPEED_STEPPER);
   stepperRight.setSpeed(-CONST_SPEED_STEPPER);
-  if (goToOrientation == 0) {
-      y -= DIST_PER_STEP;  // move north
-  } else if (goToOrientation == 90) {
-      x -= DIST_PER_STEP;  // move west
-  } else if (goToOrientation == 180) {
-      y += DIST_PER_STEP;  // move south
-  } else if (goToOrientation == 270) {
-      x += DIST_PER_STEP;  // move east
+  if(stepperLeft.runSpeed()){
+    if (goToOrientation == 0) {
+        y -= DIST_PER_STEP;  // move north
+    } else if (goToOrientation == 90) {
+        x -= DIST_PER_STEP;  // move west
+    } else if (goToOrientation == 180) {
+        y += DIST_PER_STEP;  // move south
+    } else if (goToOrientation == 270) {
+        x += DIST_PER_STEP;  // move east
+    }
   }
-  stepperLeft.runSpeed();
   stepperRight.runSpeed();
 }
 
@@ -401,6 +403,7 @@ void moveRight() {
     stepperLeft.run();
     stepperRight.run();
   }
+  
 }
 
 void moveLeft() {

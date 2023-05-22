@@ -7,8 +7,9 @@ import random
 import math
 
 from app.models.esp32 import ESP32Connection
+from app.models.esp32Bluetooth import ESP32ConnectionBluetooth
+
 from app.models.dummyData import DummyData
-from app.models.mapK import ClusterChart
 
 main = Blueprint('main', __name__)
 
@@ -25,9 +26,22 @@ global togoY
 togoY = 0
 obstacles = []
 
+
 startTime= time.time()
+#espT = ESP32ConnectionBluetooth(com_port=com_port,baud_port=baud_port)
 espT = ESP32Connection(send_port=send_port,recv_port=recv_port)
+
 dataD = DummyData(10)
+
+list_of_100_x_obs = []
+list_of_100_y_obs = []
+numberOfObsInOneGo = 50
+delete_distance = 30
+max_distance_detection = 2000
+number_min_of_obstacle = 1
+in_radius = 10
+
+
 
 global settingConnection
 settingConnection = False
@@ -41,8 +55,20 @@ settingDataESP = False
 global settingDataSIM
 settingDataSIM = False
 
+
 cluster_chart  =  ClusterChart(num_clusters=10)
 mapJson = cluster_chart.generate_chart_json()
+
+global list_of_obs
+list_of_obs = []
+
+global curr_x_car
+curr_x_car = 0
+
+global curr_y_car
+curr_y_car = 0
+
+
 
 @main.route('/')
 def index():
@@ -117,6 +143,23 @@ def get_graph_data_com():
     
     return jsonify()
 
+@main.route('/get-graph-data-slam', methods=['GET'])
+def get_graph_data_slam():
+    global list_of_obs
+    _filter_obstacles(number_min_of_obstacle, in_radius)
+    x_obs = [point[0] for point in list_of_obs]
+    y_obs = [point[1] for point in list_of_obs]
+   
+    response_data = {
+        'x_car': curr_x_car,
+        'y_car': curr_y_car,
+        'x_obs': x_obs,
+        'y_obs': y_obs
+    }
+
+    return jsonify(data=json.dumps(response_data))
+
+
 @main.route('/get-status-value', methods=['GET'])
 def get_status_value():
     return jsonify({'setting' : settingConnection, 'status': espT.connected, 'hostIP' : espT.hostIp, 'hostName' : espT.hostName})
@@ -143,7 +186,6 @@ def update_switch_state_data():
     settingConnection = (sSettingConnection == "true")
 
     return jsonify({'success': True})
-
 
 # This route generates a stream of SSE events
 @main.route('/stream-errors')
@@ -230,10 +272,10 @@ def stream_input():
 # This route generates a stream of SSE events
 @main.route('/stream-noisy-obstacle')
 def stream_noisy_obstacle():
+    global curr_x_car, curr_y_car
     def event_stream():
         # Loop indefinitely
         while True:
-            time.sleep(0.1)
             # Wait for a new error to be added
             if espT.connected:
                 if len(espT.obstacle) != 0:
@@ -241,13 +283,19 @@ def stream_noisy_obstacle():
                     espT.obstacle.pop(0)
                     # If a new error is available, send it to the client as an SSE event
                     timeOfObs = new_info[0]
-                    x_car = new_info[1]
-                    y_car = new_info[2]
+                    curr_x_car = new_info[1]
+                    curr_y_car = new_info[2]
                     distance = new_info[3]
                     orientation = new_info[4]
-                    x_obs,y_obs = _dataToObstacle(x_car,y_car,distance,orientation)
-                    if not (distance == -1):
-                        yield 'data: {}\n\n'.format(json.dumps((x_car, y_car,x_obs,y_obs)))
+                    
+                    _add_and_delete_obstacle(curr_x_car, curr_y_car, distance, orientation)
+
+                    if len(list_of_100_x_obs) > numberOfObsInOneGo :
+                        yield 'data: {}\n\n'.format(json.dumps((curr_x_car, curr_y_car, list_of_100_x_obs,list_of_100_y_obs)))
+                        list_of_100_x_obs.clear()
+                        list_of_100_y_obs.clear()
+
+
     
             elif settingDataSIM:
                 print("Adding data")
@@ -259,80 +307,18 @@ def stream_noisy_obstacle():
                 orientation = new_info[4]
                 x_obs,y_obs = _dataToObstacle(x_car,y_car,distance,orientation)
                 if not (distance == -1):
-                    yield 'data: {}\n\n'.format(json.dumps((x_car, y_car,x_obs,y_obs)))
+                    yield 'data: {}\n\n'.format(json.dumps((x_car, y_car, x_obs, y_obs)))
                 
 
     # Return the SSE response
     return Response(event_stream(), mimetype='text/event-stream')
-
-# This route generates a stream of SSE events
-@main.route('/stream-map')
-def stream_map():
-    def event_stream():
-        # Loop indefinitely
-        while True:
-            time.sleep(0.1)
-            # Wait for a new error to be added
-            if espT.connected:
-                if len(espT.obstacle) != 0:
-                    new_info = espT.obstacle[0]
-                    espT.obstacle.pop(0)
-                    # If a new error is available, send it to the client as an SSE event
-                    timeOfObs = new_info[0]
-                    x_car = new_info[1]
-                    y_car = new_info[2]
-                    distance = new_info[3]
-                    orientation = new_info[4]
-                    x_obs,y_obs = _dataToObstacle(x_car,y_car,distance,orientation)
-                    if not (distance == -1):
-                        yield 'data: {}\n\n'.format(json.dumps((x_car, y_car,x_obs,y_obs)))
-    
-            elif settingDataSIM:
-                print("Adding data")
-                new_info = dataD._randomlyFill()
-                timeOfObs = new_info[0]
-                x_car = new_info[1]
-                y_car = new_info[2]
-                distance = new_info[3]
-                orientation = new_info[4]
-                x_obs,y_obs = _dataToObstacle(x_car,y_car,distance,orientation)
-                if not (distance == -1):
-                    yield 'data: {}\n\n'.format(json.dumps((x_car, y_car,x_obs,y_obs)))
-                
-
-    # Return the SSE response
-    return Response(event_stream(), mimetype='text/event-stream')
-
-
-@main.route('/navigate', methods=['POST'])
-def navigate():
-    global robotX, robotY, obstacles
-    print("ubhhhh")
-
-    destination = request.json
-
-    # Update the robot position
-    robotX = destination['x']
-    robotY = destination['y']
-
-    # Update the obstacle data
-    obstacles = destination['obstacles']
-
-    # Prepare the response
-    response = {
-        'robotX': robotX,
-        'robotY': robotY,
-        'obstacles': obstacles
-    }
-
-    return jsonify(response)
-
 
 def _dataToObstacle(x_car,y_car, distance,orientation):    
     # Calculate the x and y coordinates of the obstacle
     orientation = math.radians(orientation)
     point_x = x_car + distance * math.cos(orientation)
     point_y = y_car + distance * math.sin(orientation)
+
     return(point_x,point_y)
 
 
@@ -362,3 +348,66 @@ def process_coordinates():
 
     # Return a response to the AJAX request if needed
     return 'Coordinates processed successfully'
+
+def _add_and_delete_obstacle(x_car, y_car, obs_distance, orientation):
+    global list_of_obs
+    # Convert the orientation from degrees to radians
+    angle_rad = math.radians(orientation)
+
+    if obs_distance != 0 and obs_distance < max_distance_detection and obs_distance > -max_distance_detection: 
+        x_new, y_new = _dataToObstacle(x_car,y_car, obs_distance,orientation)   
+        list_of_obs.append([x_new,y_new])
+        list_of_100_x_obs.append(x_new)
+        list_of_100_y_obs.append(y_new)
+        print("real data")
+        x_new -= x_car
+        y_new -= y_car
+    else :
+        obs_distance = delete_distance
+        x_new = obs_distance * math.cos(angle_rad)
+        y_new = obs_distance * math.sin(angle_rad)
+
+    # Calculate the slope of the line with the given orientation
+    slope = math.tan(angle_rad)
+
+    # Find the obstacles that lie on the linear equation between the new obstacle and the origin
+    obstacles_to_delete = []
+
+    for obstacle in list_of_obs:
+        x_obs, y_obs = obstacle
+
+        # Check if the obstacle lies on the linear equation
+        if math.isclose(y_obs, slope * x_obs, abs_tol = 10):
+            # Check if the obstacle lies between the new obstacle and the origin
+            if 0 < x_obs < x_new-10 or 0 > x_obs > x_new-10:
+                obstacles_to_delete.append(obstacle)
+
+    # Remove the obstacles that lie on the linear equation between the new obstacle and the origin
+    for obstacle in obstacles_to_delete:
+        list_of_obs.remove(obstacle)
+        
+    return list_of_obs
+
+def _filter_obstacles(number_min_of_obstacle, radius):
+    global list_of_obs
+
+    filtered_obs = []
+
+    for obstacle in list_of_obs:
+        count = 0
+
+        # Check the distance between each point and the obstacle
+        for point in list_of_obs:
+            if obstacle != point:
+                distance = math.sqrt((obstacle[0] - point[0])**2 + (obstacle[1] - point[1])**2)
+                if distance <= radius:
+                    count += 1
+
+        # If the count is greater than or equal to n, keep the obstacle
+        if count >= number_min_of_obstacle:
+            filtered_obs.append(obstacle)
+
+    list_of_obs = filtered_obs.copy()
+
+    return list_of_obs
+
