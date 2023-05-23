@@ -170,7 +170,6 @@ class ESP32Connection:
                 packed_angles = struct.pack('f', actionNumber)
                 self.send_socket.sendall(packed_angles)
 
-
                 # Wait for a response from the ESP32
                 response = 0
 
@@ -187,7 +186,6 @@ class ESP32Connection:
                     self._send_actionNumber(actionNumber)
                     return 410
                
-
             except Exception as e:
                 print("Connection error :", e)
                 timeOfRep = round( time.time() - self.time, 2)

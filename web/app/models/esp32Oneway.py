@@ -7,7 +7,7 @@ import random
 
 
 
-class ESP32Connection:
+class ESP32ConnectionOneway:
     def __init__(self, send_port, recv_port):
         print("Establishing Connection")
 

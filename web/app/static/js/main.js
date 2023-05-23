@@ -763,7 +763,7 @@ $(document).ready(function() {
     }
 
     // Call updateMap() at an interval
-    setInterval(updateMap, 40000);
-    setInterval(updatePath, 40000);
+    setInterval(updateMap, 10000);
+    setInterval(updatePath, 10000);
 
 });
