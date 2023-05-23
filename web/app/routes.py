@@ -20,13 +20,11 @@ recv_port = 8888
 send_port = 8889
 
 # Initial robot position and obstacle data
-robotX = 0
-robotY = 0
+
 global togoX 
 togoX = 1
 global togoY
 togoY = 0
-obstacles = []
 
 
 startTime= time.time()
@@ -53,17 +51,6 @@ settingDataESP = False
 
 global settingDataSIM
 settingDataSIM = False
-
-
-
-global list_of_obs
-list_of_obs = []
-
-global curr_x_car
-curr_x_car = 0
-
-global curr_y_car
-curr_y_car = 0
 
 
 
@@ -319,16 +306,7 @@ def _dataToObstacle(x_car,y_car, distance,orientation):
     return(point_x,point_y)
 
 
-@main.route('/refresh_map',methods=['GET'])
-def refresh_map():
-    global list_of_obs
-    print("rannn")
-    # Code to generate or fetch the updated SVG map
-    # Replace the following line with your logic to generate the updated map
-    cluster_chart  =  ClusterChart(list_of_obs)
-    mapJson = cluster_chart.generate_chart_json()
 
-    return mapJson
 @main.route('/get_new_trace_data', methods=['GET'])
 def get_new_trace_data():
     num_points = 3
@@ -348,65 +326,3 @@ def process_coordinates():
 
     # Return a response to the AJAX request if needed
     return 'Coordinates processed successfully'
-
-def _add_and_delete_obstacle(x_car, y_car, obs_distance, orientation):
-    global list_of_obs
-    # Convert the orientation from degrees to radians
-    angle_rad = math.radians(orientation)
-
-    if obs_distance != 0 and obs_distance < max_distance_detection and obs_distance > -max_distance_detection: 
-        x_new, y_new = _dataToObstacle(x_car,y_car, obs_distance,orientation)   
-        list_of_obs.append([x_new,y_new])
-        list_of_100_x_obs.append(x_new)
-        list_of_100_y_obs.append(y_new)
-        x_new -= x_car
-        y_new -= y_car
-    else :
-        obs_distance = delete_distance
-        x_new = obs_distance * math.cos(angle_rad)
-        y_new = obs_distance * math.sin(angle_rad)
-
-    # Calculate the slope of the line with the given orientation
-    slope = math.tan(angle_rad)
-
-    # Find the obstacles that lie on the linear equation between the new obstacle and the origin
-    obstacles_to_delete = []
-
-    for obstacle in list_of_obs:
-        x_obs, y_obs = obstacle
-
-        # Check if the obstacle lies on the linear equation
-        if math.isclose(y_obs, slope * x_obs, abs_tol = 10):
-            # Check if the obstacle lies between the new obstacle and the origin
-            if 0 < x_obs < x_new-10 or 0 > x_obs > x_new-10:
-                obstacles_to_delete.append(obstacle)
-
-    # Remove the obstacles that lie on the linear equation between the new obstacle and the origin
-    for obstacle in obstacles_to_delete:
-        list_of_obs.remove(obstacle)
-        
-    return list_of_obs
-
-def _filter_obstacles(number_min_of_obstacle, radius):
-    global list_of_obs
-
-    filtered_obs = []
-
-    for obstacle in list_of_obs:
-        count = 0
-
-        # Check the distance between each point and the obstacle
-        for point in list_of_obs:
-            if obstacle != point:
-                distance = math.sqrt((obstacle[0] - point[0])**2 + (obstacle[1] - point[1])**2)
-                if distance <= radius:
-                    count += 1
-
-        # If the count is greater than or equal to n, keep the obstacle
-        if count >= number_min_of_obstacle:
-            filtered_obs.append(obstacle)
-
-    list_of_obs = filtered_obs.copy()
-
-    return list_of_obs
-
