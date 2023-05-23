@@ -172,14 +172,13 @@ $(document).ready(function() {
         var y_car = eventData.y_car;
         var x_obs = eventData.x_obs;
         var y_obs = eventData.y_obs;
-        console.log(x_obs);
 
         Plotly.update('graph-slam', { x: [[x_car], x_obs], y: [[y_car], y_obs]},[0, 1]);
       }
     });
   }
 
-  setInterval(updateGraph, 2000);
+  setInterval(updateGraph, 10000);
 });
 
 // Noise Obstacle Map
