@@ -13,6 +13,7 @@ class ESP32ConnectionBluetooth:
         print("Establishing Connection")
 
         self.serialBT = serial.Serial(com_port, baud_port, timeout=1)
+
         
         # Connection variable
         self.espIP = None

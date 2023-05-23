@@ -116,7 +116,8 @@ IPAddress gateway(192, 168, 1, 5);
 IPAddress subnet(255, 255, 255, 0);
 
 // Kalman filter variables
-KalmanFilter kf;
+KalmanFilter kfDistance;
+KalmanFilter kfOrientation;
 
 // Sensor measurements
 double z1;  // Distance measurement 1
@@ -297,7 +298,7 @@ void sendData() {
 void updateSensors() {
   // Read acceleration and update position
   unsigned long currentTime = millis();
-  float deltaTime = (currentTime - lastTime) / 1000.0;  // Convert milliseconds to seconds
+  float deltaTime = (currentTime - lastTime) *  1000.0;  // Convert milliseconds to seconds
 
   // Update position
   for (int i = 0; i < 3; i++) {
@@ -353,6 +354,9 @@ void updateData() {
   dataSend[1] = y;
   dataSend[2] = orientation;
   dataSend[3] = lidarDistance;
+  dataSend[4] = lidarDistance;
+  dataSend[5] = time;
+
 }
 
 void rotateServo(){
