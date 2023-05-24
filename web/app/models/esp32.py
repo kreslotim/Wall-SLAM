@@ -38,6 +38,19 @@ class ESP32Connection:
         self.recv_stat = []
         self.send_stat = []
         self.time = time.time()
+
+        self.list_of_obs = []
+        self.list_of_100_x_obs = []
+        self.list_of_100_y_obs = []
+        self.numberOfObsInOneGo = 50
+        self.delete_distance_if_no_distance = 30
+        self.delete_distance_linear_equation = 10
+        self.max_distance_detection = 2000
+        self.number_min_of_obstacle = 1
+        self.in_radius = 10
+
+        self.curr_x_car = 0
+        self.curr_y_car = 0
     
 ######## Thread Looping #############
 
@@ -161,7 +174,6 @@ class ESP32Connection:
                 packed_angles = struct.pack('f', actionNumber)
                 self.send_socket.sendall(packed_angles)
 
-
                 # Wait for a response from the ESP32
                 response = 0
 
@@ -178,7 +190,6 @@ class ESP32Connection:
                     self._send_actionNumber(actionNumber)
                     return 410
                
-
             except Exception as e:
                 print("Connection error :", e)
                 timeOfRep = round( time.time() - self.time, 2)
@@ -237,9 +248,81 @@ class ESP32Connection:
             self.output.append((timeOfRep, 'Sent Move Forward successful : ' + str(repStatut))) 
         else :
             self.output.append((timeOfRep, 'Sent Move Forward fail  : ' +str(repStatut))) 
- 
+
+############ OBSTACLE METHODS ############
+
+    def _add_and_delete_obstacle(self, x_car, y_car, obs_distance, orientation):
+
+        if obs_distance != 0 and obs_distance < self.max_distance_detection and obs_distance > -self.max_distance_detection:
+            x_new, y_new = self._dataToObstacle(x_car,y_car, obs_distance,orientation)   
+            self.list_of_obs.append([x_new,y_new])
+            self.list_of_100_x_obs.append(x_new)
+            self.list_of_100_y_obs.append(y_new)
+        else :
+            x_new, y_new = self._dataToObstacle(x_car,y_car, obs_distance,orientation)   
+            obs_distance = self.delete_distance_if_no_distance
+
+        # Calculate the linear equation between the car and new obstacle
+        m = (y_new - y_car)/(x_new - y_car ) if (x_new - y_car) != 0 else 0
+        b = -m*x_car + y_car
+
+        # Find the obstacles that lie on the linear equation between the new obstacle and the origin
+        obstacles_to_delete = []
+
+        for obstacle in self.list_of_obs:
+            x_obs, y_obs = obstacle
+
+            # Check if the obstacle lies on the linear equation
+            distance = abs(y_obs - m * x_obs - b) / math.sqrt(1 + m**2)
+
+            # Check if the obstacle lies between the new obstacle and the origin
+            if (x_car < x_obs < x_new - 10 or x_car > x_obs > x_new + 10) and self.delete_distance_linear_equation > distance:
+                    obstacles_to_delete.append(obstacle)
+
+        # Remove the obstacles that lie on the linear equation between the new obstacle and the origin
+        for obstacle in obstacles_to_delete:
+            self.list_of_obs.remove(obstacle)
+            
+        return self.list_of_obs
+
+    def _filter_obstacles(self, number_min_of_obstacle, radius):
+        filtered_obs = []
+
+        for obstacle in self.list_of_obs:
+            count = 0
+
+            # Check the distance between each point and the obstacle
+            for point in self.list_of_obs:
+                if obstacle != point:
+                    distance = math.sqrt((obstacle[0] - point[0])**2 + (obstacle[1] - point[1])**2)
+                    if distance <= radius:
+                        count += 1
+
+            # If the count is greater than or equal to n, keep the obstacle
+            if count >= number_min_of_obstacle:
+                filtered_obs.append(obstacle)
+
+        self.list_of_obs = filtered_obs.copy()
+
+        return self.list_of_obs
+
+    def _is_ready_to_go(self):
+        return len(self.list_of_100_x_obs) > self.numberOfObsInOneGo 
+
+    def _clear_temp_list(self):
+        self.list_of_100_x_obs.clear()
+        self.list_of_100_y_obs.clear()
+
 
 ############ HELPER METHOD ############
+
+    def _dataToObstacle(self, x_car,y_car, distance,orientation):    
+        # Calculate the x and y coordinates of the obstacle
+        orientation = math.radians(orientation)
+        point_x = x_car + distance * math.cos(orientation)
+        point_y = y_car + distance * math.sin(orientation)
+
+        return(point_x,point_y)
 
     def _is_socket_alive(self):
         if self.send_socket is None: 

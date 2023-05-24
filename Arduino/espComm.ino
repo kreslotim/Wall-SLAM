@@ -24,7 +24,7 @@ int servoAngle=1;
 int numberOfConnectionOld = 0;
 float actionNumber = 0;
 float orientation = 0;
-int goToOrientation = 0;
+int goToOrientation = 90;
 float x = 0;
 float y = 0;
 unsigned long startTime; // Variable to store the start time
@@ -79,10 +79,6 @@ Servo servo;
 // Create instance of Lidar
 Adafruit_VL53L1X vl53Front = Adafruit_VL53L1X(XSHUT_PIN, IRQ_PIN);
 Adafruit_VL53L1X vl53Back = Adafruit_VL53L1X(XSHUT_PIN, IRQ_PIN);
-TwoWire wireOne = TwoWire(0);
-TwoWire wireTwo = TwoWire(1);
-TwoWire wireThree = TwoWire(2);
-
 
 // Create intance of Gyro, Accel and Mag
 Adafruit_FXAS21002C gyro = Adafruit_FXAS21002C(0x0021002C);
@@ -94,7 +90,6 @@ NewPing frontUltrasonic(TRIG_PIN, ECHO_PIN, MAX_DISTANCE_SONAR);
 // Create instances of stepper motors
 AccelStepper stepperLeft(FULLSTEP, L_IN1, L_IN3, L_IN2, L_IN4);
 AccelStepper stepperRight(FULLSTEP, R_IN1, R_IN3, R_IN2, R_IN4);
-
 
 // SSID and password of Wifi connection:
 const char* password = "0123456789A";
@@ -163,7 +158,6 @@ void setup() {
 
   // Setup Timer
   startTime = millis(); // Record the start time
-
 }
 
 void setupLidarsAndIMU() {
@@ -298,7 +292,7 @@ void packData() {
   dataSend[1] = distanceSonarFront;
   dataSend[2] = lidarDistanceFront;
   dataSend[3] = lidarDistanceBack;
-  dataSend[4] = servo.read();
+  dataSend[4] = servo.read() + goToOrientation;
   dataSend[5] = x;
   dataSend[6] = y;
   dataSend[7] = elapsedTime;
@@ -333,10 +327,13 @@ void action(float actionNumber) {
 
     case 3:
       moveRight();
+      actionNumber = 0;
       break;
 
     case 4:
       moveLeft();
+      actionNumber = 0;
+
       break;
 
     default:
@@ -418,6 +415,7 @@ void moveLeft() {
   }
 }
 
+
 void Task1code(void* pvParameters) {
   for (;;) {
     action(actionNumber);
@@ -425,7 +423,9 @@ void Task1code(void* pvParameters) {
 }
 
 void loop() {
-  sendData();
-  readData();
-  delay(100);
+  if(WiFi.softAPgetStationNum() == 1){
+    sendData();
+    readData();
+    delay(10);
+  } 
 }
