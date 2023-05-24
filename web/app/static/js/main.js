@@ -691,7 +691,7 @@ $(document).ready(function() {
     Plotly.newPlot('map', chartData, layout, config).then(function(gd) {
 
   
-      gd.addEventListener('click', function(eventData) {
+      gd.addEventListener('plotly_click', function(eventData) {
         var xaxis = gd._fullLayout.xaxis;
         var yaxis = gd._fullLayout.yaxis;
         var x = xaxis.p2l(eventData.x);
@@ -714,10 +714,10 @@ $(document).ready(function() {
           });
         });
 
-        
+   
+    
       
-    
-    
+
     // Function to update the new trace data
     function updatePath() {
       $.ajax({
@@ -749,22 +749,122 @@ $(document).ready(function() {
         url: '/refresh_map',
         type: 'GET',
         success: function(data) {
-          var newChartData = JSON.parse(data);
-    
-          // Add the new trace to the chart data
-          if (newChartData.hasOwnProperty('data')) {
-            chartData = newChartData;
-            chartData.data.push(path);
-            chartData.data.push(robot);
-            chartData.data.push(togo);
-          } 
-          Plotly.newPlot('map', chartData.data, chartData.layout);
-        }
+            var newChartData = JSON.parse(data);
+            if (newChartData.hasOwnProperty('data')) {
+              chartData = newChartData;
+              chartData.data.push(path);
+              chartData.data.push(robot);
+              chartData.data.push(togo);
+            } 
+            Plotly.newPlot('map', chartData.data, chartData.layout);
+          }
+        
       });
     }
 
-    // Call updateMap() at an interval
-    setInterval(updateMap, 40000);
-    setInterval(updatePath, 40000);
 
+    var progressIntervalId; // Variable to hold the progress interval ID
+    var progressValue = 0; // Current progress value
+    var intervalId; // Variable to hold the interval ID
+
+     // Function to update the progress bar
+     function updateProgressBar() {
+      progressValue += 10; // Increase progress value by 10
+      if (progressValue >= 100) progressValue=0;
+      document.getElementById('progressBar').style.width = progressValue + '%'; // Update progress bar width
+      document.getElementById('progressBar').innerHTML = progressValue + '%'; 
+      document.getElementById('progressBar').setAttribute('aria-valuenow', progressValue); // Update aria-valuenow attribute
+      if (!intervalId) {
+        clearInterval(progressIntervalId); // Clear the progress interval when it reaches 100%
+        progressValue = 0; // Reset progress value
+        document.getElementById('progressBar').style.width = '0%'; // Reset progress bar width
+        document.getElementsByClassName('progress')[0].style.display = 'none'; // Hide the progress bar
+      }
+    }
+
+      // Toggle button event listener
+      document.getElementById('toggleButtonKmean').addEventListener('click', function() {
+       
+  
+        if (intervalId) {
+          // If interval is active, clear it and deactivate the toggle button
+          clearInterval(intervalId);
+          intervalId = null;
+          clearInterval(progressIntervalId);
+          this.innerHTML = 'Toggle Update';
+        } else {
+          const kmeanupdateSlider = $("#kmeanupdate").val();
+          timeInTerval =  parseInt(kmeanupdateSlider)*1000;
+          console.log(timeInTerval)
+          // If interval is inactive, start it and activate the toggle button
+          intervalId = setInterval(updateMap, timeInTerval);
+          progressIntervalId = setInterval(updateProgressBar, (timeInTerval/10)); // Update progress bar every 400ms
+          
+          this.innerHTML = 'Stop Update';
+          document.getElementsByClassName('progress')[0].style.display = 'block'; // Show the progress bar
+        }
+      });
+    // Call updateMap() at an interval
+ 
+    setInterval(updatePath, 4000);
+     // Call updateMap() when the button is clicked
+    $('#kmeansbtn').click(function() {
+      updateMap();
+    });
 });
+
+const kmeanupdateSlider = document.getElementById('kmeanupdate');
+const valuekmeanupdate = document.getElementById('valuekmeanupdate');
+
+kmeanupdateSlider.addEventListener('change', function() {
+    valuekmeanupdate.innerText = this.value;
+});
+const filterSlider = document.getElementById('filter');
+const valueFilter = document.getElementById('valuefilter');
+
+filterSlider.addEventListener('change', function() {
+    valueFilter.innerText = this.value;
+    updateSliderValues();
+});
+const max_kSlider = document.getElementById('max_k');
+const valuemax_k = document.getElementById('valuemax_k');
+
+max_kSlider.addEventListener('change', function() {
+  valuemax_k.innerText = this.value;
+  updateSliderValues();
+});
+const splitSlider = document.getElementById('split');
+const valuesplit = document.getElementById('valuesplit');
+
+splitSlider.addEventListener('change', function() {
+  valuesplit.innerText = this.value;
+  updateSliderValues();
+});
+const thresholdSlider = document.getElementById('threshold');
+const valuethreshold = document.getElementById('valuethreshold');
+
+thresholdSlider.addEventListener('change', function() {
+  valuethreshold.innerText = this.value;
+  updateSliderValues();
+});
+
+function updateSliderValues() {
+  var filterSlider = $("#filter").val();
+  var max_kSlider = $("#max_k").val();
+  var splitSlider = $("#split").val();
+  var thresholdSlider = $("#threshold").val();
+
+  $.ajax({
+    url: '/update_kmean_slider',
+    type: 'POST',
+    data: { filter: filterSlider, max_k: max_kSlider,split:splitSlider,threshold:thresholdSlider },
+    success: function(response) {
+      console.log('Slider values sent to the server successfully.');
+      // Handle the response from the server if needed
+    },
+    error: function(xhr, status, error) {
+      console.error('Error sending slider values to the server:', error);
+      // Handle the error if needed
+    }
+  });
+}

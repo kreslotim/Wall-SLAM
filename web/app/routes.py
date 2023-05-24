@@ -1,4 +1,5 @@
 
+import threading
 from flask import Response, render_template, jsonify, request
 from flask import Blueprint
 import time
@@ -31,7 +32,8 @@ obstacles = []
 startTime= time.time()
 #espT = ESP32ConnectionBluetooth(com_port=com_port,baud_port=baud_port)
 espT = ESP32Connection(send_port=send_port,recv_port=recv_port)
-
+global cluster_chart
+cluster_chart  =  ClusterChart()
 dataD = DummyData(10)
 
 list_of_100_x_obs = []
@@ -68,10 +70,25 @@ global curr_y_car
 curr_y_car = 0
 
 
+# Create a lock to synchronize access to the computation
+computation_lock = threading.Lock()
 
 @main.route('/')
 def index():
     return render_template('index.html', ip=ip)
+
+
+
+@main.route('/update_kmean_slider', methods=['POST'])
+def update_kmean_slider():
+    global cluster_chart
+    filter_value = int(request.form.get('filter'))
+    max_k_value = int(request.form.get('max_k'))
+    split_value = float(request.form.get('split'))
+    threshold_value = float(request.form.get('threshold'))
+    
+    cluster_chart  =  ClusterChart(split_value,threshold_value,max_k_value,filter_value)
+    return 'Slider values received successfully'
 
 @main.route('/run-python-function', methods=['POST'])
 def run_python_function():
@@ -129,13 +146,16 @@ def my_python_function(slider):
 def get_graph_data_com():
     print( "GRAPH " + str(espT.connected))
     if espT.connected:
+        espT.listening_lock.acquire()
         rec =espT.recv_stat
         send=  espT.send_stat
+        espT.listening_lock.release()
             
         x_sent =[pair[0] for pair in rec]
         x_received =[pair[1] for pair in rec]
         y_sent = [pair[0] for pair in send]
         y_received =[pair[1] for pair in send]
+        
 
     
         return jsonify(x_sent=x_sent, y_sent=y_sent, x_received=x_received,y_received=y_received)
@@ -195,6 +215,7 @@ def stream_errors():
         while True:
             time.sleep(1)
             # Wait for a new error to be added
+            espT.listening_lock.acquire()
             if len(espT.errors) != 0:
                 new_error = espT.errors[0]
                 espT.errors.pop(0)
@@ -202,6 +223,7 @@ def stream_errors():
                 error_time = new_error[0]
                 error_message = str(new_error[1])
                 yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
+            espT.listening_lock.release()
 
 
     # Return the SSE response
@@ -214,15 +236,17 @@ def stream_info():
         error = []
         # Loop indefinitely
         while True:
-            time.sleep(0.1)
+            time.sleep(1)
             # Wait for a new error to be added
-            if len(espT.info) != 0:
+            espT.listening_lock.acquire()
+            while len(espT.info) != 0:
                 new_info = espT.info[0]
                 espT.info.pop(0)
                 # If a new error is available, send it to the client as an SSE event
                 error_time = new_info[0]
                 error_message = str(new_info[1])
                 yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
+            espT.listening_lock.release()
 
 
     # Return the SSE response
@@ -234,15 +258,17 @@ def stream_output():
     def event_stream():
         # Loop indefinitely
         while True:
-            time.sleep(0.1)
+            time.sleep(1)
             # Wait for a new error to be added
-            if len(espT.output) != 0:
+            espT.listening_lock.acquire()
+            while len(espT.output) != 0:
                 new_info = espT.output[0]
                 espT.output.pop(0)
                 # If a new error is available, send it to the client as an SSE event
                 error_time = new_info[0]
                 error_message = str(new_info[1])
                 yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
+            espT.listening_lock.release()
 
 
     # Return the SSE response
@@ -254,15 +280,17 @@ def stream_input():
     def event_stream():
         # Loop indefinitely
         while True:
-            time.sleep(0.1)
+            time.sleep(1)
+            espT.listening_lock.acquire()
             # Wait for a new error to be added
-            if len(espT.input) != 0:
+            while len(espT.input) != 0:
                 new_info = espT.input[0]
                 espT.input.pop(0)
                 # If a new error is available, send it to the client as an SSE event
                 error_time = new_info[0]
                 error_message = str(new_info[1])
                 yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
+            espT.listening_lock.release()
 
 
     # Return the SSE response
@@ -277,7 +305,9 @@ def stream_noisy_obstacle():
         while True:
             # Wait for a new error to be added
             if espT.connected:
-                if len(espT.obstacle) != 0:
+                time.sleep(0.1)
+                espT.listening_lock.acquire()
+                while len(espT.obstacle) != 0:
                     new_info = espT.obstacle[0]
                     espT.obstacle.pop(0)
                     # If a new error is available, send it to the client as an SSE event
@@ -293,6 +323,7 @@ def stream_noisy_obstacle():
                         yield 'data: {}\n\n'.format(json.dumps((curr_x_car, curr_y_car, list_of_100_x_obs,list_of_100_y_obs)))
                         list_of_100_x_obs.clear()
                         list_of_100_y_obs.clear()
+                espT.listening_lock.release()
 
 
     
@@ -321,16 +352,18 @@ def _dataToObstacle(x_car,y_car, distance,orientation):
     return(point_x,point_y)
 
 
-@main.route('/refresh_map',methods=['GET'])
-def refresh_map():
-    global list_of_obs
-    print("rannn")
-    # Code to generate or fetch the updated SVG map
-    # Replace the following line with your logic to generate the updated map
-    cluster_chart  =  ClusterChart(list_of_obs)
-    mapJson = cluster_chart.generate_chart_json()
 
-    return mapJson
+@main.route('/refresh_map', methods=['GET'])
+def refresh_map():
+    global list_of_obs, cluster_chart
+
+    mapJson = cluster_chart.generate_chart_json(list_of_obs)
+               
+               
+    return jsonify(mapJson)
+
+
+
 @main.route('/get_new_trace_data', methods=['GET'])
 def get_new_trace_data():
     num_points = 3

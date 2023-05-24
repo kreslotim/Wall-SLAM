@@ -32,6 +32,7 @@ class ESP32Connection:
 
         # OUTPUT
         self.obstacle = []
+        self.listening_lock = threading.Lock()
 
         # Statistic variable
         self.recv_stat = []
@@ -74,6 +75,7 @@ class ESP32Connection:
 
                 if data:
                     self.recv_socket.send("200".encode())
+                    self.listening_lock.acquire()
 
                     # TODO INACURATE. ESP OUTPUT UNCLEAR.
                     distanceBack = data_decoded[3]
@@ -102,6 +104,8 @@ class ESP32Connection:
                     self.output.append((timeOfReading, 'Obstacle found at ', distanceFront, ' mm, looking at ', orientation)) 
                     # Log it
                     timeOfRep = round( time.time() - self.time, 2)
+
+                    self.listening_lock.release()
         
                     #self.recv_stat.append([1, timeOfRep])
 

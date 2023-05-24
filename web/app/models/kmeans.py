@@ -94,31 +94,26 @@ def compute_centers(data, cluster_assignments, K):
             centers[k] = np.sum(cluster_points, axis=0) / len(cluster_points)
     return centers
 
-    
-def filter_clusters(data, cluster_assignments, min_points=5):
+def filter_clusters(cluster_assignments, min_points=4):
     """
-    Filter out clusters with less than min_points data points.
+    Filter out clusters with less than min_points data points and assign them to a new cluster.
     
     Arguments:
-        data: array of shape (N, D) where N is the number of data points, D is the number of features.
         cluster_assignments: array of shape (N,) with the cluster assignment of each data point.
-        min_points: minimum number of points required for a cluster to be valid (default: 5).
+        min_points: minimum number of points required for a cluster to be valid (default: 4).
+    
     Returns:
-        filtered_data: array of shape (M, D) with the filtered data points.
-        filtered_cluster_assignments: array of shape (M,) with the filtered cluster assignments.
+        filtered_cluster_assignments: array of shape (N,) with the filtered cluster assignments.
     """
     unique_clusters, cluster_counts = np.unique(cluster_assignments, return_counts=True)
     print(cluster_counts)
-    valid_clusters = unique_clusters[cluster_counts >= min_points]
+    
+    invalid_clusters = unique_clusters[cluster_counts < min_points]
+    
+    # Assign invalid clusters to a new cluster (9999)
+    filtered_cluster_assignments = np.where(np.isin(cluster_assignments, invalid_clusters), 9999, cluster_assignments)
 
-    filtered_indices = np.isin(cluster_assignments, valid_clusters)
-    filtered_data = data[filtered_indices]
-    filtered_cluster_assignments = cluster_assignments[filtered_indices]
-
-    return filtered_data, filtered_cluster_assignments
-
-
-
+    return filtered_cluster_assignments
 
 class KMeans(object):
 
@@ -129,7 +124,7 @@ class KMeans(object):
     We also use it to make prediction by attributing labels to clusters.
     """
 
-    def __init__(self, K, max_iters=100, filter = 5 ):
+    def __init__(self, max_k=40, max_iters=100, filter = 5 ):
         """
         Initialize the new object (see dummy_methods.py)
         and set its arguments.
@@ -139,11 +134,12 @@ class KMeans(object):
             max_iters (int): maximum number of iterations
             filter (int): minium number of data needed to make a cluster
         """
-        self.K = K
+        self.K = 1
         self.max_iters = max_iters
+        self.max_k = max_k
         self.filter = filter
 
-    def k_means(self, data, max_iter):
+    def k_means(self, data):
         """
         Main K-Means algorithm that performs clustering of the data.
         
@@ -155,10 +151,12 @@ class KMeans(object):
             cluster_assignments (array): shape (N,) final cluster assignment for each data point.
         """
         centers = init_centers(data, self.K) # initializes randomly the cluster centers 
+        cluster_assignments = np.zeros(len(data))  # initialize cluster assignments
+
         sse = np.zeros(self.K) # initialize SSE for each cluster
 
         # Loop over the iterations to update the centers every iteration
-        max_iter=100
+        max_iter = self.max_iters
         for i in range(max_iter): 
             if ((i+1) % 10 == 0):
                 print(f"Iteration {i+1}/{max_iter}...")
@@ -169,17 +167,16 @@ class KMeans(object):
 
             # End of the algorithm if the centers have not moved (hint: use old_centers and look into np.all)
             if np.allclose(old_centers, centers): #compare the old centers `old_centers` and the new centers `centers` of each iteration
-                for k in range(self.K):
-                    cluster_assignments = find_closest_cluster(compute_distance(data, centers))
-                    sse[k] = np.sum((data[cluster_assignments == k] - old_centers[k])**2)
-
+                cluster_assignments = find_closest_cluster(compute_distance(data, centers))
                 print(f"K-Means has converged after {i+1} iterations! for K= {self.K}")
                 break
-        
+
+        for k in range(self.K): 
+            sse[k] = np.sum((data[cluster_assignments == k] - old_centers[k])**2)
         return centers, cluster_assignments, sse
     
 
-    def fit(self, training_data):
+    def fit(self, training_data, threshold=0.2):
         """
         Train the model and return predicted labels for training data.
 
@@ -188,42 +185,36 @@ class KMeans(object):
         
         Arguments:
             training_data (array): training data of shape (N,D)
+            threshold (float) : the stopping criteria, should be between 0 and 1
         Returns:
-            filtered_data: array of shape (M, D) with the filtered data points.
-            filtered_cluster_assignments: array of shape (M,) with the filtered cluster: 
+            filtered_cluster_assignments: shape (N,) final cluster assignment for each data point. Cluster without 4 points are reallocated to cluster 9999
             optimal_K : the optimal number of cluster  
         """
 
         ##
         # First, find the clusters by applying K-means to the data
-        nbOfRun = self.K
+
 
         # create an empty list to store the sum of squared distances for each k value
         ssd = []
-        centers = []
-        for i in range(nbOfRun):
+        for i in range(self.max_k):
 
             self.K = i+1
-            self.centers, cluster_assignments, sse = self.k_means(training_data, self.max_iters)
-            centers.append(self.centers)
-           
+            self.centers, cluster_assignments, sse = self.k_means(training_data)
             ssd.append( np.sum(sse))
-            if (ssd[i-1]**2 + (i-1)**2) < (ssd[i]**2 + (i)**2) :
-                print(f"optimal is  k : {i}")
-                
-                
-                # Filter clusters with less than 5 points
-                data, filtered_cluster_assignments = filter_clusters(training_data, cluster_assignments, self.filter)
 
-                return  data, filtered_cluster_assignments, (i+1)
+            
+            if len(ssd) >= 2:
+                rate_of_change = ssd[-1] - ssd[-2]
 
-
+                if rate_of_change < threshold and rate_of_change > 0:
+                    filtered_cluster_assignments = filter_clusters(cluster_assignments, self.filter)
+                    return filtered_cluster_assignments, i
+       
         # find the value of k where the elbow curve is optimal
         optimal_K = self.K-1  # add 1 because of zero-based indexing and we skipped k=0
-        
-
-
-        return centers[self.K-1],cluster_assignments, optimal_K
+        filtered_cluster_assignments = filter_clusters( cluster_assignments, self.filter)
+        return filtered_cluster_assignments, optimal_K
 
 
     def predict(self, data):
@@ -235,9 +226,9 @@ class KMeans(object):
         Returns:
             labels: array of shape (N,) with the cluster assignment of each data point.
         """
+        
         distances = compute_distance(data, self.centers)
         labels = find_closest_cluster(distances)
+        labels = filter_clusters(labels, self.filter)
         return labels
-        
-
 
