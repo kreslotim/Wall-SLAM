@@ -178,7 +178,7 @@ $(document).ready(function() {
     });
   }
 
-  setInterval(updateGraph, 10000);
+  setInterval(updateGraph, 5000);
 });
 
 // Noise Obstacle Map

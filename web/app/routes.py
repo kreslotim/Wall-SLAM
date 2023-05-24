@@ -140,10 +140,8 @@ def my_python_function(slider):
 def get_graph_data_com():
     print( "GRAPH " + str(espT.connected))
     if espT.connected:
-        espT.listening_lock.acquire()
         rec =espT.recv_stat
         send=  espT.send_stat
-        espT.listening_lock.release()
             
         x_sent =[pair[0] for pair in rec]
         x_received =[pair[1] for pair in rec]
@@ -206,9 +204,8 @@ def stream_errors():
         error = []
         # Loop indefinitely
         while True:
-            time.sleep(1)
+            time.sleep(0.1)
             # Wait for a new error to be added
-            espT.listening_lock.acquire()
             if len(espT.errors) != 0:
                 new_error = espT.errors[0]
                 espT.errors.pop(0)
@@ -216,7 +213,7 @@ def stream_errors():
                 error_time = new_error[0]
                 error_message = str(new_error[1])
                 yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
-            espT.listening_lock.release()
+
 
 
     # Return the SSE response
@@ -229,17 +226,16 @@ def stream_info():
         error = []
         # Loop indefinitely
         while True:
-            time.sleep(1)
+            time.sleep(0.1)
             # Wait for a new error to be added
-            espT.listening_lock.acquire()
-            while len(espT.info) != 0:
+            if len(espT.info) != 0:
                 new_info = espT.info[0]
                 espT.info.pop(0)
                 # If a new error is available, send it to the client as an SSE event
                 error_time = new_info[0]
                 error_message = str(new_info[1])
                 yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
-            espT.listening_lock.release()
+
 
 
     # Return the SSE response
@@ -251,17 +247,17 @@ def stream_output():
     def event_stream():
         # Loop indefinitely
         while True:
-            time.sleep(1)
+            time.sleep(0.1)
             # Wait for a new error to be added
-            espT.listening_lock.acquire()
-            while len(espT.output) != 0:
+            
+            if len(espT.output) != 0:
                 new_info = espT.output[0]
                 espT.output.pop(0)
                 # If a new error is available, send it to the client as an SSE event
                 error_time = new_info[0]
                 error_message = str(new_info[1])
                 yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
-            espT.listening_lock.release()
+         
 
 
     # Return the SSE response
@@ -273,17 +269,17 @@ def stream_input():
     def event_stream():
         # Loop indefinitely
         while True:
-            time.sleep(1)
-            espT.listening_lock.acquire()
+            time.sleep(0.1)
+           
             # Wait for a new error to be added
-            while len(espT.input) != 0:
+            if len(espT.input) != 0:
                 new_info = espT.input[0]
                 espT.input.pop(0)
                 # If a new error is available, send it to the client as an SSE event
                 error_time = new_info[0]
                 error_message = str(new_info[1])
                 yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
-            espT.listening_lock.release()
+         
 
 
     # Return the SSE response
@@ -297,9 +293,7 @@ def stream_noisy_obstacle():
         while True:
             # Wait for a new error to be added
             if espT.connected:
-                time.sleep(0.1)
-                espT.listening_lock.acquire()
-                while len(espT.obstacle) != 0:
+                if len(espT.obstacle) != 0:
                     new_info = espT.obstacle[0]
                     espT.obstacle.pop(0)
                     # If a new error is available, send it to the client as an SSE event
@@ -334,7 +328,6 @@ def stream_noisy_obstacle():
     # Return the SSE response
     return Response(event_stream(), mimetype='text/event-stream')
 
-
 #TODO TO DELETE 
 def _dataToObstacle(x_car,y_car, distance,orientation):    
     # Calculate the x and y coordinates of the obstacle
@@ -348,9 +341,9 @@ def _dataToObstacle(x_car,y_car, distance,orientation):
 
 @main.route('/refresh_map', methods=['GET'])
 def refresh_map():
-    global list_of_obs, cluster_chart
+    global cluster_chart
 
-    mapJson = cluster_chart.generate_chart_json(list_of_obs)
+    mapJson = cluster_chart.generate_chart_json(espT.list_of_obs)
                
                
     return jsonify(mapJson)
