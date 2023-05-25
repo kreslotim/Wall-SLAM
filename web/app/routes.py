@@ -39,8 +39,8 @@ numberOfObsInOneGo = 50
 delete_distance_if_no_distance = 30
 delete_distance_linear_equation = 10
 max_distance_detection = 2000
-number_min_of_obstacle = 1
-in_radius = 10
+number_min_of_obstacle = 2
+in_radius = 30
 
 global settingConnection
 settingConnection = False
@@ -156,9 +156,9 @@ def get_graph_data_com():
 
 @main.route('/get-graph-data-slam', methods=['GET'])
 def get_graph_data_slam():
-    list_of_obs = espT._filter_obstacles(number_min_of_obstacle, in_radius)
-    x_obs = [point[0] for point in list_of_obs]
-    y_obs = [point[1] for point in list_of_obs]
+    #list_of_obs = espT._filter_obstacles(number_min_of_obstacle, in_radius)
+    x_obs = [point[0] for point in espT.list_of_obs]
+    y_obs = [point[1] for point in espT.list_of_obs]
    
     response_data = {
         'x_car': espT.curr_x_car,

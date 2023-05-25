@@ -42,7 +42,7 @@ class ESP32Connection:
         self.list_of_100_x_obs = []
         self.list_of_100_y_obs = []
         self.numberOfObsInOneGo = 50
-        self.delete_distance_if_no_distance = 30
+        self.delete_distance_if_no_distance = 1
         self.delete_distance_linear_equation = 10
         self.max_distance_detection = 2000
         self.number_min_of_obstacle = 1
@@ -100,12 +100,13 @@ class ESP32Connection:
                     if (distanceBack == -1) :
                         distanceBack = 0
                     else :
-                        distanceBack = -distanceBack-20
-                    orientation= data_decoded[4]
+                        distanceBack = -distanceBack - 20
+
+                    orientation = data_decoded[4]
 
                     x_car = data_decoded[5]
                     y_car = data_decoded[6]
-                    timeOfReading= data_decoded[7]
+                    timeOfReading = data_decoded[7]
 
                    
                    
@@ -249,18 +250,22 @@ class ESP32Connection:
 
     def _add_and_delete_obstacle(self, x_car, y_car, obs_distance, orientation):
 
-        if obs_distance != 0 and obs_distance < self.max_distance_detection and obs_distance > -self.max_distance_detection:
-            x_new, y_new = self._dataToObstacle(x_car,y_car, obs_distance,orientation)   
+        if obs_distance != 0 and -self.max_distance_detection < obs_distance < self.max_distance_detection:
+            x_new, y_new = self._dataToObstacle(x_car, y_car, obs_distance,orientation)   
             self.list_of_obs.append([x_new,y_new])
             self.list_of_100_x_obs.append(x_new)
             self.list_of_100_y_obs.append(y_new)
         else :
-            x_new, y_new = self._dataToObstacle(x_car,y_car, obs_distance,orientation)   
             obs_distance = self.delete_distance_if_no_distance
+            x_new, y_new = self._dataToObstacle(x_car,y_car, obs_distance,orientation)   
 
         # Calculate the linear equation between the car and new obstacle
-        m = (y_new - y_car)/(x_new - y_car ) if (x_new - y_car) != 0 else 0
-        b = -m*x_car + y_car
+        if x_new - x_car != 0:
+            m = (y_new - y_car) / (x_new - x_car)
+            b = -m * x_car + y_car
+        else:
+            m = float('inf')
+            b = y_car
 
         # Find the obstacles that lie on the linear equation between the new obstacle and the origin
         obstacles_to_delete = []
@@ -269,16 +274,18 @@ class ESP32Connection:
             x_obs, y_obs = obstacle
 
             # Check if the obstacle lies on the linear equation
-            distance = abs(y_obs - m * x_obs - b) / math.sqrt(1 + m**2)
+            if m != float('inf'):
+                distance = abs(y_obs - m * x_obs - b) / math.sqrt(1 + m**2)
+            else:
+                distance = abs(y_car - y_new)
 
             # Check if the obstacle lies between the new obstacle and the origin
-            if (x_car < x_obs < x_new - 10 or x_car > x_obs > x_new + 10) and self.delete_distance_linear_equation > distance:
+            if (x_car < x_obs < x_new  or x_car > x_obs > x_new ) and (y_car  < y_obs < y_new  or y_car > y_obs > y_new )and self.delete_distance_linear_equation > distance :
                     obstacles_to_delete.append(obstacle)
 
         # Remove the obstacles that lie on the linear equation between the new obstacle and the origin
-        for obstacle in obstacles_to_delete:
-            self.list_of_obs.remove(obstacle)
-            
+        self.list_of_obs = [obstacle for obstacle in self.list_of_obs if obstacle not in obstacles_to_delete]
+
         return self.list_of_obs
 
     def _filter_obstacles(self, number_min_of_obstacle, radius):
