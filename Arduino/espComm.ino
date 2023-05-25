@@ -24,9 +24,9 @@ int servoAngle=1;
 int numberOfConnectionOld = 0;
 float actionNumber = 0;
 float orientation = 0;
-int goToOrientation = 90;
-float x = 0;
-float y = 0;
+int goToOrientation = 0;
+float curr_x = 0;
+float curr_y = 0;
 unsigned long startTime; // Variable to store the start time
 unsigned long elapsedTime;
 int direction = 1;
@@ -293,13 +293,24 @@ void packData() {
   dataSend[2] = lidarDistanceFront;
   dataSend[3] = lidarDistanceBack;
   dataSend[4] = servo.read() + goToOrientation;
-  dataSend[5] = x;
-  dataSend[6] = y;
+  dataSend[5] = curr_x;
+  dataSend[6] = curr_y;
   dataSend[7] = elapsedTime;
   dataSend[8] = aevent.acceleration.y;
   dataSend[9] = aevent.acceleration.z;
   dataSend[10] = mevent.magnetic.x;
   dataSend[11] = mevent.magnetic.y;
+  Serial.print("Orientation :");
+  Serial.print(goToOrientation);
+
+  Serial.print( "Curr_X : ");
+  Serial.print(curr_x);
+  Serial.print("Curr_Y:" );
+  Serial.println(curr_y);
+
+
+
+
 }
 
 void rotateServo() {
@@ -361,13 +372,13 @@ void moveForward() {
   stepperRight.setSpeed(CONST_SPEED_STEPPER);
   if(stepperLeft.runSpeed()){
     if (goToOrientation == 0) {
-        y += DIST_PER_STEP;  // move north
+        curr_y += DIST_PER_STEP;  // move north
     } else if (goToOrientation == 90) {
-        x += DIST_PER_STEP;  // move west
+        curr_x += DIST_PER_STEP;  // move west
     } else if (goToOrientation == 180) {
-        y -= DIST_PER_STEP;  // move south
+        curr_y -= DIST_PER_STEP;  // move south
     } else if (goToOrientation == 270) {
-        x -= DIST_PER_STEP;  // move east
+        curr_x -= DIST_PER_STEP;  // move east
     }
   }
   stepperRight.runSpeed();
@@ -378,13 +389,13 @@ void moveBackward() {
   stepperRight.setSpeed(-CONST_SPEED_STEPPER);
   if(stepperLeft.runSpeed()){
     if (goToOrientation == 0) {
-        y -= DIST_PER_STEP;  // move north
+        curr_y -= DIST_PER_STEP;  // move north
     } else if (goToOrientation == 90) {
-        x -= DIST_PER_STEP;  // move west
+        curr_x -= DIST_PER_STEP;  // move west
     } else if (goToOrientation == 180) {
-        y += DIST_PER_STEP;  // move south
+        curr_y += DIST_PER_STEP;  // move south
     } else if (goToOrientation == 270) {
-        x += DIST_PER_STEP;  // move east
+        curr_x += DIST_PER_STEP;  // move east
     }
   }
   stepperRight.runSpeed();
@@ -405,6 +416,7 @@ void moveRight() {
 
 void moveLeft() {
   goToOrientation = (int)(goToOrientation - 90) % 360;
+  goToOrientation = goToOrientation < 0 ? goToOrientation + 360 : goToOrientation;
   stepperLeft.setCurrentPosition(0);
   stepperRight.setCurrentPosition(0);
   stepperLeft.move(STEPS_90_DEG);  // turn right 90 degrees
