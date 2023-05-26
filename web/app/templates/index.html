@@ -76,17 +76,17 @@
                     <div class="m-2">
                         <h5 class="my-2"> Chewbacca direct input </h5>
                         <p> This to manually test the command send to the ESP </p>
-
+                        <div id="debugStatus"></div>
                         <div>
-                            <button class="m-1 btn btn-secondary" onclick="sendMoveForward()">Move Forward</button>
-                            <button class="m-1 btn btn-secondary" onclick="sendMoveBackward()">Move Backward</button>
+                            <button class="m-1 btn btn-secondary" onclick="sendMovementCommand('forward')" >Move Forward</button>
+                            <button class="m-1 btn btn-secondary" onclick="sendMovementCommand('backward')" >Move Backward</button>
                         </div>
                         <div>
-                            <button class="m-1 btn btn-secondary" onclick="sendMoveRight()">Move Right</button>
-                            <button class="m-1 btn btn-secondary" onclick="sendMoveLeft()">Move Left</button>
+                            <button class="m-1 btn btn-secondary" onclick="sendMovementCommand('right')" >Move Right</button>
+                            <button class="m-1 btn btn-secondary" onclick="sendMovementCommand('left')" >Move Left</button>
                         </div>
                         <div>
-                            <button class="m-1 btn btn-secondary" onclick="sendStop()">Stop</button>
+                            <button class="m-1 btn btn-secondary" onclick="sendMovementCommand('stop')" >Stop</button>
                         </div>
                     </div> 
                     <hr>

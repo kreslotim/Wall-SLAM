@@ -207,7 +207,8 @@ class ESP32Connection:
         if repStatut == 200 :
             self.output.append((timeOfRep, 'Sent stop successful :' + str(repStatut))) 
         else :
-            self.output.append((timeOfRep, 'Sent Move fail : ' + str(repStatut))) 
+            self.output.append((timeOfRep, 'Sent Move fail : ' + str(repStatut)))
+        return repStatut
  
     def _sendMove_Forward(self):
         repStatut = self._send_actionNumber(1)
@@ -216,7 +217,7 @@ class ESP32Connection:
             self.output.append((timeOfRep, 'Sent Move Forward successful :' + str(repStatut))) 
         else :
             self.output.append((timeOfRep, 'Sent Move Forward fail : ' + str(repStatut))) 
- 
+        return repStatut
     
     
     def _sendMove_Backward(self):
@@ -226,7 +227,7 @@ class ESP32Connection:
             self.output.append((timeOfRep, 'Sent Move Forward successful :' + str(repStatut))) 
         else :
             self.output.append((timeOfRep, 'Sent Move Forward fail  : ' + str(repStatut))) 
- 
+        return repStatut
 
     def _sendMove_Right(self):
         repStatut = self._send_actionNumber(3)
@@ -235,7 +236,7 @@ class ESP32Connection:
             self.output.append((timeOfRep, 'Sent Move Forward successful :' + str(repStatut))) 
         else :
             self.output.append((timeOfRep, 'Sent Move Forward fail  : ' + str(repStatut))) 
- 
+        return repStatut
 
     def _sendMove_Left(self):
         repStatut = self._send_actionNumber(4)
@@ -244,7 +245,7 @@ class ESP32Connection:
             self.output.append((timeOfRep, 'Sent Move Forward successful : ' + str(repStatut))) 
         else :
             self.output.append((timeOfRep, 'Sent Move Forward fail  : ' +str(repStatut))) 
-
+        return repStatut
 ############ OBSTACLE METHODS ############
 
     def _add_and_delete_obstacle(self, x_car, y_car, obs_distance, orientation):

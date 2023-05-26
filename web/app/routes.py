@@ -9,7 +9,6 @@ import math
 import numpy as np
 
 from app.models.esp32 import ESP32Connection
-from app.models.esp32Bluetooth import ESP32ConnectionBluetooth
 
 from app.models.dummyData import DummyData
 from app.models.mapK import ClusterChart
@@ -29,7 +28,7 @@ togoY = 0
 
 
 startTime= time.time()
-#espT = ESP32ConnectionBluetooth(com_port=com_port,baud_port=baud_port)
+
 espT = ESP32Connection(send_port=send_port,recv_port=recv_port)
 global cluster_chart
 cluster_chart  =  ClusterChart()
@@ -72,7 +71,6 @@ def index():
     return render_template('index.html', ip=ip)
 
 
-
 @main.route('/update_kmean_slider', methods=['POST'])
 def update_kmean_slider():
     global cluster_chart
@@ -84,58 +82,35 @@ def update_kmean_slider():
     cluster_chart  =  ClusterChart(split_value,threshold_value,max_k_value,filter_value)
     return 'Slider values received successfully'
 
-@main.route('/run-python-function', methods=['POST'])
-def run_python_function():
-    # Get the value of the slider from the AJAX request
-    slider_value = request.form.get('value')
 
-    # Call your Python function here, passing the slider value as a parameter
-    result = my_python_function(slider_value)
-    return jsonify(result=result)
+@main.route('/post-move', methods=['POST'])
+def post_move():
+    direction = request.args.get('direction')
+    repCode = 0
 
-@main.route('/map-kmean', methods=['POST'])
-def map_kmean():
-    print("generate Kmean")    
-
-@main.route('/move-forward', methods=['POST'])
-def move_forward():
-    print("FORWARDDDD")
-    espT._sendMove_Forward()
-    return jsonify()
-
-@main.route('/move-backward', methods=['POST'])
-def move_backward():
-    print("BACKWARRRDDD")
-    espT._sendMove_Backward()
-    return jsonify()
-
-@main.route('/move-left', methods=['POST'])
-def move_left():
-    print("LEFTTT")
-    espT._sendMove_Left()
-    return jsonify()
-
-@main.route('/move-right', methods=['POST'])
-def move_right():
-    print("RIGGHHH")
-    espT._sendMove_Right()
+    if direction == 'forward':
+        repCode = espT._sendMove_Forward()
+        pass
+    elif direction == 'stop':
+        repCode = espT._sendStop()
+        pass
+    elif direction == 'right':
+        repCode = espT._sendMove_Right()
+        pass
+    elif direction == 'left':
+        repCode = espT._sendMove_Left()
+        pass
+    elif direction == 'backward':
+        repCode = espT._sendMove_Backward()
+        pass
+    else:
+        repCode = 404
     
-    return jsonify()
+    if repCode == 404:
+         return jsonify({'message': 'Unable to send Command', 'espStatus' : repCode })
+    return jsonify({'message': 'Command received', 'espStatus' : repCode })
 
-@main.route('/move-stop', methods=['POST'])
-def move_stop():
-    print("STOPPPPP")
-    espT._sendStop()
-    return jsonify()
   
-def reset_esp_connection():
-    print("RESETTTT")
-
-def my_python_function(slider):  
-    print("SPED SET TO")
-    print(slider)
-   
-
 @main.route('/get-graph-data-com', methods=['POST'])
 def get_graph_data_com():
     print( "GRAPH " + str(espT.connected))

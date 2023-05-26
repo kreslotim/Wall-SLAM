@@ -3,11 +3,8 @@ from scipy.spatial import ConvexHull
 from app.models.kmeans import KMeans
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
-import plotly
-from scipy.spatial import Delaunay
-from alphashape import alphashape
 import json
-from shapely.geometry import MultiPolygon
+
 import matplotlib.cm as cm
 
 
