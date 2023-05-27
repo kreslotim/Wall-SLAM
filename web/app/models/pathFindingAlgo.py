@@ -49,13 +49,13 @@ class PathFinder:
         return grid
 
 
-    def shortest_path(self, grid_pos, grid_dest, grid):
+    def shortest_path(grid_pos, grid_dest, grid):
         """
-        Finds the shortest path between two cells of the grid
+        Finds the shortest path between two cells of the grid with minimal turns
         :param grid_pos: departure cell
         :param grid_dest: destination cell
         :param grid: sampled obstacles as a discrete grid
-        :return: array with global path instructions e.g. go [N,N,N,E,E,S,S,...]
+        :return: array with global path instructions with minimal turns, e.g., go [N,N,N,E,E,S,S,...]
         """
         rows = len(grid)
         cols = len(grid[0])
@@ -79,7 +79,7 @@ class PathFinder:
 
             # Check if the current position is the destination
             if current_pos == grid_dest:
-                return path[0]
+                return path
 
             x, y = current_pos
 
@@ -95,12 +95,17 @@ class PathFinder:
 
                     # Check if the new position is not an obstacle and not visited
                     if grid[new_x][new_y] == 0 and new_pos not in visited:
-                        queue.append((new_pos, path + [direction_names[i]]))
+                        new_path = path + [direction_names[i]]
+
+                        # Check if there will be a turn in direction
+                        if len(new_path) >= 2 and new_path[-1] != new_path[-2]:
+                            queue.append((new_pos, new_path))
+                        else:
+                            queue.appendleft((new_pos, new_path))
                         visited.add(new_pos)
 
         # If there is no path to the destination
         return [-1]
-
 
     def encode_directions(self, path):
         """
