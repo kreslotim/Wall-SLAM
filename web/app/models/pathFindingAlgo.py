@@ -16,7 +16,7 @@ class PathFinder:
         """
         Generate grid from collected obstacle scans
 
-        :param obst: raw list of obstacles in car coordinates
+        :param obst: raw list of obstacles in car coordinates  
         :return: sampled grid with cells set to 1 or 0
         """
         # Initialize the 2D array representing the grid map
@@ -117,7 +117,7 @@ class PathFinder:
         """
         :param orient: orientation: initial orientation of robot (N=0, W=90, ...)
         :param path: encoded global path instructions e.g. go [0,90,90,180,...]
-        :return: array of instructions to the car to execute, e.g. ['L', 'L', 'F', 'F'] can be changed to action numbers in
+        :return: array of instructions to the car to execute, e.g. [1,4,..] can be changed  in
                 def path_to_seq(orient, path)
         """
         current_orientation = orient
@@ -136,11 +136,11 @@ class PathFinder:
         i = 0
         while i < len(global_instructions):
             while current_orientation != global_instructions[i]:
-                car_instructions.append("L")
+                car_instructions.append(4)
                 current_orientation = (current_orientation + 90) % 360
 
             while i < len(global_instructions) and current_orientation == global_instructions[i]:
-                car_instructions.append("F")
+                car_instructions.append(1)
                 i += 1
 
         return car_instructions
@@ -155,7 +155,7 @@ class PathFinder:
                 :param pos_car: initial car position (x,y) tuple (cm)
 
             Returns:
-                array of instructions to the car e.g. ['L', 'L', 'F', 'F'] can be changed to action numbers in
+                array of instructions to the car e.g. [1,4,..]  can be modified in
                 def path_to_seq(orient, path)
 
                 IMPORTANT: returns an empty array in all error cases
@@ -177,3 +177,5 @@ class PathFinder:
 
         #TODO not optimal 
         return instr[0]
+    
+    
