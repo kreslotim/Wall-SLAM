@@ -4,8 +4,6 @@ import struct
 import threading
 from app.models.slamData import SlamData
 from app.models.pathFindingAlgo import PathFinder
-from pathFindingAlgo import instructions_to_go_x_y
-
 
 class ESP32Connection:
 
@@ -27,7 +25,7 @@ class ESP32Connection:
 
         # Logging
         self.errors = []
-        self.info=[]
+        self.info = []
         self.output = []
         self.input = []
 
@@ -41,6 +39,7 @@ class ESP32Connection:
 
         # Data variable
         self.slam_data = SlamData()
+        self.path_finder = PathFinder()
         self.action_instruction_list = []
         
 
@@ -89,7 +88,7 @@ class ESP32Connection:
                     self.slam_data.curr_x_car = data_decoded[5]
                     self.slam_data.curr_y_car = data_decoded[6]
                     timeOfReading = data_decoded[7]
-
+                    self.slam_data.perfect_orientation = data_decoded[8]
 
                     # Filter invalid distances to 0, to allow negative distances
                     if (distanceFront == -1) :
@@ -247,6 +246,14 @@ class ESP32Connection:
             self.output.append((timeOfRep, 'Sent Move Forward fail  : ' +str(repStatut))) 
         return repStatut
     
+############ PATH FINDING ############
+    def _sendPath_Instruction(self):
+        pos_car = (self.slam_data.curr_x_car, self.slam_data.curr_y_car)
+        
+        # Calculate the best path and send the instrucitions
+        #TODO for now instructions_to_go_x_y sends an Array but needs to be modified to only send the first instruction of the list
+        self._send_actionNumber(self.path_finder.instructions_to_go_x_y(pos_car, self.slam_data.perfect_orientation, self.slam_data.list_of_obs))
+
 ############ HELPER METHOD ############
 
     def _is_socket_alive(self):
