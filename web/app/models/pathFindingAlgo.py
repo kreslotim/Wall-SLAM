@@ -118,18 +118,18 @@ class PathFinder:
         return encoded_list
     
 
-    def generate_coordinate_nodes(self, path, initial_position):
+    def generate_coordinate_nodes(self,path, initial_position):
         x, y = initial_position.copy()
-        coordinate_nodes = [initial_position]  
+        coordinate_nodes = [initial_position]
 
         for instruction in path:
-            if instruction == 'up':
+            if instruction == "N":
                 y -= 1
-            elif instruction == 'down':
+            elif instruction == "S":
                 y += 1
-            elif instruction == 'left':
+            elif instruction == "W":
                 x -= 1
-            elif instruction == 'right':
+            elif instruction == "E":
                 x += 1
 
             coordinate_nodes.append((x, y))
