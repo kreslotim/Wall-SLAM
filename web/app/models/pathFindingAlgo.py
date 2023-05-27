@@ -5,13 +5,21 @@ class PathFinder:
  
     def __init__(self):
         self.target_x = 0
-        self.target_y = 0            
+        self.target_y = 0  
+
+        # "Radius" of the sqaure grid cm
+        self.grid_rad = 100
+        self.cell_dim = 10
+
 
     def _setTarget_xy(self, target_x, target_y):
         self.target_x=target_x
         self.target_y=target_y
-        
 
+    def car_to_grid_coor(self, car_pos, grid_rad, cell_width):
+        return (int((grid_rad - car_pos[1]) / cell_width), int((car_pos[0] + grid_rad) / cell_width))
+      
+        
     def generateGrid(self, obst):
         """
         Generate grid from collected obstacle scans
@@ -20,24 +28,23 @@ class PathFinder:
         :return: sampled grid with cells set to 1 or 0
         """
         # Initialize the 2D array representing the grid map
-        grid = np.zeros((20, 20))
-        obstacle_coordinates = obst
-        cell_dimension = 10
+        grid = np.zeros((2*self.grid_rad / self.cell_dim, 2*self.grid_rad / self.cell_dim))
+        obstacle_coordinates = obst.copy()
+        
         # Sensitivity (obstacle points per block, think of it as a threshold)
         sensitivity = 3
 
         # Iterate through the list of obstacle coordinates
         for obstacle in obstacle_coordinates:
             # Convert obstacle coordinates to grid coordinates
-            grid_x = int((obstacle[0] + 100) / cell_dimension)
-            grid_y = int((100 - obstacle[1]) / cell_dimension)
+            grid_x = self.car_to_grid_coor(obstacle, 100, 10)[0]
+            grid_y = self.car_to_grid_coor(obstacle, 100, 10)[1]
 
             # Increment the value of the corresponding grid cell, ensure that its valid too
-            if 0 <= grid_x < 20 and 0 <= grid_y < 20:
+            if 0 <= grid_x < 2*self.grid_rad / self.cell_dim and 0 <= grid_y < 2*self.grid_rad / self.cell_dim:
                 grid[grid_y, grid_x] += 1
 
         grid = np.where(grid < sensitivity, 0, 1)
-
 
         return grid
 
@@ -55,7 +62,7 @@ class PathFinder:
 
         # Check for trivial case: the current position is the destination
         if grid_pos == grid_dest or grid[grid_dest[0]][grid_dest[1]] == 1:
-            return []
+            return [-1]
 
         # Create a queue for BFS algo
         queue = deque([(grid_pos, [])])
@@ -72,7 +79,7 @@ class PathFinder:
 
             # Check if the current position is the destination
             if current_pos == grid_dest:
-                return path
+                return path[0]
 
             x, y = current_pos
 
@@ -92,12 +99,12 @@ class PathFinder:
                         visited.add(new_pos)
 
         # If there is no path to the destination
-        return []
+        return [-1]
 
 
     def encode_directions(self, path):
         """
-        :param path: global path instructions e.g. go [N,N,N,E,E,S,S,...]
+        :param path: global path instructions e.g. go [W,W.]
         :return: encoded global path instructions e.g. go [0,90,90,180,...]
         """
         encoding_map = {'N': 0, 'W': 90, 'S': 180, 'E': 270}
@@ -134,17 +141,24 @@ class PathFinder:
         i = 0
         while i < len(global_instructions):
             while current_orientation != global_instructions[i]:
-                car_instructions.append(4)
-                current_orientation = (current_orientation + 90) % 360
+                if (current_orientation + 180) % 360 == global_instructions[i]:
+                    car_instructions.append(4)
+                    car_instructions.append(4)
+                    current_orientation = (current_orientation + 180) % 360
+                elif (current_orientation + 90) % 360 == global_instructions[i]:
+                    car_instructions.append(4)
+                    current_orientation = (current_orientation + 90) % 360
+                else:
+                    car_instructions.append(3)
+                    current_orientation =  (current_orientation + 270) % 360
 
-            while i < len(global_instructions) and current_orientation == global_instructions[i]:
-                car_instructions.append(1)
-                i += 1
-
+                while i < len(global_instructions) and current_orientation == global_instructions[i]:
+                    car_instructions.append(1)
+                    i += 1
         return car_instructions
 
 
-    def instructions_to_go_x_y(self, pos_car, orientation, obst):
+    def instructions_to_go_x_y(self, pos_car, dest_car, orientation, obst):
         """
             Calculates the shortest route
                 :param obst: list of obstacles
@@ -160,8 +174,8 @@ class PathFinder:
                 (same start & destination, destination is an obstacle, ...)
 
             """
-        start = (int((100 - pos_car[1]) / 10), int((pos_car[0] + 100) / 10))
-        end = (int((100 - self.target_y) / 10), int((self.target_x + 100) / 10))
+        start = self.car_to_grid_coor(pos_car, 100, 10)
+        end = self.car_to_grid_coor(dest_car, 100, 10)
 
         grid = self.generateGrid(obst)
         path = self.shortest_path(start, end, grid)
@@ -174,6 +188,6 @@ class PathFinder:
         print(instr)
 
         #TODO not optimal 
-        return instr[0]
+        return float(instr[0])
     
     
