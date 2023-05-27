@@ -116,6 +116,25 @@ class PathFinder:
                 encoded_list.append(encoded_direction)
 
         return encoded_list
+    
+
+    def generate_coordinate_nodes(self, path, initial_position):
+        x, y = initial_position.copy()
+        coordinate_nodes = [initial_position]  
+
+        for instruction in path:
+            if instruction == 'up':
+                y -= 1
+            elif instruction == 'down':
+                y += 1
+            elif instruction == 'left':
+                x -= 1
+            elif instruction == 'right':
+                x += 1
+
+            coordinate_nodes.append((x, y))
+
+        return coordinate_nodes
 
 
     def path_to_seq(self, orient, path):
