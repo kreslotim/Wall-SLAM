@@ -34,10 +34,7 @@ global cluster_chart
 cluster_chart  =  ClusterChart()
 dataD = DummyData(10)
 
-numberOfObsInOneGo = 50
-delete_distance_if_no_distance = 30
-delete_distance_linear_equation = 10
-max_distance_detection = 2000
+#TODO to delete later
 number_min_of_obstacle = 2
 in_radius = 30
 
@@ -52,19 +49,6 @@ settingDataESP = False
 
 global settingDataSIM
 settingDataSIM = False
-
-
-
-global list_of_obs
-list_of_obs = []
-
-global curr_x_car
-curr_x_car = 0
-
-global curr_y_car
-curr_y_car = 0
-
-
 
 @main.route('/')
 def index():
@@ -131,13 +115,13 @@ def get_graph_data_com():
 
 @main.route('/get-graph-data-slam', methods=['GET'])
 def get_graph_data_slam():
-    #list_of_obs = espT._filter_obstacles(number_min_of_obstacle, in_radius)
-    x_obs = [point[0] for point in espT.list_of_obs]
-    y_obs = [point[1] for point in espT.list_of_obs]
+    list_of_obs = espT.slam_data._filter_obstacles(number_min_of_obstacle, in_radius)
+    x_obs = [point[0] for point in list_of_obs]
+    y_obs = [point[1] for point in list_of_obs]
    
     response_data = {
-        'x_car': espT.curr_x_car,
-        'y_car': espT.curr_y_car,
+        'x_car': espT.slam_data.curr_x_car,
+        'y_car': espT.slam_data.curr_y_car,
         'x_obs': x_obs,
         'y_obs': y_obs
     }
@@ -268,25 +252,10 @@ def stream_noisy_obstacle():
         while True:
             # Wait for a new error to be added
             if espT.connected:
-                if len(espT.obstacle) != 0:
-                    new_info = espT.obstacle[0]
-                    espT.obstacle.pop(0)
-                    # If a new error is available, send it to the client as an SSE event
-                    timeOfObs = new_info[0]
-                    espT.curr_x_car = new_info[1]
-                    espT.curr_y_car = new_info[2]
-                    distance = new_info[3]
-                    orientation = new_info[4]
-                    
-                    espT._add_and_delete_obstacle(espT.curr_x_car, espT.curr_y_car, distance, orientation)
-
-                    if espT._is_ready_to_go():
-                        yield 'data: {}\n\n'.format(json.dumps((espT.curr_x_car, espT.curr_y_car, espT.list_of_100_x_obs, espT.list_of_100_y_obs)))
-                        espT._clear_temp_list()
+                if espT.slam_data._is_ready_to_go():
+                    yield 'data: {}\n\n'.format(json.dumps((espT.curr_x_car, espT.curr_y_car, espT.list_of_100_x_obs, espT.list_of_100_y_obs)))
+                    espT._clear_temp_list()
             
-
-
-    
             elif settingDataSIM:
                 print("Adding data")
                 new_info = dataD._randomlyFill()
@@ -312,18 +281,14 @@ def _dataToObstacle(x_car,y_car, distance,orientation):
 
     return(point_x,point_y)
 
-
-
 @main.route('/refresh_map', methods=['GET'])
 def refresh_map():
     global cluster_chart
 
-    mapJson = cluster_chart.generate_chart_json(espT.list_of_obs)
+    mapJson = cluster_chart.generate_chart_json(espT.slam_data.list_of_obs)
                
                
     return jsonify(mapJson)
-
-
 
 @main.route('/get_new_trace_data', methods=['GET'])
 def get_new_trace_data():
