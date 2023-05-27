@@ -36,10 +36,8 @@ class PathFinder:
             if 0 <= grid_x < 20 and 0 <= grid_y < 20:
                 grid[grid_y, grid_x] += 1
 
-        # Denoise
-        grid[grid < sensitivity] = 0
-        # Set occupied cells at least 3 obstacles
-        grid[grid >= sensitivity] = 1
+        grid = np.where(grid < sensitivity, 0, 1)
+
 
         return grid
 
