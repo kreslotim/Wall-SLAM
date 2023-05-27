@@ -3,8 +3,8 @@ import time
 import struct
 import threading
 from app.models.slamData import SlamData
-
-
+from app.models.pathFindingAlgo import PathFinder
+from pathFindingAlgo import instructions_to_go_x_y
 
 
 class ESP32Connection:
@@ -41,6 +41,9 @@ class ESP32Connection:
 
         # Data variable
         self.slam_data = SlamData()
+        self.action_instruction_list = []
+        
+
     
 ######## Thread Looping #############
 
@@ -192,6 +195,9 @@ class ESP32Connection:
             self.send_stat.append([1,timeOfRep]) # To make a graph about the number of packet send
             return 200
         return 400
+    
+
+
 
 
 ############ ESP DIRECT COMMAND METHOD ############
