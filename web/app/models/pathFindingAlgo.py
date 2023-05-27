@@ -123,7 +123,7 @@ class PathFinder:
         return encoded_list
     
 
-    def generate_coordinate_nodes(self,path, initial_position):
+    def generate_coordinate_nodes_grid(self,path, initial_position):
         x, y = initial_position.copy()
         coordinate_nodes = [initial_position]
 
@@ -136,6 +136,25 @@ class PathFinder:
                 x -= 1
             elif instruction == "E":
                 x += 1
+
+            coordinate_nodes.append((x, y))
+
+        return coordinate_nodes
+    
+
+    def generate_coordinate_nodes_car(self,path, initial_position):
+        x, y = initial_position.copy()
+        coordinate_nodes = [initial_position]
+
+        for instruction in path:
+            if instruction == "N":
+                y += 10
+            elif instruction == "S":
+                y -= 10
+            elif instruction == "W":
+                x -= 10
+            elif instruction == "E":
+                x += 10
 
             coordinate_nodes.append((x, y))
 
