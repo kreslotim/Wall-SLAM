@@ -3,8 +3,6 @@ import random
 
 class SlamData:
     def __init__(self):
-        print("Establishing Connection")
-
         # INPUT
         self.numberOfObsInOneGo = 50
         self.delete_distance_if_no_distance = 1
