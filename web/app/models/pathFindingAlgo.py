@@ -6,7 +6,12 @@ class PathFinder:
     def __init__(self):
         self.target_x = 0
         self.target_y = 0            
-            
+
+    def _setTarget_xy(self, target_x, target_y):
+        self.target_x=target_x
+        self.target_y=target_y
+        
+
     def generateGrid(self, obst):
         """
         Generate grid from collected obstacle scans
