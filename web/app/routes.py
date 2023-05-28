@@ -96,28 +96,6 @@ def get_graph_orientation():
 @main.route('/get-graph-com', methods=['GET'])
 def get_graph_com():
     print(" COM ")
-    return jsonify({'message': 'Command received'}, 200)
-@main.route('/get-graph-obs-raw', methods=['GET'])
-def get_graph_obs_raw():
-    print(" obs-raw ")
-    return jsonify({'message': 'Command received'}, 200)
-@main.route('/get-graph-redundancy', methods=['GET'])
-def get_graph_redundancy():
-    print(" redundancy ")
-    return jsonify({'message': 'Command received'}, 200)
-@main.route('/get-graph-kmeans', methods=['GET'])
-def get_graph_kmeans():
-    print(" kmeans ")
-    return jsonify({'message': 'Command received'}, 200)
-@main.route('/get-graph-movement', methods=['GET'])
-def get_graph_movement():
-    print(" movement ")
-    return jsonify({'message': 'Command received'}, 200)
-
-############ Decrepitated API ############
-@main.route('/get-graph-data-com', methods=['POST'])
-def get_graph_data_com():
-    print( "GRAPH " + str(espT.connected))
     if espT.connected:
         rec =espT.recv_stat
         send=  espT.send_stat
@@ -129,10 +107,13 @@ def get_graph_data_com():
         
         return jsonify(x_sent=x_sent, y_sent=y_sent, x_received=x_received,y_received=y_received)
     
-    return jsonify()
-
-@main.route('/get-graph-data-slam', methods=['GET'])
-def get_graph_data_slam():
+    return jsonify({'message': 'Command received'}, 200)
+@main.route('/get-graph-obs-raw', methods=['GET'])
+def get_graph_obs_raw():
+    print(" obs-raw ")
+    return jsonify({'message': 'Command received'}, 200)
+@main.route('/get-graph-redundancy', methods=['GET'])
+def get_graph_redundancy():
     list_of_obs = espT.slam_data._filter_obstacles(number_min_of_obstacle, in_radius)
     x_obs = [point[0] for point in list_of_obs]
     y_obs = [point[1] for point in list_of_obs]
@@ -145,6 +126,17 @@ def get_graph_data_slam():
     }
 
     return jsonify(data=json.dumps(response_data))
+  
+
+@main.route('/get-graph-kmeans', methods=['GET'])
+def get_graph_kmeans():
+    global cluster_chart
+    mapJson = cluster_chart.generate_chart_json(espT.slam_data.list_of_obs)
+    return jsonify(mapJson)
+@main.route('/get-graph-movement', methods=['GET'])
+def get_graph_movement():
+    print(" movement ")
+    return jsonify({'message': 'Command received'}, 200)
 
 @main.route('/update_kmean_slider', methods=['POST'])
 def update_kmean_slider():
@@ -183,157 +175,3 @@ def update_switch_state_data():
     settingConnection = (sSettingConnection == "true")
 
     return jsonify({'success': True})
-
-# This route generates a stream of SSE events
-@main.route('/stream-errors')
-def stream_errors():
-    def event_stream():
-        error = []
-        # Loop indefinitely
-        while True:
-            time.sleep(0.1)
-            # Wait for a new error to be added
-            if len(espT.errors) != 0:
-                new_error = espT.errors[0]
-                espT.errors.pop(0)
-                # If a new error is available, send it to the client as an SSE event
-                error_time = new_error[0]
-                error_message = str(new_error[1])
-                yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
-
-
-
-    # Return the SSE response
-    return Response(event_stream(), mimetype='text/event-stream')
-
-# This route generates a stream of SSE events
-@main.route('/stream-info')
-def stream_info():
-    def event_stream():
-        error = []
-        # Loop indefinitely
-        while True:
-            time.sleep(0.1)
-            # Wait for a new error to be added
-            if len(espT.info) != 0:
-                new_info = espT.info[0]
-                espT.info.pop(0)
-                # If a new error is available, send it to the client as an SSE event
-                error_time = new_info[0]
-                error_message = str(new_info[1])
-                yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
-
-
-
-    # Return the SSE response
-    return Response(event_stream(), mimetype='text/event-stream')
-
-# This route generates a stream of SSE events
-@main.route('/stream-output')
-def stream_output():
-    def event_stream():
-        # Loop indefinitely
-        while True:
-            time.sleep(0.1)
-            # Wait for a new error to be added
-            
-            if len(espT.output) != 0:
-                new_info = espT.output[0]
-                espT.output.pop(0)
-                # If a new error is available, send it to the client as an SSE event
-                error_time = new_info[0]
-                error_message = str(new_info[1])
-                yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
-         
-
-
-    # Return the SSE response
-    return Response(event_stream(), mimetype='text/event-stream')
-
-# This route generates a stream of SSE events
-@main.route('/stream-input')
-def stream_input():
-    def event_stream():
-        # Loop indefinitely
-        while True:
-            time.sleep(0.1)
-           
-            # Wait for a new error to be added
-            if len(espT.input) != 0:
-                new_info = espT.input[0]
-                espT.input.pop(0)
-                # If a new error is available, send it to the client as an SSE event
-                error_time = new_info[0]
-                error_message = str(new_info[1])
-                yield 'data: {}\n\n'.format(json.dumps((error_time, error_message)))
-         
-
-
-    # Return the SSE response
-    return Response(event_stream(), mimetype='text/event-stream')
-
-# This route generates a stream of SSE events
-@main.route('/stream-noisy-obstacle')
-def stream_noisy_obstacle():
-    def event_stream():
-        # Loop indefinitely
-        while True:
-            # Wait for a new error to be added
-            if espT.connected:
-                if espT.slam_data._is_ready_to_go():
-                    yield 'data: {}\n\n'.format(json.dumps((espT.curr_x_car, espT.curr_y_car, espT.list_of_100_x_obs, espT.list_of_100_y_obs)))
-                    espT._clear_temp_list()
-            
-            elif settingDataSIM:
-                print("Adding data")
-                new_info = dataD._randomlyFill()
-                timeOfObs = new_info[0]
-                x_car = new_info[1]
-                y_car = new_info[2]
-                distance = new_info[3]
-                orientation = new_info[4]
-                x_obs,y_obs = _dataToObstacle(x_car,y_car,distance,orientation)
-                if not (distance == -1):
-                    yield 'data: {}\n\n'.format(json.dumps((x_car, y_car, x_obs, y_obs)))
-                
-
-    # Return the SSE response
-    return Response(event_stream(), mimetype='text/event-stream')
-
-#TODO TO DELETE 
-def _dataToObstacle(x_car,y_car, distance,orientation):    
-    # Calculate the x and y coordinates of the obstacle
-    orientation = math.radians(orientation)
-    point_x = x_car + distance * math.cos(orientation)
-    point_y = y_car + distance * math.sin(orientation)
-
-    return(point_x,point_y)
-
-@main.route('/refresh_map', methods=['GET'])
-def refresh_map():
-    global cluster_chart
-
-    mapJson = cluster_chart.generate_chart_json(espT.slam_data.list_of_obs)
-               
-               
-    return jsonify(mapJson)
-
-@main.route('/get_new_trace_data', methods=['GET'])
-def get_new_trace_data():
-    num_points = 3
-    points = [(random.random(), random.random()) for _ in range(num_points)]
-    print(f"sending togo {togoX}")
-    return jsonify({'points': points, 'robot' : (2,1), 'togo' : (togoX,togoY)})
-
-@main.route('/process_coordinates', methods=['POST'])
-def process_coordinates():
-    global togoX,togoY
-    togoX = request.form.get('x')
-    togoY = request.form.get('y')
-    print(togoX,togoY)
-
-    # Process the received coordinates
-    # ... Your code to handle the coordinates ...
-
-    # Return a response to the AJAX request if needed
-    return 'Coordinates processed successfully'
