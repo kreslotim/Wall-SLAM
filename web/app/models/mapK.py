@@ -97,10 +97,15 @@ class ClusterChart:
 
         data = []
         layout = {
-            'title': 'K-means Clustering with Geometrical Shapes',
             'xaxis': {'title': 'X'},
             'yaxis': {'title': 'Y'},
-            'showlegend': True
+            'showlegend': True,
+             'margin': {
+                't' : '10', 
+                'l' : '40', 
+                'r' : '20',
+                'b' : '40'
+            },
         }
 
         # Initialize 'shapes' key with an empty list
@@ -162,6 +167,7 @@ class ClusterChart:
         chart_data = {'data': data, 'layout': layout}
         chart_json = json.dumps(chart_data)
         return chart_json
+    
     def accuracy_fn(self,preds, train_cluster_assignment):
         if not (preds.any() and train_cluster_assignment.any()):
             return 0

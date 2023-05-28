@@ -5,6 +5,7 @@ import threading
 from app.models.slamData import SlamData
 from app.models.pathFindingAlgo import PathFinder
 
+
 class ESP32Connection:
 
     def __init__(self, send_port, recv_port):
