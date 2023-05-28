@@ -26,15 +26,35 @@ function sendMovementCommand(direction) {
 /* --------------- Graph Function --------------- */
   
 $(document).ready(function() {
-  var updateCom = initGraphCom(); // Call the function to initialize the graph
-  var updateRedundancy = initGraphRedundancy();
-  var updateNoise = initGraphNoise();
-  var updateKmeans = initKmeanGraph();
+  var [updateCom,resetCom] = initGraphCom(); // Call the function to initialize the graph
+  var [updateRedundancy,resetRedundancy] = initGraphRedundancy();
+  var [updateNoise, resetNoise] = initGraphNoise();
+  var [updateKmeans,resetKmeans] = initKmeanGraph();
   initKmeanSlider();
-  var updateDistance = initDistance();
-  var updateGyro = initGyro();
-  var updateMovement = initMouvement();
+  var [updateDistance,resetDistance] = initDistance();
+  var [updateGyro,resetOrientation] = initGyro();
+  var [updateMovement,resetMovement] = initMouvement();
   masterUpdate(updateDistance,updateCom,updateRedundancy,updateNoise,updateKmeans,updateGyro,updateMovement);
+  // Call updateMap() when the button is clicked
+  $('#update-master').click(function() {
+    updateCom();
+    updateRedundancy();
+    updateNoise();
+    updateKmeans();
+    updateDistance();
+    updateGyro();
+    updateMovement();
+  })
+  $('#reset-master').click(function() {
+    resetCom();
+    resetRedundancy();
+    resetNoise();
+    resetKmeans();
+    resetDistance();
+    resetOrientation();
+    resetMovement();
+  })
+
 });
 function toggleUpdate(name, updateFunction) {
   var progressIntervalId; // Variable to hold the progress interval ID
@@ -258,20 +278,23 @@ function initDistance(){
       url: '/get-graph-distance',
       type: 'GET',
       success: function(data) {
-          var newChartData = JSON.parse(data);
+          // var newChartData = JSON.parse(data);
           // Plotly.newPlot('graph-distance', newChartData.data, newChartData.layout);
         }
       
     });
+  }
+  function reset(){
+    Plotly.newPlot('graph-distance', data, layout, { displayModeBar: false });
   }
   // Call updateMap() when the button is clicked
   $('#update-distance').click(function() {
     updateMap();
   })
   $('#reset-distance').click(function() {
-    Plotly.newPlot('graph-distance', data, layout, { displayModeBar: false });
+    reset();
   })
-  return updateMap;
+  return [updateMap, reset];
   }
 function initGyro(){
   toggleUpdate("orientation",updateMap);
@@ -349,20 +372,23 @@ function initGyro(){
       url: '/get-graph-orientation',
       type: 'GET',
       success: function(data) {
-          var newChartData = JSON.parse(data);
+          // var newChartData = JSON.parse(data);
           // Plotly.newPlot('graph-distance', newChartData.data, newChartData.layout);
         }
       
     });
+  }
+  function reset(){
+    Plotly.newPlot('graph-orientation', data, layout,{ displayModeBar: false });
   }
   // Call updateMap() when the button is clicked
   $('#update-orientation').click(function() {
       updateMap();
     })
     $('#reset-orientation').click(function() {
-      Plotly.newPlot('graph-orientation', data, layout,{ displayModeBar: false });
+     reset();
     })
-  return updateMap;
+  return [updateMap, reset];
 
 }
 function initGraphCom() {
@@ -394,20 +420,24 @@ function initGraphCom() {
       url: '/get-graph-com',
       type: 'GET',
       success: function(data) {
-          var newChartData = JSON.parse(data);
+          // var newChartData = JSON.parse(data);
           // Plotly.newPlot('graph-distance', newChartData.data, newChartData.layout);
         }
       
     });
+  }
+  function reset(){
+    Plotly.newPlot('graph-com', data, layout, { displayModeBar: false });
   }
    // Call updateMap() when the button is clicked
    $('#update-com').click(function() {
     updateMap();
   })
   $('#reset-com').click(function() {
-    Plotly.newPlot('graph-com', data, layout, { displayModeBar: false });
+    reset();
   })
-  return updateMap;
+
+  return [updateMap, reset];
 }
 
 function initGraphRedundancy() {
@@ -451,6 +481,7 @@ function initGraphRedundancy() {
       url: '/get-graph-redundancy',
       type: 'GET',
       success: function(response) {
+        /*
         console.log(response.data);
         var eventData = JSON.parse(response.data);
         
@@ -460,8 +491,12 @@ function initGraphRedundancy() {
         var y_obs = eventData.y_obs;
 
         Plotly.update('graph-redundancy', { x: [[x_car], x_obs], y: [[y_car], y_obs]},[0, 1],{ displayModeBar: false });
+        */
       }
     });
+  }
+  function reset(){
+    Plotly.newPlot('graph-redundancy', data, layout,{ displayModeBar: false });
   }
    // Call updateMap() when the button is clicked
    $('#update-redundancy').click(function() {
@@ -469,10 +504,10 @@ function initGraphRedundancy() {
   })
      // Call updateMap() when the button is clicked
     $('#reset-redundancy').click(function() {
-      Plotly.newPlot('graph-redundancy', data, layout,{ displayModeBar: false });
+     reset();
 
     })
-    return updateMap;
+    return [updateMap, reset];
 };
 
 function initGraphNoise() {
@@ -533,6 +568,7 @@ function initGraphNoise() {
         url: '/get-graph-obs-raw',
         type: 'GET',
         success: function(response) {
+          /*
           console.log(response.data);
           var eventData = JSON.parse(response.data);
           
@@ -542,19 +578,24 @@ function initGraphNoise() {
           var y_obs = eventData.y_obs;
   
           Plotly.update('graph-obs-raw', { x: [[x_car], x_obs], y: [[y_car], y_obs]},[0, 1],{ displayModeBar: false });
+        */
         }
       });
     }
+  
+  function reset(){
+    Plotly.newPlot('graph-obs-raw', data, layout,{ displayModeBar: false });
+  }
        // Call updateMap() when the button is clicked
    $('#update-obs-raw').click(function() {
     updateMap();
   })
   $('#reset-obs-raw').click(function() {
-    Plotly.extendTraces('graph-obs-raw', { x: [[x_car], x_obs], y: [[y_car], y_obs] }, [0, 1],{ displayModeBar: false });
+    reset();
   })
     
      
-  return updateMap;
+  return [updateMap, reset];
 };
 
 function initKmeanGraph() {
@@ -581,11 +622,14 @@ function initKmeanGraph() {
       url: '/get-graph-kmeans',
       type: 'GET',
       success: function(data) {
-          var newChartData = JSON.parse(data);
-          Plotly.newPlot('graph-kmeans', newChartData.data, newChartData.layout);
+          // var newChartData = JSON.parse(data);
+          // Plotly.newPlot('graph-kmeans', newChartData.data, newChartData.layout);
         }
       
     });
+  }
+  function reset(){
+    Plotly.newPlot('graph-kmeans', chartData, layout, config,{ displayModeBar: false });
   }
 
 
@@ -638,9 +682,9 @@ function initKmeanGraph() {
   });
     // Call updateMap() when the button is clicked
    $('#reset-kmeans').click(function() {
-    Plotly.newPlot('graph-kmeans', chartData, layout, config,{ displayModeBar: false });
+    reset();
     });
-    return updateMap;
+    return [updateMap, reset];
 };
 
 
@@ -815,21 +859,24 @@ Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
       url: '/get-graph-movement',
       type: 'GET',
       success: function(data) {
-          var newChartData = JSON.parse(data);
-          Plotly.newPlot('graph-movement', newChartData.data, newChartData.layout);
+          // var newChartData = JSON.parse(data);
+          // Plotly.newPlot('graph-movement', newChartData.data, newChartData.layout);
         }
       
     });
+  }
+  function reset(){
+    Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
   }
   $('#update-movement').click(function() {
     updateMap();
   });
     // Call updateMap() when the button is clicked
    $('#reset-movement').click(function() {
-    Plotly.newPlot('graph-movement', chartData, layout, config,{ displayModeBar: false });
+    reset();
     });
 
-  return updateMap;
+  return [updateMap, reset];
 }
 
 /* --------------- Connection Status Checker --------------- */
