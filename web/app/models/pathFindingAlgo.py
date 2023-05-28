@@ -230,8 +230,14 @@ class PathFinder:
 
         grid = self.generateGrid(obst)
         path = self.shortest_path(start, end, grid)
-        instr = self.path_to_seq(orientation, path)
 
+        if path[0] == -1:
+            self.x_route = []
+            self.y_route = []
+            return float(404)
+
+        instr = self.path_to_seq(orientation, path)
+        
         self.x_route, self.y_route = self.generate_coordinate_nodes_grid(path)
         
         return float(instr[0])
