@@ -232,6 +232,8 @@ class PathFinder:
         path = self.shortest_path(start, end, grid)
 
         if path[0] == -1:
+            self.x_route = []
+            self.y_route = []
             return float(404)
 
         instr = self.path_to_seq(orientation, path)
