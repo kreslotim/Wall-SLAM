@@ -30,7 +30,7 @@ $(document).ready(function() {
   var [updateRedundancy,resetRedundancy] = initGraphRedundancy();
   var [updateNoise, resetNoise] = initGraphNoise();
   var [updateKmeans,resetKmeans] = initKmeanGraph();
-  initKmeanSlider();
+  
   var [updateDistance,resetDistance] = initDistance();
   var [updateGyro,resetOrientation] = initGyro();
   var [updateMovement,resetMovement] = initMouvement();
@@ -54,6 +54,7 @@ $(document).ready(function() {
     resetOrientation();
     resetMovement();
   })
+  initKmeanSlider();
 
 });
 function toggleUpdate(name, updateFunction) {
@@ -622,8 +623,8 @@ function initKmeanGraph() {
       url: '/get-graph-kmeans',
       type: 'GET',
       success: function(data) {
-          // var newChartData = JSON.parse(data);
-          // Plotly.newPlot('graph-kmeans', newChartData.data, newChartData.layout);
+         var newChartData = JSON.parse(data);
+         Plotly.newPlot('graph-kmeans', newChartData.data, newChartData.layout);
         }
       
     });
@@ -652,28 +653,6 @@ function initKmeanGraph() {
     }
   }
 
-    // Toggle button event listener
-    document.getElementById('toggleButtonKmean').addEventListener('click', function() {
-     
-
-      if (intervalId) {
-        // If interval is active, clear it and deactivate the toggle button
-        clearInterval(intervalId);
-        intervalId = null;
-        clearInterval(progressIntervalId);
-        this.innerHTML = 'Toggle Update';
-      } else {
-        const kmeanupdateSlider = $("#kmeanupdate").val();
-        timeInTerval =  parseInt(kmeanupdateSlider)*1000;
-        console.log(timeInTerval)
-        // If interval is inactive, start it and activate the toggle button
-        intervalId = setInterval(updateMap, timeInTerval);
-        progressIntervalId = setInterval(updateProgressBar, (timeInTerval/10)); // Update progress bar every 400ms
-        
-        this.innerHTML = 'Stop Update';
-        document.getElementsByClassName('progress')[0].style.display = 'block'; // Show the progress bar
-      }
-    });
   // Call updateMap() at an interval
 
    // Call updateMap() when the button is clicked
@@ -689,12 +668,6 @@ function initKmeanGraph() {
 
 
 function initKmeanSlider(){
-const kmeanupdateSlider = document.getElementById('kmeanupdate');
-const valuekmeanupdate = document.getElementById('valuekmeanupdate');
-
-kmeanupdateSlider.addEventListener('change', function() {
-  valuekmeanupdate.innerText = this.value;
-});
 const filterSlider = document.getElementById('filter');
 const valueFilter = document.getElementById('valuefilter');
 

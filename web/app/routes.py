@@ -126,8 +126,6 @@ def get_graph_redundancy():
     }
 
     return jsonify(data=json.dumps(response_data))
-  
-
 @main.route('/get-graph-kmeans', methods=['GET'])
 def get_graph_kmeans():
     global cluster_chart
@@ -138,6 +136,7 @@ def get_graph_movement():
     print(" movement ")
     return jsonify({'message': 'Command received'}, 200)
 
+############ SETTING API ############
 @main.route('/update_kmean_slider', methods=['POST'])
 def update_kmean_slider():
     global cluster_chart

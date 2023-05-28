@@ -182,7 +182,14 @@
         </div>
         <div class="col card mx-2 my-2">  
             <div class="card-body">
-                <h5 class="card-tile">kmeans Correction using Kalman</h5>
+                <div class="d-flex justify-content-between">
+                <h5 class="card-tile">Kmeans </h5>
+                <div class="setting" style="display: block;">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                        More Setting
+                    </button>
+                </div>
+                </div>
                 <hr>
                 <div class="mt-4 setting" style="display: block;">
                     <div class="d-flex">
@@ -200,10 +207,41 @@
                         </div>
                        
                     </div>
+    
                     
-                    <div class="row mx-auto my-2"> 
                       
-                    </div>       
+                      <div class="collapse card card-body m-2" id="collapseExample">
+                            <div class="mx-2 d-flex justify-content-between"> 
+                                <p> Max Number Of Obstacle (K) </p>
+                            
+                                <div class="d-flex">
+                                    <p class='mx-2 my-auto'><span id="valuemax_k"> 50 </span></p>
+                                    <input type="range" min="2" max="100" value="50" step="1" class="slider" id="max_k" >
+                                </div>
+                            </div>
+                            <div class="mx-2 d-flex justify-content-between"> 
+                                <p> split </p>
+                                <div class="d-flex">
+                                    <p class='mx-2 my-auto'><span id="valuesplit"> 0.9 </span></p>
+                                    <input type="range" min="0.6" max="1" value="0.9" step="0.01" class="slider" id="split" >
+                                </div>
+                            </div>
+                            <div class="mx-2 d-flex justify-content-between"> 
+                                <p> threshold </p>
+                                <div class="d-flex">
+                                    <p class='mx-2 my-auto'><span id="valuethreshold"> 1 </span></p>
+
+                                    <input type="range" min="0" max="10" value="1" step="0.01" class="slider" id="threshold" >
+                                </div>
+                            </div>
+                            <div class="mx-2 d-flex justify-content-between"> 
+                                <p> Minimum of point for a cluster </p>
+                                <div class="d-flex">
+                                    <p class='mx-2 my-auto'> <span id="valuefilter" class='mx-2'> 10 </span> </p>
+                                    <input type="range" min="1" max="100" value="10" step="1" class="slider" id="filter" >
+                                </div>
+                            </div>
+                      </div>    
                 </div>
                                    
                 <div id="graph-kmeans" style="height: 200px;"></div>
@@ -368,19 +406,6 @@
 
             </div>
         </div>
-        <div class="col-xl-5 card m-2">
-            <div class="card-body">
-                <h4 class="card-tile">Communication</h4>
-                <hr>
-
- 
-                <div class="row">
-                    <div id="graph"></div>
-                </div>
-               
-                
-            </div>
-        </div>
     </div>
 
     <div class="row">
@@ -409,94 +434,6 @@
             </div>
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-xl-5 card m-2">  
-            <div class="card-body">
-                <h4 class="card-tile">Obstacle Encounter with Noise</h4>
-                <hr>
-                <div class="row">
-                <div id="graph-obstacle"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-5 card m-2">  
-            <div class="card-body">
-                <h4 class="card-tile">Obstacle Error Corrected with SLAM</h4>
-                <hr>
-                <div class="row">
-                <div id="graph-slam"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-10 card m-2">  
-            <div class="card-body">
-                <h4 class="card-tile">Final Map</h4>
-                <hr>
-                <div class="my-4">
-                    <h5 class="my-2"> Kmean Setting</h5>
-                    <div class="my-3">
-                        <div class="mx-2 d-flex justify-content-between"> 
-                            <p> Max Number Of Obstacle (K) </p>
-                        
-                            <div class="d-flex">
-                                <p class='mx-2 my-auto'><span id="valuemax_k"> 50 </span></p>
-                                <input type="range" min="2" max="100" value="50" step="1" class="slider" id="max_k" >
-                            </div>
-                        </div>
-                        <div class="mx-2 d-flex justify-content-between"> 
-                            <p> split </p>
-                            <div class="d-flex">
-                                <p class='mx-2 my-auto'><span id="valuesplit"> 0.9 </span></p>
-                                <input type="range" min="0.6" max="1" value="0.9" step="0.01" class="slider" id="split" >
-                            </div>
-                        </div>
-                        <div class="mx-2 d-flex justify-content-between"> 
-                            <p> threshold </p>
-                            <div class="d-flex">
-                                <p class='mx-2 my-auto'><span id="valuethreshold"> 1 </span></p>
-
-                                <input type="range" min="0" max="10" value="1" step="0.01" class="slider" id="threshold" >
-                            </div>
-                        </div>
-                        <div class="mx-2 d-flex justify-content-between"> 
-                            <p> Minimum of point for a cluster </p>
-                            <div class="d-flex">
-                                <p class='mx-2 my-auto'> <span id="valuefilter" class='mx-2'> 10 </span> </p>
-                                <input type="range" min="1" max="100" value="10" step="1" class="slider" id="filter" >
-                            </div>
-                        </div>
-                        <div class="mx-2 d-flex justify-content-between"> 
-                            <p> Update graph every second</p>
-                            <div class="d-flex">
-                                <p class='mx-2 my-auto'> <span id="valuekmeanupdate" > 10 </span>s</p>
-                                <input type="range" min="2" max="100" value="10" step="1" class="slider" id="kmeanupdate" >
-                            </div>
-                        </div>
-                    </div>
-                            
-                        
-
-                </div>
-                <div class="row">
-                    <button id="toggleButtonKmean" class="col-4 btn btn-primary mx-auto">Toggle Update</button>
-                    <div class="col-6 progress my-2 mx-auto" style="display: none;">
-                        <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                </div>
-               
-                <button class="btn btn-secondary m-4" id="kmeansbtn">Run Kmeans on current obstacle</button>
-               
-                    <div id="alertContainer"></div>
-
-                    <div id="map"></div>
-                        
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </div>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
 <script src="{{ url_for('static', filename='js/bootstrap/bootstrap.js') }}"></script>
