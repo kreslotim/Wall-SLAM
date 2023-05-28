@@ -8,6 +8,7 @@ import json
 import matplotlib.cm as cm
 
 
+
 class ClusterChart:
     def __init__(self, train_split=0.9, threshold=0.3, max_k = 40, filter=10):
         self.num_clusters = 0
@@ -26,8 +27,8 @@ class ClusterChart:
             shape_idx = np.random.randint(6)
             shape_name = shape_names[shape_idx]
             
-            # Randomly generate center coordinates within (0-4, 0-4)
-            center = np.random.rand(2) * 4
+            # Randomly generate center coordinates within (-10, -10) to (10, 10)
+            center = np.random.rand(2) * 20 - 10
             
             # Generate points for the selected shape
             if shape_idx == 0:  # Triangle
@@ -83,14 +84,9 @@ class ClusterChart:
 
         # Filter hence breaking the shape.  
     
-        train_cluster_assignment, self.num_clusters = self.kmeans.fit(xtrain, self.threshold)
+        train_cluster_assignment,centers, self.num_clusters = self.kmeans.fit(xtrain, self.threshold)
 
-        # Predict on unseen data
-        preds = self.kmeans.predict(xtest)
 
-        ## Report results: performance on train and valid/test sets
-        acc = self.accuracy_fn(preds, train_cluster_assignment)
-        print(f"Test set:  accuracy = {acc:.3f}%")
 
         # Generate a color map with 100 colors
         color_map = cm.get_cmap('tab20',self.num_clusters)
@@ -164,51 +160,36 @@ class ClusterChart:
                     'marker': {'color': color}
                 })
 
+        max_point = self.find_furthest_point(2, centers)
+
+        # Add the furthest point as a scatter marker with a red 'x' marker
+        data.append({
+            'x': [max_point[0]],
+            'y': [max_point[1]],
+            'mode': 'markers',
+            'name': 'Furthest Point',
+            'size' : 10,
+            'marker': {'color': 'blue', 'symbol': 'x'}
+        })
         chart_data = {'data': data, 'layout': layout}
         chart_json = json.dumps(chart_data)
-        return chart_json
+        return chart_json, max_point
     
-    def accuracy_fn(self,preds, train_cluster_assignment):
-        if not (preds.any() and train_cluster_assignment.any()):
-            return 0
-        num_samples = preds.shape[0]
-        num_clusters = max(max(train_cluster_assignment), max(preds)) + 1
 
-        cluster_mapping = [-1] * num_clusters
-        assigned_clusters = set()
+    def find_furthest_point(self,grid_size, obstacles):
+        # Calculate the Manhattan distance from a point to all obstacles
+        def calculate_distance(point):
+            return sum(abs(point[0] - obs[0]) + abs(point[1] - obs[1]) for obs in obstacles)
 
-        correct = 0
+        # Find the point with the maximum distance from obstacles
+        max_distance = 0
+        max_point = None
+        for x in range(-grid_size // 2, grid_size // 2 + 1):
+            for y in range(-grid_size // 2, grid_size // 2 + 1):
+                point = (x, y)
+                distance = calculate_distance(point)
+                if distance > max_distance:
+                    max_distance = distance
+                    max_point = point
 
-        for i in range(num_samples):
-            pred_cluster = preds[i]
-            true_cluster = train_cluster_assignment[i]
-
-            if pred_cluster not in assigned_clusters:
-                cluster_mapping[pred_cluster] = true_cluster
-                assigned_clusters.add(pred_cluster)
-
-            if cluster_mapping[pred_cluster] == true_cluster:
-                correct += 1
-
-        accuracy = correct / num_samples * 100
-        return accuracy
-
-        """Return the macro F1-score."""
-        class_ids = np.unique(gt_labels)
-        macrof1 = 0
-        for val in class_ids:
-            predpos = (pred_labels == val)
-            gtpos = (gt_labels==val)
-            
-            tp = sum(predpos*gtpos)
-            fp = sum(predpos*~gtpos)
-            fn = sum(~predpos*gtpos)
-            if tp == 0:
-                continue
-            else:
-                precision = tp/(tp+fp)
-                recall = tp/(tp+fn)
-
-            macrof1 += 2*(precision*recall)/(precision+recall)
-
-        return macrof1/len(class_ids)
+        return max_point
