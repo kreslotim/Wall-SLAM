@@ -19,6 +19,9 @@ class SlamData:
         # Current Car coordinates
         self.curr_x_car = 0
         self.curr_y_car = 0
+        self.perfect_orientation = 0
+
+
     
     def _add_and_delete_obstacle(self, x_car, y_car, obs_distance, orientation):
 
