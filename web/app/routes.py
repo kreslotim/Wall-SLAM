@@ -112,7 +112,6 @@ def get_graph_com():
 @main.route('/get-graph-obs-raw', methods=['GET'])
 def get_graph_obs_raw():
     print(" obs-raw ")
-    #TODO condition might not be necessaire no more
     response_data = {
         'x_car': espT.slam_data.curr_x_car,
         'y_car': espT.slam_data.curr_y_car,

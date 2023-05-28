@@ -454,8 +454,8 @@ function initGraphRedundancy() {
       symbol: 'circle'
     }
   }, {
-    x: [1, 1.02, 1.05, 1.1, 0, 0.3, -0.5],
-    y: [1, 1, 0.9, 1, 0, 0.3, -0.5],
+    x: [],
+    y: [],
     mode: 'markers',
     type: 'scatter',
     marker: {
@@ -482,8 +482,6 @@ function initGraphRedundancy() {
       url: '/get-graph-redundancy',
       type: 'GET',
       success: function(response) {
-        /*
-        console.log(response.data);
         var eventData = JSON.parse(response.data);
         
         var x_car = eventData.x_car;
@@ -492,7 +490,6 @@ function initGraphRedundancy() {
         var y_obs = eventData.y_obs;
 
         Plotly.update('graph-redundancy', { x: [[x_car], x_obs], y: [[y_car], y_obs]},[0, 1],{ displayModeBar: false });
-        */
       }
     });
   }
@@ -553,6 +550,7 @@ function initGraphNoise() {
      Plotly.newPlot('graph-obs-raw', data, layout,{ displayModeBar: false });
  
      // Event listener for SSE events
+     //TODO Useless to delete I think
      eventSource.onmessage = function(event) {
        var eventData = JSON.parse(event.data);
        var x_car = eventData[0];
@@ -562,14 +560,13 @@ function initGraphNoise() {
 
 
        Plotly.extendTraces('graph-obs-raw', { x: [[x_car], x_obs], y: [[y_car], y_obs] }, [0, 1],{ displayModeBar: false });
-
      };
+
      function updateMap() {
       $.ajax({
         url: '/get-graph-obs-raw',
         type: 'GET',
         success: function(response) {
-          /*
           console.log(response.data);
           var eventData = JSON.parse(response.data);
           
@@ -577,9 +574,8 @@ function initGraphNoise() {
           var y_car = eventData.y_car;
           var x_obs = eventData.x_obs;
           var y_obs = eventData.y_obs;
-  
-          Plotly.update('graph-obs-raw', { x: [[x_car], x_obs], y: [[y_car], y_obs]},[0, 1],{ displayModeBar: false });
-        */
+
+          Plotly.extendTraces('graph-obs-raw', { x: [[x_car], x_obs], y: [[y_car], y_obs] }, [0, 1],{ displayModeBar: false });
         }
       });
     }
