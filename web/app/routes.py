@@ -55,18 +55,7 @@ def index():
     return render_template('index.html', ip=ip)
 
 
-@main.route('/update_kmean_slider', methods=['POST'])
-def update_kmean_slider():
-    global cluster_chart
-    filter_value = int(request.form.get('filter'))
-    max_k_value = int(request.form.get('max_k'))
-    split_value = float(request.form.get('split'))
-    threshold_value = float(request.form.get('threshold'))
-    
-    cluster_chart  =  ClusterChart(split_value,threshold_value,max_k_value,filter_value)
-    return 'Slider values received successfully'
-
-
+############ MOVEMENT API ############
 @main.route('/post-move', methods=['POST'])
 def post_move():
     direction = request.args.get('direction')
@@ -94,7 +83,38 @@ def post_move():
          return jsonify({'message': 'Unable to send Command', 'espStatus' : repCode })
     return jsonify({'message': 'Command received', 'espStatus' : repCode })
 
-  
+
+############ GRAPH API ############ 
+@main.route('/get-graph-distance', methods=['GET'])
+def get_graph_distance():
+    print(" distance ")
+    return jsonify({'message': 'Command received'}, 200)
+@main.route('/get-graph-orientation', methods=['GET'])
+def get_graph_orientation():
+    print(" orientation ")
+    return jsonify({'message': 'Command received'}, 200)
+@main.route('/get-graph-com', methods=['GET'])
+def get_graph_com():
+    print(" COM ")
+    return jsonify({'message': 'Command received'}, 200)
+@main.route('/get-graph-obs-raw', methods=['GET'])
+def get_graph_obs_raw():
+    print(" obs-raw ")
+    return jsonify({'message': 'Command received'}, 200)
+@main.route('/get-graph-redundancy', methods=['GET'])
+def get_graph_redundancy():
+    print(" redundancy ")
+    return jsonify({'message': 'Command received'}, 200)
+@main.route('/get-graph-kmeans', methods=['GET'])
+def get_graph_kmeans():
+    print(" kmeans ")
+    return jsonify({'message': 'Command received'}, 200)
+@main.route('/get-graph-movement', methods=['GET'])
+def get_graph_movement():
+    print(" movement ")
+    return jsonify({'message': 'Command received'}, 200)
+
+############ Decrepitated API ############
 @main.route('/get-graph-data-com', methods=['POST'])
 def get_graph_data_com():
     print( "GRAPH " + str(espT.connected))
@@ -107,8 +127,6 @@ def get_graph_data_com():
         y_sent = [pair[0] for pair in send]
         y_received =[pair[1] for pair in send]
         
-
-    
         return jsonify(x_sent=x_sent, y_sent=y_sent, x_received=x_received,y_received=y_received)
     
     return jsonify()
@@ -128,6 +146,16 @@ def get_graph_data_slam():
 
     return jsonify(data=json.dumps(response_data))
 
+@main.route('/update_kmean_slider', methods=['POST'])
+def update_kmean_slider():
+    global cluster_chart
+    filter_value = int(request.form.get('filter'))
+    max_k_value = int(request.form.get('max_k'))
+    split_value = float(request.form.get('split'))
+    threshold_value = float(request.form.get('threshold'))
+    
+    cluster_chart  =  ClusterChart(split_value,threshold_value,max_k_value,filter_value)
+    return 'Slider values received successfully'
 
 @main.route('/get-status-value', methods=['GET'])
 def get_status_value():

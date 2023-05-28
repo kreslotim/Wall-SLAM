@@ -3,8 +3,6 @@ import time
 import struct
 import threading
 from app.models.slamData import SlamData
-from app.models.pathFindingAlgo import PathFinder
-from pathFindingAlgo import instructions_to_go_x_y
 
 
 class ESP32Connection:

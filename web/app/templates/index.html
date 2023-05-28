@@ -2,9 +2,252 @@
 {% import "bootstrap/utils.html" as utils %}
 
 {% block content %}
-<div class="container">
-    <span class="title m-5" ><h1>WALL-SLAM Interface</h1></span>
-    <div class="row">
+<div class="container-fluid">
+    <div class="card m-2 mt-5 mb-5">
+        <div class="card-body d-flex">
+            <h5> WALL-SLAM interface</h5>
+            <div class="form-check form-switch mx-4">
+                <input class="form-check-input" type="checkbox" id="connection-switch" onchange="SettingConnectionState()">
+                <label class="form-check-label" for="switch">Connection to ESP</label>
+                <p id="connection-message"></p>
+                <div class="d-flex">
+                    <button id="reset-master" class="mx-1 btn btn-primary reset">Reset</button>
+                    <button id="update-master" class="mx-1 btn btn-primary update">Update</button>
+                    <button id="tg-update-master" class="mx-1 btn btn-primary tg-update">Toggle Update</button>
+                    <div class="mx-auto">
+                        <div class="d-flex">
+                            <p class='mx-2 my-auto'> <span id="label-frequency-master" class="label-frequency" >10</span>s</p>
+                            <input type="range" min="2" max="100" value="10" step="1" class="slider slider-frequency" id="slider-frequency-master" style="width:100px;" >
+                        </div>
+                        <div class="progress pdiv my-auto" id="progress-master" style="display: none;">
+                            <div id="pb-master" class="progress-bar pb" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+            </div> 
+            <span class="badge connected-badge"></span>
+            <button id="toggleButtonHideSetting" class="mx-1 btn btn-primary"  onclick="settingHide()">Hide Off</button>
+        </div>
+    </div>
+    <div class="row mx-2">
+        <div class="col card mx-2 my-2">  
+            <div class="card-body">
+                <h5 class="card-tile">Distance Correction using Kalman</h5>
+                <hr>
+                <div class="mt-4 setting" style="display: block;">
+                    <div class="d-flex">
+                        <button id="reset-distance" class="mx-1 btn btn-primary reset">Reset</button>
+                        <button id="update-distance" class="mx-1 btn btn-primary update">Update</button>
+                        <button id="tg-update-distance" class="mx-1 btn btn-primary tg-update">Toggle Update</button>
+                        <div class="mx-auto">
+                            <div class="d-flex">
+                                <p class='mx-2 my-auto'> <span id="label-frequency-distance" class="label-frequency" >10</span>s</p>
+                                <input type="range" min="2" max="100" value="10" step="1" class="slider slider-frequency" id="slider-frequency-distance" style="width:100px;" >
+                            </div>
+                            <div class="progress pdiv my-auto" id="progress-distance" style="display: none;">
+                                <div id="pb-distance" class="progress-bar pb" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                    
+                    <div class="row mx-auto my-2"> 
+                      
+                    </div>       
+                </div>
+                                   
+                <div id="graph-distance" style="height: 200px;"></div>
+                        
+            </div>
+        </div>
+        <div class="col card mx-2 my-2">  
+            <div class="card-body">
+                <h5 class="card-tile">orientation Correction using Kalman</h5>
+                <hr>
+                <div class="mt-4 setting" style="display: block;">
+                    <div class="d-flex">
+                        <button id="reset-orientation" class="mx-1 btn btn-primary reset">Reset</button>
+                        <button id="update-orientation" class="mx-1 btn btn-primary update">Update</button>
+                        <button id="tg-update-orientation" class="mx-1 btn btn-primary tg-update">Toggle Update</button>
+                        <div class="mx-auto">
+                            <div class="d-flex">
+                                <p class='mx-2 my-auto'> <span id="label-frequency-orientation" class="label-frequency" >10</span>s</p>
+                                <input type="range" min="2" max="100" value="10" step="1" class="slider slider-frequency" id="slider-frequency-orientation" style="width:100px;" >
+                            </div>
+                            <div class="progress pdiv my-auto" id="progress-orientation" style="display: none;">
+                                <div id="pb-orientation" class="progress-bar pb" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                    
+                    <div class="row mx-auto my-2"> 
+                      
+                    </div>       
+                </div>
+                                   
+                <div id="graph-orientation" style="height: 200px;"></div>
+                        
+            </div>
+        </div>    <div class="col card mx-2 my-2">  
+            <div class="card-body">
+                <h5 class="card-tile">com Correction using Kalman</h5>
+                <hr>
+                <div class="mt-4 setting" style="display: block;">
+                    <div class="d-flex">
+                        <button id="reset-com" class="mx-1 btn btn-primary reset">Reset</button>
+                        <button id="update-com" class="mx-1 btn btn-primary update">Update</button>
+                        <button id="tg-update-com" class="mx-1 btn btn-primary tg-update">Toggle Update</button>
+                        <div class="mx-auto">
+                            <div class="d-flex">
+                                <p class='mx-2 my-auto'> <span id="label-frequency-com" class="label-frequency" >10</span>s</p>
+                                <input type="range" min="2" max="100" value="10" step="1" class="slider slider-frequency" id="slider-frequency-com" style="width:100px;" >
+                            </div>
+                            <div class="progress pdiv my-auto" id="progress-com" style="display: none;">
+                                <div id="pb-com" class="progress-bar pb" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                    
+                    <div class="row mx-auto my-2"> 
+                      
+                    </div>       
+                </div>
+                                   
+                <div id="graph-com" style="height: 200px;"></div>
+                        
+            </div>
+        </div>
+    </div>
+    <div class="row mx-2">
+        <div class="col card mx-2 my-2">  
+            <div class="card-body">
+                <h5 class="card-tile">obs-raw Correction using Kalman</h5>
+                <hr>
+                <div class="mt-4 setting" style="display: block;">
+                    <div class="d-flex">
+                        <button id="reset-obs-raw" class="mx-1 btn btn-primary reset">Reset</button>
+                        <button id="update-obs-raw" class="mx-1 btn btn-primary update">Update</button>
+                        <button id="tg-update-obs-raw" class="mx-1 btn btn-primary tg-update">Toggle Update</button>
+                        <div class="mx-auto">
+                            <div class="d-flex">
+                                <p class='mx-2 my-auto'> <span id="label-frequency-obs-raw" class="label-frequency" >10</span>s</p>
+                                <input type="range" min="2" max="100" value="10" step="1" class="slider slider-frequency" id="slider-frequency-obs-raw" style="width:100px;" >
+                            </div>
+                            <div class="progress pdiv my-auto" id="progress-obs-raw" style="display: none;">
+                                <div id="pb-obs-raw" class="progress-bar pb" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                    
+                    <div class="row mx-auto my-2"> 
+                      
+                    </div>       
+                </div>
+                                   
+                <div id="graph-obs-raw" style="height: 200px;"></div>
+                        
+            </div>
+        </div>
+        <div class="col card mx-2 my-2">  
+            <div class="card-body">
+                <h5 class="card-tile">redundancy Correction using Kalman</h5>
+                <hr>
+                <div class="mt-4 setting" style="display: block;">
+                    <div class="d-flex">
+                        <button id="reset-redundancy" class="mx-1 btn btn-primary reset">Reset</button>
+                        <button id="update-redundancy" class="mx-1 btn btn-primary update">Update</button>
+                        <button id="tg-update-redundancy" class="mx-1 btn btn-primary tg-update">Toggle Update</button>
+                        <div class="mx-auto">
+                            <div class="d-flex">
+                                <p class='mx-2 my-auto'> <span id="label-frequency-redundancy" class="label-frequency" >10</span>s</p>
+                                <input type="range" min="2" max="100" value="10" step="1" class="slider slider-frequency" id="slider-frequency-redundancy" style="width:100px;" >
+                            </div>
+                            <div class="progress pdiv my-auto" id="progress-redundancy" style="display: none;">
+                                <div id="pb-redundancy" class="progress-bar pb" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                    
+                    <div class="row mx-auto my-2"> 
+                      
+                    </div>       
+                </div>
+                                   
+                <div id="graph-redundancy" style="height: 200px;"></div>
+                        
+            </div>
+        </div>
+        <div class="col card mx-2 my-2">  
+            <div class="card-body">
+                <h5 class="card-tile">kmeans Correction using Kalman</h5>
+                <hr>
+                <div class="mt-4 setting" style="display: block;">
+                    <div class="d-flex">
+                        <button id="reset-kmeans" class="mx-1 btn btn-primary reset">Reset</button>
+                        <button id="update-kmeans" class="mx-1 btn btn-primary update">Update</button>
+                        <button id="tg-update-kmeans" class="mx-1 btn btn-primary tg-update">Toggle Update</button>
+                        <div class="mx-auto">
+                            <div class="d-flex">
+                                <p class='mx-2 my-auto'> <span id="label-frequency-kmeans" class="label-frequency" >10</span>s</p>
+                                <input type="range" min="2" max="100" value="10" step="1" class="slider slider-frequency" id="slider-frequency-kmeans" style="width:100px;" >
+                            </div>
+                            <div class="progress pdiv my-auto" id="progress-kmeans" style="display: none;">
+                                <div id="pb-kmeans" class="progress-bar pb" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                    
+                    <div class="row mx-auto my-2"> 
+                      
+                    </div>       
+                </div>
+                                   
+                <div id="graph-kmeans" style="height: 200px;"></div>
+                        
+            </div>
+        </div>
+    </div>
+    <div class="row mx-2">
+        <div class="col card mx-2 my-2">  
+            <div class="card-body">
+                <h5 class="card-tile">Navigation using Dijkstra</h5>
+                <hr>
+                <div class="mt-4 setting" style="display: block;">
+                    <div class="d-flex">
+                        <button id="reset-movement" class="mx-1 btn btn-primary reset">Reset</button>
+                        <button id="update-movement" class="mx-1 btn btn-primary update">Update</button>
+                        <button id="tg-update-movement" class="mx-1 btn btn-primary tg-update">Toggle Update</button>
+                        <div class="mx-auto">
+                            <div class="d-flex">
+                                <p class='mx-2 my-auto'> <span id="label-frequency-movement" class="label-frequency" >10</span>s</p>
+                                <input type="range" min="2" max="100" value="10" step="1" class="slider slider-frequency" id="slider-frequency-movement" style="width:100px;" >
+                            </div>
+                            <div class="progress pdiv my-auto" id="progress-movement" style="display: none;">
+                                <div id="pb-movement" class="progress-bar pb" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                    
+                    <div class="row mx-auto my-2"> 
+                      
+                    </div>       
+                </div>
+                                   
+                <div id="graph-movement" style="height: 300px;"></div>
+                        
+            </div>
+           
+        </div>
+   
+    </div>
+    <div class="row mx-2 my-5">
+
+ 
         <div class="col-xl-5 card m-2">
             <div class="card-body">
                 <h4 class="card-tile ">Global Setting</h4>

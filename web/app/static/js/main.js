@@ -1,6 +1,6 @@
 
 
-/* --------------- Movement Function --------------- */
+/* --------------- Movement Function ---------KmeansGyro------ */
 function sendMovementCommand(direction) {
   var debugStatus = document.getElementById("debugStatus");
   $.ajax({
@@ -26,18 +26,348 @@ function sendMovementCommand(direction) {
 /* --------------- Graph Function --------------- */
   
 $(document).ready(function() {
-  initGraphCom(); // Call the function to initialize the graph
-  initGraphNoise();
-  initKmeanGraph();
+  var updateCom = initGraphCom(); // Call the function to initialize the graph
+  var updateRedundancy = initGraphRedundancy();
+  var updateNoise = initGraphNoise();
+  var updateKmeans = initKmeanGraph();
   initKmeanSlider();
+  var updateDistance = initDistance();
+  var updateGyro = initGyro();
+  var updateMovement = initMouvement();
+  masterUpdate(updateDistance,updateCom,updateRedundancy,updateNoise,updateKmeans,updateGyro,updateMovement);
 });
+function toggleUpdate(name, updateFunction) {
+  var progressIntervalId; // Variable to hold the progress interval ID
+  var progressValue = 0; // Current progress value
+  var intervalId; // Variable to hold the interval ID
 
+  // Update Label
+  const sf = document.getElementById('slider-frequency-' + name);
+  const lf = document.getElementById('label-frequency-'+ name);
+  sf.addEventListener('change', function() {
+    lf.innerText = this.value;
+  });
 
-function initGraphCom() {
+  // Function to update the progress bar
+  function updateProgressBar() {
+    progressValue += 10; // Increase progress value by 10
+    if (progressValue >= 100) progressValue = 0;
+    document.getElementById('pb-' + name).style.width = progressValue + '%'; // Update progress bar width
+    document.getElementById('pb-' + name).innerHTML = progressValue + '%';
+    document.getElementById('pb-' + name).setAttribute('aria-valuenow', progressValue); // Update aria-valuenow attribute
+    if (!intervalId) {
+      clearInterval(progressIntervalId); // Clear the progress interval when it reaches 100%
+      progressValue = 0; // Reset progress value
+      document.getElementById('pb-' + name).style.width = '0%'; // Reset progress bar width
+      document.getElementById('progress-'+ name).style.display = 'none'; // Hide the progress bar
+    }
+  }
+
+  // Toggle button event listener
+  document.getElementById('tg-update-' + name).addEventListener('click', function() {
+    if (intervalId) {
+      // If interval is active, clear it and deactivate the toggle button
+      clearInterval(intervalId);
+      intervalId = null;
+      clearInterval(progressIntervalId);
+      this.innerHTML = 'Toggle Update';
+      var progressContainers = document.getElementById('progress-'+ name);
+      progressContainers.style.display = 'none'; // Hide the progress bar
+      document.getElementById('pb-' + name).style.width = '0%'; // Reset progress bar width
+      document.getElementById("tg-update-"+ name).classList.add('tg-update');
+      document.getElementById('progress-'+ name).classList.add('pdiv');
+      document.getElementById('pb-'+ name).classList.add('pb');
+      document.getElementById('label-frequency-'+ name).classList.add('label-frequency');
+      document.getElementById('slider-frequency-'+ name).classList.add('slider-frequency');
+
+      progressValue = 0; // Reset progress value
+    } else {
+      const updateSlider = document.getElementById('slider-frequency-' + name).value;
+      timeInterval = parseInt(updateSlider) * 1000;
+      console.log(timeInterval);
+      // If interval is inactive, start it and activate the toggle button
+      intervalId = setInterval(updateFunction, timeInterval);
+      progressIntervalId = setInterval(updateProgressBar, timeInterval / 10); // Update progress bar every 10% of the timeInterval
+      this.innerHTML = 'Stop Update';
+      document.getElementById('progress-'+name).style.display = 'block'; // Show the progress bar
+      document.getElementById('progress-'+ name).classList.remove('pdiv');
+      document.getElementById('pb-'+ name).classList.remove('pb');
+      document.getElementById("tg-update-"+ name).classList.remove('tg-update');
+      document.getElementById('label-frequency-'+ name).classList.remove('label-frequency');
+      document.getElementById('slider-frequency-'+ name).classList.remove('slider-frequency');
+    }
+  });
+}
+function masterUpdate(...updateArray){
+  // Master Control
+
+   // Update Label
+   const slider = document.getElementById('slider-frequency-master');
   
+    slider.addEventListener('change', function() {
+      const labels = document.getElementsByClassName('label-frequency');
+      const inputs = document.getElementsByClassName('slider-frequency');
+      for (var i = 0; i < labels.length; i++) {
+          var label = labels[i];
+          var input = inputs[i];
+          label.innerText = this.value;
+          input.value = this.value;
+      }
+      });
+    
+  
+ 
+    var progressIntervalId; // Variable to hold the progress interval ID
+    var progressValue = 0; // Current progress value
+    var intervalId; // Variable to hold the interval ID
+  
+    // Function to update the progress bar
+    function updateProgressBar() {
+      progressValue += 10; // Increase progress value by 10
+      if (progressValue >= 100) progressValue = 0;
+      var progressBar = document.getElementsByClassName('pb');
+      for (var i = 0; i < progressBar.length; i++) {
+        progressBar[i].style.width = progressValue + '%'; // Update progress bar width
+        progressBar[i].innerHTML = progressValue + '%';
+        progressBar[i].setAttribute('aria-valuenow', progressValue); // Update aria-valuenow attribute
+      }
+      if (!intervalId) {
+        clearInterval(progressIntervalId); // Clear the progress interval when it reaches 100%
+        progressValue = 0; // Reset progress value
+        for (var i = 0; i < progressBar.length; i++) {
+          progressBar[i].style.width = '0%'; // Reset progress bar width
+        }
+        var progressContainers = document.getElementsByClassName('pdiv');
+        for (var i = 0; i < progressContainers.length; i++) {
+          progressContainers[i].style.display = 'none'; // Hide the progress bar
+          
+        }
+      }
+    }
+    function allUpdate() {
+      for (var i = 0; i < updateArray.length; i++) {
+        updateArray[i]();
+      }
+    }
+    // Toggle button event listener
+    document.getElementById('tg-update-master').addEventListener('click', function() {
+      if (intervalId) {
+        // If interval is active, clear it and deactivate the toggle button
+        clearInterval(intervalId);
+        intervalId = null;
+        clearInterval(progressIntervalId);
+        this.innerHTML = 'Toggle Update';
+        var progressContainers = document.getElementsByClassName('pdiv');
+        for (var i = 0; i < progressContainers.length; i++) {
+          progressContainers[i].style.display = 'none'; // Hide the progress bar
+        
+        }
+          // Reset individual toggle buttons to "off" mode
+        var toggleButtons = document.getElementsByClassName('tg-update');
+        for (var i = 0; i < toggleButtons.length; i++) {
+          if (toggleButtons[i] !== this) {
+            toggleButtons[i].innerHTML = 'Toggle Update';
+          }
+        }
+        var bar = document.getElementsByClassName('pb');
+        for (var i = 0; i < bar.length; i++) {
+          if (bar[i] !== this) {
+            bar[i].style.width = '0%'; // Reset progress bar width
+          }
+        }
+      
+        progressValue = 0; // Reset progress value
+      } else {
+        const updateSlider = document.getElementById('slider-frequency-master').value;
+        timeInterval = parseInt(updateSlider) * 1000;
+        console.log(timeInterval);
+        // If interval is inactive, start it and activate the toggle button
+        intervalId = setInterval(allUpdate, timeInterval);
+        progressIntervalId = setInterval(updateProgressBar, timeInterval / 10); // Update progress bar every 10% of the timeInterval
+        this.innerHTML = 'Stop Update';
+        var progressContainers = document.getElementsByClassName('pdiv');
+        for (var i = 0; i < progressContainers.length; i++) {
+          progressContainers[i].style.display = 'block'; // Show the progress bar
+        }
+         // Reset individual toggle buttons to "off" mode
+        var toggleButtons = document.getElementsByClassName('tg-update');
+        for (var i = 0; i < toggleButtons.length; i++) {
+          if (toggleButtons[i] !== this) {
+            toggleButtons[i].innerHTML = 'Stop Update';
+          }
+        }
+      }
+    });
+}
+
+function initDistance(){
+
+
+  toggleUpdate("distance",updateMap);
+    // Sample data
+  var time = []; // Time points
+  var distance1 = []; // Distance values for series 1
+  var distance2 = []; // Distance values for series 2
+  var distance3 = []; // Distance values for series 3
+
+  // Data traces
+  var trace1 = {
+    x: time,
+    y: distance1,
+    mode: 'lines',
+    name: 'Distance 1'
+  };
+
+  var trace2 = {
+    x: time,
+    y: distance2,
+    mode: 'lines',
+    name: 'Distance 2'
+  };
+
+  var trace3 = {
+    x: time,
+    y: distance3,
+    mode: 'lines',
+    name: 'Distance 3'
+  };
+
+  // Layout configuration
   var layout = {
-    width: 500,
-    height: 300,
+    xaxis: {
+      title: 'Time'
+    },
+    yaxis: {
+      title: 'Distance'
+    },
+    margin: {
+      t: 10, // Top margin
+      l: 40, // Left margin
+      r: 20, // Right margin
+      b: 40  // Bottom margin
+    },
+  };
+
+  // Combine the traces into an array
+  var data = [trace1, trace2, trace3];
+
+  // Create the line chart
+  Plotly.newPlot('graph-distance', data, layout, { displayModeBar: false });
+  function updateMap() {
+    $.ajax({
+      url: '/get-graph-distance',
+      type: 'GET',
+      success: function(data) {
+          var newChartData = JSON.parse(data);
+          // Plotly.newPlot('graph-distance', newChartData.data, newChartData.layout);
+        }
+      
+    });
+  }
+  // Call updateMap() when the button is clicked
+  $('#update-distance').click(function() {
+    updateMap();
+  })
+  $('#reset-distance').click(function() {
+    Plotly.newPlot('graph-distance', data, layout, { displayModeBar: false });
+  })
+  return updateMap;
+  }
+function initGyro(){
+  toggleUpdate("orientation",updateMap);
+  // Sample data
+  var angles = [30, 150, 270]; // Angles for three objects (in degrees)
+  // Data traces
+  var trace1 = {
+    r: [1],
+    theta: [angles[0]],
+    mode: 'markers',
+    name: 'Object 1',
+    marker: {
+      size: 10,
+      symbol: 'circle'
+    },
+    type: 'scatterpolar'
+  };
+
+  var trace2 = {
+    r: [1],
+    theta: [angles[1]],
+    mode: 'markers',
+    name: 'Object 2',
+    marker: {
+      size: 10,
+      symbol: 'circle'
+    },
+    type: 'scatterpolar'
+  };
+
+  var trace3 = {
+    r: [1],
+    theta: [angles[2]],
+    mode: 'markers',
+    name: 'Object 3',
+    marker: {
+      size: 10,
+      symbol: 'circle'
+    },
+    type: 'scatterpolar'
+  };
+
+  // Combine the traces into an array
+  var data = [trace1, trace2, trace3];
+
+  // Layout configuration
+  var layout = {
+    margin: {
+      t: 10, // Top margin
+      l: 40, // Left margin
+      r: 20, // Right margin
+      b: 40  // Bottom margin
+    },
+    polar: {
+      radialaxis: {
+        visible: false,
+        range: [0, 1] // Set the range of the radial axis
+      },
+      angularaxis: {
+        tickmode: 'array',
+        tickvals: [0, 45, 90, 135, 180, 225, 270, 315], // Set custom tick values for the angular axis (in degrees)
+        ticktext: ['0°', '45°', '90°', '135°', '180°', '225°', '270°', '315°'], // Set custom tick labels for the angular axis
+        direction: 'clockwise' // Set the direction of the angular axis
+      }
+    },
+    showlegend: true,
+  };
+
+
+
+  // Create the 3D chart
+  Plotly.newPlot('graph-orientation', data, layout,{ displayModeBar: false });
+  function updateMap() {
+    $.ajax({
+      url: '/get-graph-orientation',
+      type: 'GET',
+      success: function(data) {
+          var newChartData = JSON.parse(data);
+          // Plotly.newPlot('graph-distance', newChartData.data, newChartData.layout);
+        }
+      
+    });
+  }
+  // Call updateMap() when the button is clicked
+  $('#update-orientation').click(function() {
+      updateMap();
+    })
+    $('#reset-orientation').click(function() {
+      Plotly.newPlot('graph-orientation', data, layout,{ displayModeBar: false });
+    })
+  return updateMap;
+
+}
+function initGraphCom() {
+  toggleUpdate("com",updateMap);
+  var layout = {
     xaxis: {
       //range: [Date.now() - 60000, Date.now()], // show only the last 60 seconds
       tickformat: 'S', // display time in seconds, e.g. "30s" for 30 seconds ago
@@ -45,32 +375,43 @@ function initGraphCom() {
     yaxis: {
       tickformat: ',d', // display values as numbers
       title: 'Number of Packets'
-    }
+    },
+    margin: {
+      t: 10, // Top margin
+      l: 40, // Left margin
+      r: 20, // Right margin
+      b: 40  // Bottom margin
+    },
   };
-  var data = [{ x: [], y: [], type: 'bar', name: 'Sent' },
-              { x: [], y: [], type: 'bar', name: 'Received' }];
-
-  Plotly.newPlot('graph', data, layout);
-
-  function updateGraphCom() {
+  var data = [
+    { x: [], y: [], type: 'bar', name: 'Sent' },
+    { x: [], y: [], type: 'bar', name: 'Received' }
+  ];
+  
+  Plotly.newPlot('graph-com', data, layout, { displayModeBar: false });
+  function updateMap() {
     $.ajax({
-      url: '/get-graph-data-com',
-      type: 'POST',
-      success: function(response) {
-        var eventData = JSON.parse(response);
-        var x_car = eventData.x_car;
-        var y_car = eventData.y_car;
-        var x_obs = eventData.x_obs;
-        var y_obs = eventData.y_obs;
+      url: '/get-graph-com',
+      type: 'GET',
+      success: function(data) {
+          var newChartData = JSON.parse(data);
+          // Plotly.newPlot('graph-distance', newChartData.data, newChartData.layout);
+        }
       
-        Plotly.update('g', { x: [[x_car], y_car], y: [[x_obs], y_obs]},[0, 1]);
-      }
     });
   }
+   // Call updateMap() when the button is clicked
+   $('#update-com').click(function() {
+    updateMap();
+  })
+  $('#reset-com').click(function() {
+    Plotly.newPlot('graph-com', data, layout, { displayModeBar: false });
+  })
+  return updateMap;
 }
 
-function initGraphSlam() {
-  
+function initGraphRedundancy() {
+  toggleUpdate("redundancy",updateMap);
   var data = [{
     x: [],
     y: [],
@@ -82,8 +423,8 @@ function initGraphSlam() {
       symbol: 'circle'
     }
   }, {
-    x: [],
-    y: [],
+    x: [1, 1.02, 1.05, 1.1, 0, 0.3, -0.5],
+    y: [1, 1, 0.9, 1, 0, 0.3, -0.5],
     mode: 'markers',
     type: 'scatter',
     marker: {
@@ -94,15 +435,20 @@ function initGraphSlam() {
   }];
 
   var layout = {
-    title: 'Obstacle Graph',
+    margin: {
+      t: 10, // Top margin
+      l: 40, // Left margin
+      r: 20, // Right margin
+      b: 40  // Bottom margin
+    },
     xaxis: { title: 'X Coordinate' },
     yaxis: { title: 'Y Coordinate' }
   };
-  Plotly.newPlot('graph-slam', data, layout);
+  Plotly.newPlot('graph-redundancy', data, layout,{ displayModeBar: false });
 
-  function updateGraphSlam() {
+  function updateMap() {
     $.ajax({
-      url: '/get-graph-data-slam',
+      url: '/get-graph-redundancy',
       type: 'GET',
       success: function(response) {
         console.log(response.data);
@@ -113,21 +459,31 @@ function initGraphSlam() {
         var x_obs = eventData.x_obs;
         var y_obs = eventData.y_obs;
 
-        Plotly.update('graph-slam', { x: [[x_car], x_obs], y: [[y_car], y_obs]},[0, 1]);
+        Plotly.update('graph-redundancy', { x: [[x_car], x_obs], y: [[y_car], y_obs]},[0, 1],{ displayModeBar: false });
       }
     });
   }
+   // Call updateMap() when the button is clicked
+   $('#update-redundancy').click(function() {
+    updateMap();
+  })
+     // Call updateMap() when the button is clicked
+    $('#reset-redundancy').click(function() {
+      Plotly.newPlot('graph-redundancy', data, layout,{ displayModeBar: false });
+
+    })
+    return updateMap;
 };
 
-
 function initGraphNoise() {
+    toggleUpdate("obs-raw",updateMap);
      // EventSource for receiving SSE events
      var eventSource = new EventSource('/stream-noisy-obstacle');
 
      // Plotly graph initialization
      var data = [{
-       x: [],
-       y: [],
+      x: [],
+      y: [],
        mode: 'markers+lines',
        type: 'scatter',
        marker: {
@@ -136,8 +492,8 @@ function initGraphNoise() {
          symbol: 'circle'
        }
      }, {
-       x: [],
-       y: [],
+      x: [],
+      y: [],
        mode: 'markers',
        type: 'scatter',
        marker: {
@@ -148,12 +504,17 @@ function initGraphNoise() {
      }];
  
      var layout = {
-       title: 'Obstacle Graph',
+      margin: {
+        t: 10, // Top margin
+        l: 40, // Left margin
+        r: 20, // Right margin
+        b: 40  // Bottom margin
+      },
        xaxis: { title: 'X Coordinate' },
        yaxis: { title: 'Y Coordinate' }
      };
  
-     Plotly.newPlot('graph-obstacle', data, layout);
+     Plotly.newPlot('graph-obs-raw', data, layout,{ displayModeBar: false });
  
      // Event listener for SSE events
      eventSource.onmessage = function(event) {
@@ -164,90 +525,64 @@ function initGraphNoise() {
        var y_obs = eventData[3];
 
 
-       Plotly.extendTraces('graph-obstacle', { x: [[x_car], x_obs], y: [[y_car], y_obs] }, [0, 1]);
+       Plotly.extendTraces('graph-obs-raw', { x: [[x_car], x_obs], y: [[y_car], y_obs] }, [0, 1],{ displayModeBar: false });
 
      };
-   
+     function updateMap() {
+      $.ajax({
+        url: '/get-graph-obs-raw',
+        type: 'GET',
+        success: function(response) {
+          console.log(response.data);
+          var eventData = JSON.parse(response.data);
+          
+          var x_car = eventData.x_car;
+          var y_car = eventData.y_car;
+          var x_obs = eventData.x_obs;
+          var y_obs = eventData.y_obs;
+  
+          Plotly.update('graph-obs-raw', { x: [[x_car], x_obs], y: [[y_car], y_obs]},[0, 1],{ displayModeBar: false });
+        }
+      });
+    }
+       // Call updateMap() when the button is clicked
+   $('#update-obs-raw').click(function() {
+    updateMap();
+  })
+  $('#reset-obs-raw').click(function() {
+    Plotly.extendTraces('graph-obs-raw', { x: [[x_car], x_obs], y: [[y_car], y_obs] }, [0, 1],{ displayModeBar: false });
+  })
+    
+     
+  return updateMap;
 };
 
 function initKmeanGraph() {
-
+  toggleUpdate("kmeans",updateMap());
   var config = { responsive: true };
   var layout = {
+    margin: {
+      t: 10, // Top margin
+      l: 40, // Left margin
+      r: 20, // Right margin
+      b: 40  // Bottom margin
+    },
     hovermode: 'closest',
     clickmode: 'event+select',
   }; 
-  var path = {
-    x: [1, 2, 3, 4, 5],   // X-axis data
-    y: [1, 2, 3, 4, 5],  // Y-axis data
-    type: 'scatter',   // Chart type (e.g., scatter, bar, etc.)
-    mode: 'lines',     // Display mode (e.g., lines, markers, etc.)
-    name: 'New Trace'  // Trace name (for legend)
-  };
-  var robot = {
-    x: [0],
-    y:  [0],
-    mode: 'markers',
-    name: 'robot',
-    marker: {
-      color: 'red',
-      size: 20
-      }
-  };
-  var togo = {
-    x: [1],
-    y:  [1],
-    mode: 'markers',
-    name: 'to go',
-    marker: {
-      color: 'blue',
-      size: 20
-      }
-  };
-  var chartData =  { data: [robot,path, togo], layout: layout };
+ 
+  var chartData =  { data: [], layout: layout };
 
 
-  Plotly.newPlot('map', chartData, layout, config);
-
-  // Function to update the new trace data
-  function updatePath() {
-    $.ajax({
-      url: '/get_new_trace_data',
-      type: 'GET',
-      success: function(data) {
-        // TODO add a new trace, a single point from data.robot. 
-        var newPoints = data.points;
-        robot.x = [data.robot[0]];
-        robot.y = [data.robot[1]];
-        togo.x = [data.togo[0]];
-        togo.y = [data.togo[1]];
-        console.log(togo.x, togo.y)
-        path.x = newPoints.map(point => point[0]);
-        path.y = newPoints.map(point => point[1]);
-      
-
-        Plotly.newPlot('map', chartData.data, chartData.layout);
-      
-      },
-      error: function(error) {
-        console.log(error);
-      }
-    });
-  }
+  Plotly.newPlot('graph-kmeans', chartData, layout, config,{ displayModeBar: false });
   
   function updateMap() {
     $.ajax({
-      url: '/refresh_map',
+      url: '/get-graph-kmeans',
       type: 'GET',
       success: function(data) {
           var newChartData = JSON.parse(data);
-          if (newChartData.hasOwnProperty('data')) {
-            chartData = newChartData;
-            chartData.data.push(path);
-            chartData.data.push(robot);
-            chartData.data.push(togo);
-          } 
-          Plotly.newPlot('map', chartData.data, chartData.layout);
+          Plotly.newPlot('graph-kmeans', newChartData.data, newChartData.layout);
         }
       
     });
@@ -297,16 +632,17 @@ function initKmeanGraph() {
     });
   // Call updateMap() at an interval
 
-  setInterval(updatePath, 4000);
    // Call updateMap() when the button is clicked
-  $('#kmeansbtn').click(function() {
+  $('#update-kmeans').click(function() {
     updateMap();
   });
-
-    
-
-
+    // Call updateMap() when the button is clicked
+   $('#reset-kmeans').click(function() {
+    Plotly.newPlot('graph-kmeans', chartData, layout, config,{ displayModeBar: false });
+    });
+    return updateMap;
 };
+
 
 function initKmeanSlider(){
 const kmeanupdateSlider = document.getElementById('kmeanupdate');
@@ -366,6 +702,136 @@ $.ajax({
 }
 };
 
+function initMouvement(){
+toggleUpdate("movement",updateMap);
+// Generate an empty 20x20 grid
+var numRows = 20;
+var numCols = 20;
+var data = Array.from({ length: numRows }, () => Array(numCols).fill(null));
+
+
+data[2][2] = 0; // Assign a value to represent the grayed-out cell
+data[3][2] = 0; // Assign a value to represent the grayed-out cell
+data[2][3] = 0; // Assign a value to represent the grayed-out cell
+data[3][3] = 0; // Assign a value to represent the grayed-out cell
+
+// Define the path coordinates
+var pathCoordinates = [
+  [0, 1], // Starting cell at row 0, column 1
+  [1, 1],  // Ending cell at row 1, column 1
+  [1, 2],  // Ending cell at row 1, column 1
+  [1, 3],  // Ending cell at row 1, column 1
+  [1, 4],  // Ending cell at row 1, column 1
+];
+
+// Create the trace for the grid
+var gridTrace = {
+  z: data,
+  type: 'heatmap',
+  colorscale: [[0, 'gray'], [1, 'white']],
+  showscale: false
+};
+
+// Create the trace for the path
+var pathTrace = {
+  x: pathCoordinates.map(coord => coord[1]), // Column coordinates
+  y: pathCoordinates.map(coord => coord[0]), // Row coordinates
+  mode: 'lines',
+  line: {
+    color: 'red',
+    width: 3
+  }
+};
+// Create the trace for the markers
+var startTrace = {
+  x: [pathCoordinates[0][1]], // Column coordinates of markers
+  y: [pathCoordinates[0][0]], // Row coordinates of markers
+  mode: 'markers',
+  marker: {
+    symbol: 'circle',
+    size: 10,
+    color: 'blue'
+  },
+  name: 'robot'
+};
+var endTrace = {
+  x: [pathCoordinates.at(-1)[1]], // Column coordinates of markers
+  y: [pathCoordinates.at(-1)[0]], // Row coordinates of markers
+  mode: 'markers',
+  marker: {
+    symbol: 'circle',
+    size: 10,
+    color: 'orange'
+  },
+  name: 'toGo'
+};
+// Define the data array with both traces
+var allData = [gridTrace, pathTrace,startTrace,endTrace];
+
+// Define the layout
+var layout = {
+  xaxis: { title: 'X' },
+  yaxis: { title: 'Y' },
+  margin: {
+    t: 10, // Top margin
+    l: 40, // Left margin
+    r: 20, // Right margin
+    b: 40  // Bottom margin
+  },
+};
+
+// Create the plot
+Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
+
+/*
+  // Function to update the new trace data
+  function updatePath() {
+    $.ajax({
+      url: '/get_new_trace_data',
+      type: 'GET',
+      success: function(data) {
+        // TODO add a new trace, a single point from data.robot. 
+        var newPoints = data.points;
+        robot.x = [data.robot[0]];
+        robot.y = [data.robot[1]];
+        togo.x = [data.togo[0]];
+        togo.y = [data.togo[1]];
+        console.log(togo.x, togo.y)
+        path.x = newPoints.map(point => point[0]);
+        path.y = newPoints.map(point => point[1]);
+      
+
+        Plotly.newPlot('map', chartData.data, chartData.layout,{ displayModeBar: false });
+      
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  }
+  */
+  function updateMap() {
+    $.ajax({
+      url: '/get-graph-movement',
+      type: 'GET',
+      success: function(data) {
+          var newChartData = JSON.parse(data);
+          Plotly.newPlot('graph-movement', newChartData.data, newChartData.layout);
+        }
+      
+    });
+  }
+  $('#update-movement').click(function() {
+    updateMap();
+  });
+    // Call updateMap() when the button is clicked
+   $('#reset-movement').click(function() {
+    Plotly.newPlot('graph-movement', chartData, layout, config,{ displayModeBar: false });
+    });
+
+  return updateMap;
+}
+
 /* --------------- Connection Status Checker --------------- */
 $(document).ready(function() {
   initStatusCheck();
@@ -409,6 +875,25 @@ function initStatusCheck() {
 };
 
 /* --------------- Setting Switch --------------- */
+function settingHide(){
+  var toggleButton = document.getElementById('toggleButtonHideSetting');
+  var settingDivs = document.querySelectorAll('.setting');
+  var style = '';
+  if (toggleButton.textContent === 'Hide Off') {
+    toggleButton.classList.add('active');
+    toggleButton.textContent = 'Hide On';
+    style = 'none';
+  } else {
+    toggleButton.textContent = 'Hide Off';
+    toggleButton.classList.remove('active');
+    style = 'block';
+  }
+  settingDivs.forEach( function(settingDiv) {
+    settingDiv.style.display = style;
+  });
+
+ 
+}
 function SettingConnectionState() {
   var isChecked = $('#connection-switch').is(':checked');
   var dataESPSwitch = $('#data-ESP-switch');
