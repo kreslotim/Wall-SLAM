@@ -97,7 +97,7 @@ def get_graph_orientation():
 def get_graph_com():
     print(" COM ")
     if espT.connected:
-        rec =espT.recv_stat
+        rec = espT.recv_stat
         send=  espT.send_stat
             
         x_sent =[pair[0] for pair in rec]
@@ -108,10 +108,20 @@ def get_graph_com():
         return jsonify(x_sent=x_sent, y_sent=y_sent, x_received=x_received,y_received=y_received)
     
     return jsonify({'message': 'Command received'}, 200)
+
 @main.route('/get-graph-obs-raw', methods=['GET'])
 def get_graph_obs_raw():
     print(" obs-raw ")
-    return jsonify({'message': 'Command received'}, 200)
+    #TODO condition might not be necessaire no more
+    response_data = {
+        'x_car': espT.slam_data.curr_x_car,
+        'y_car': espT.slam_data.curr_y_car,
+        'x_obs': espT.slam_data.list_of_100_x_obs,
+        'y_obs': espT.slam_data.list_of_100_y_obs
+    }
+    espT.slam_data._clear_temp_list()
+    return jsonify(data=json.dumps(response_data))
+
 @main.route('/get-graph-redundancy', methods=['GET'])
 def get_graph_redundancy():
     list_of_obs = espT.slam_data._filter_obstacles(number_min_of_obstacle, in_radius)
@@ -134,6 +144,16 @@ def get_graph_kmeans():
 @main.route('/get-graph-movement', methods=['GET'])
 def get_graph_movement():
     print(" movement ")
+    if espT.connected:
+        espT._sendPath_Instruction()
+        response_data = {
+        'x_car': espT.slam_data.curr_x_car,
+        'y_car': espT.slam_data.curr_y_car,
+        'x_route': espT.path_finder.x_route,
+        'y_route': espT.path_finder.y_route
+         }
+
+        return jsonify(data=json.dumps(response_data))
     return jsonify({'message': 'Command received'}, 200)
 
 ############ SETTING API ############

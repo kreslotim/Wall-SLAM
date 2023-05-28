@@ -4,13 +4,18 @@ import numpy as np
 class PathFinder:
  
     def __init__(self):
+
+        # Target position
         self.target_x = 0
-        self.target_y = 0  
+        self.target_y = 0 
+
+        # Target route
+        self.x_route = []
+        self.y_route = []
 
         # "Radius" of the sqaure grid cm
         self.grid_rad = 100
         self.cell_dim = 10
-
 
     def _setTarget_xy(self, target_x, target_y):
         self.target_x=target_x
@@ -125,8 +130,10 @@ class PathFinder:
 
     def generate_coordinate_nodes_grid(self,path, initial_position):
         x, y = initial_position.copy()
-        coordinate_nodes = [initial_position]
+        coordinate_x_nodes = [x]
+        coordinate_y_nodes = [y]
 
+                            
         for instruction in path:
             if instruction == "N":
                 y -= 1
@@ -137,9 +144,10 @@ class PathFinder:
             elif instruction == "E":
                 x += 1
 
-            coordinate_nodes.append((x, y))
+            coordinate_x_nodes.append(x)
+            coordinate_y_nodes.append(y)
 
-        return coordinate_nodes
+        return coordinate_x_nodes, coordinate_y_nodes
     
 
     def generate_coordinate_nodes_car(self,path, initial_position):
@@ -224,13 +232,8 @@ class PathFinder:
         path = self.shortest_path(start, end, grid)
         instr = self.path_to_seq(orientation, path)
 
-        grid[start] = 2  # mark start with 2 in the grid
-        grid[end] = 3  # mark end with 3 in the grid
-        print(grid)
-        print(path)
-        print(instr)
-
-        #TODO not optimal 
+        self.x_route, self.y_route = self.generate_coordinate_nodes_grid(path)
+        
         return float(instr[0])
     
     

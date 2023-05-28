@@ -252,9 +252,10 @@ class ESP32Connection:
         pos_car = (self.slam_data.curr_x_car, self.slam_data.curr_y_car)
         
         # Calculate the best path and send the instrucitions
-        #TODO for now instructions_to_go_x_y sends an Array but needs to be modified to only send the first instruction of the list
-        self._send_actionNumber(self.path_finder.instructions_to_go_x_y(pos_car, self.slam_data.perfect_orientation, self.slam_data.list_of_obs))
+        actionNumber = self.path_finder.instructions_to_go_x_y(pos_car, self.slam_data.perfect_orientation, self.slam_data.list_of_obs)
 
+        if actionNumber != 404 :
+            self._send_actionNumber(actionNumber)
 ############ HELPER METHOD ############
 
     def _is_socket_alive(self):
