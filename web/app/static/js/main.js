@@ -481,6 +481,7 @@ function initGraphRedundancy() {
     $.ajax({
       url: '/get-graph-redundancy',
       type: 'GET',
+
       success: function(response) {
         var eventData = JSON.parse(response.data);
         
@@ -825,7 +826,7 @@ Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
   */
   function updateMap() {
     $.ajax({
-      url: '/get-graph-movement',
+      url: 'redundancy',
       type: 'GET',
       success: function(data) {
           // var newChartData = JSON.parse(data);
