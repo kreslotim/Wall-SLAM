@@ -817,12 +817,42 @@ Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
       url: '/get-graph-movement',
       type: 'POST',
       data: { togo: JSON.stringify(togo) }, // Send the togo coordinates as data
-      success: function(data) {
-          var newChartData = JSON.parse(data);
+      success: function(response) {
+        var newData = JSON.parse(response.data);
+        console.log(newData);
 
-          pathTrace.x = newChartData.x_route;
-          pathTrace.y = newChartData.y_route;
-          Plotly.newPlot('graph-movement', newChartData.data, newChartData.layout);
+          // Update grid trace
+          var numRows = 20;
+          var numCols = 20;
+          var gridData = Array.from({ length: numRows }, () => Array(numCols).fill(null));
+    
+          newData.gridData.forEach(function (coord) {
+            var row = coord[0];
+            var col = coord[1];
+            gridData[row][col] = 0;
+          });
+    
+          gridTrace.z = gridData;
+    
+          // Update path trace
+          pathTrace.x = newData.pathX;
+          pathTrace.y = newData.pathY;
+    
+          // Update start trace
+          startTrace.x = [newData.pathX[0]];
+          startTrace.y = [newData.pathY[0]];
+    
+          // Update end trace
+          endTrace.x = [newData.pathX.at(-1)];
+    
+          // Update allData array
+          allData = [gridTrace, pathTrace, startTrace, endTrace];
+
+                // Redraw the plot
+          Plotly.newPlot('graph-movement', allData, layout, { displayModeBar: false });
+        },
+        error: function (error) {
+          console.log(error);
         }
     });
   }
@@ -855,7 +885,7 @@ Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
     });
 
   return [updateMap, reset];
-}
+} 
 
 /* --------------- Connection Status Checker --------------- */
 $(document).ready(function() {

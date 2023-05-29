@@ -164,8 +164,14 @@ def get_graph_movement():
 
         return jsonify(data=json.dumps(response_data))
     
-    return jsonify({'message': 'not connected'}, 200)
+    newData = {
+        'gridData': [(10, 10), (3, 2), (2, 3), (3, 3)],  # Example grid coordinates to be grayed out
+        'pathX': [0, 1, 1, 1, 1],
+        'pathY': [1, 1, 2, 3, 4],
+        }
 
+    return jsonify(data=json.dumps(newData))
+    
 ############ SETTING API ############
 @main.route('/update_kmean_slider', methods=['POST'])
 def update_kmean_slider():
