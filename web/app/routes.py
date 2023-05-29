@@ -138,7 +138,8 @@ def get_graph_redundancy():
 @main.route('/get-graph-kmeans', methods=['GET'])
 def get_graph_kmeans():
     global cluster_chart
-    mapJson = cluster_chart.generate_chart_json(espT.slam_data.list_of_obs)
+    mapJson, togo = cluster_chart.generate_chart_json(espT.slam_data.list_of_obs)
+    print(togo)
     return jsonify(mapJson)
 @main.route('/get-graph-movement', methods=['GET'])
 def get_graph_movement():
