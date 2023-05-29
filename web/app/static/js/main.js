@@ -549,19 +549,6 @@ function initGraphNoise() {
      };
  
      Plotly.newPlot('graph-obs-raw', data, layout,{ displayModeBar: false });
- 
-     // Event listener for SSE events
-     //TODO Useless to delete I think
-     eventSource.onmessage = function(event) {
-       var eventData = JSON.parse(event.data);
-       var x_car = eventData[0];
-       var y_car = eventData[1];
-       var x_obs = eventData[2];
-       var y_obs = eventData[3];
-
-
-       Plotly.extendTraces('graph-obs-raw', { x: [[x_car], x_obs], y: [[y_car], y_obs] }, [0, 1],{ displayModeBar: false });
-     };
 
      function updateMap() {
       $.ajax({
