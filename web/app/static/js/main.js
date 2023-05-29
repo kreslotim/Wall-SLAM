@@ -811,20 +811,41 @@ Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
     });
   }
   */
+ var togo = [0,0]
   function updateMap() {
     $.ajax({
-      url: 'redundancy',
-      type: 'GET',
+      url: '/get-graph-movement',
+      type: 'POST',
+      data: { togo: JSON.stringify(togo) }, // Send the togo coordinates as data
       success: function(data) {
-          // var newChartData = JSON.parse(data);
-          // Plotly.newPlot('graph-movement', newChartData.data, newChartData.layout);
+          var newChartData = JSON.parse(data);
+
+          pathTrace.x = newChartData.x_route;
+          pathTrace.y = newChartData.y_route;
+          Plotly.newPlot('graph-movement', newChartData.data, newChartData.layout);
         }
-      
     });
   }
   function reset(){
     Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
   }
+
+      // Function to handle the click event
+      function handleClick(eventData) {
+        // Retrieve the clicked point's coordinates
+        togo[0] = eventData.points[0].x;
+        togo[1] = eventData.points[0].y;
+        updateMap();
+      }
+      // Attach the click event handler to the plot
+    var graphMovement = document.getElementById('graph-movement');
+    graphMovement.on('plotly_click', handleClick);
+      // Call updateMap() when the button is clicked
+     $('#reset-movement').click(function() {
+      reset();
+      });
+
+      
   $('#update-movement').click(function() {
     updateMap();
   });

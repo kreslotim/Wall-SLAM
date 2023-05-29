@@ -33,7 +33,7 @@ class PathFinder:
         :return: sampled grid with cells set to 1 or 0
         """
         # Initialize the 2D array representing the grid map
-        grid = np.zeros((2*self.grid_rad / self.cell_dim, 2*self.grid_rad / self.cell_dim))
+        grid = np.zeros((int(2*self.grid_rad / self.cell_dim), int(2*self.grid_rad / self.cell_dim)))
         obstacle_coordinates = obst.copy()
         
         # Sensitivity (obstacle points per block, think of it as a threshold)
@@ -209,7 +209,7 @@ class PathFinder:
         return car_instructions
 
 
-    def instructions_to_go_x_y(self, pos_car, dest_car, orientation, obst):
+    def instructions_to_go_x_y(self, pos_car, orientation, obst):
         """
             Calculates the shortest route
                 :param obst: list of obstacles
@@ -226,7 +226,7 @@ class PathFinder:
 
             """
         start = self.car_to_grid_coor(pos_car, 100, 10)
-        end = self.car_to_grid_coor(dest_car, 100, 10)
+        end = self.car_to_grid_coor([self.target_x, self.target_y], 100, 10)
 
         grid = self.generateGrid(obst)
         path = self.shortest_path(start, end, grid)

@@ -141,11 +141,20 @@ def get_graph_kmeans():
     mapJson, togo = cluster_chart.generate_chart_json(espT.slam_data.list_of_obs)
     print(togo)
     return jsonify(mapJson)
-@main.route('/get-graph-movement', methods=['GET'])
+
+@main.route('/get-graph-movement', methods=['POST'])
 def get_graph_movement():
-    print(" movement ")
+    print("run")
+    togo = request.form.get('togo')
+  
     if espT.connected:
-        espT._sendPath_Instruction()
+        if togo:
+            print("pass")
+            togo_coordinates = json.loads(togo)
+            espT.path_finder.setTarget_xy(togo_coordinates)
+            espT._sendPath_Instruction()
+            
+    
         response_data = {
         'x_car': espT.slam_data.curr_x_car,
         'y_car': espT.slam_data.curr_y_car,
@@ -154,7 +163,8 @@ def get_graph_movement():
          }
 
         return jsonify(data=json.dumps(response_data))
-    return jsonify({'message': 'Command received'}, 200)
+    
+    return jsonify({'message': 'not connected'}, 200)
 
 ############ SETTING API ############
 @main.route('/update_kmean_slider', methods=['POST'])
