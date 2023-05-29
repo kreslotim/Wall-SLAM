@@ -844,6 +844,8 @@ Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
     
           // Update end trace
           endTrace.x = [newData.pathX.at(-1)];
+          endTrace.y = [newData.pathY.at(-1)];
+
     
           // Update allData array
           allData = [gridTrace, pathTrace, startTrace, endTrace];

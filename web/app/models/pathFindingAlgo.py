@@ -17,6 +17,8 @@ class PathFinder:
         self.grid_rad = 100
         self.cell_dim = 10
 
+        self.grid = None
+
     def setTarget_xy(self, coordinates):
         self.target_x=coordinates[0]
         self.target_y=coordinates[1]
@@ -24,7 +26,6 @@ class PathFinder:
     def car_to_grid_coor(self, car_pos, grid_rad, cell_width):
         return (int((grid_rad - car_pos[1]) / cell_width), int((car_pos[0] + grid_rad) / cell_width))
       
-        
     def generateGrid(self, obst):
         """
         Generate grid from collected obstacle scans
@@ -33,7 +34,7 @@ class PathFinder:
         :return: sampled grid with cells set to 1 or 0
         """
         # Initialize the 2D array representing the grid map
-        grid = np.zeros((int(2*self.grid_rad / self.cell_dim), int(2*self.grid_rad / self.cell_dim)))
+        self.grid = np.zeros((int(2*self.grid_rad / self.cell_dim), int(2*self.grid_rad / self.cell_dim)))
         obstacle_coordinates = obst.copy()
         
         # Sensitivity (obstacle points per block, think of it as a threshold)
@@ -47,12 +48,11 @@ class PathFinder:
 
             # Increment the value of the corresponding grid cell, ensure that its valid too
             if 0 <= grid_x < 2*self.grid_rad / self.cell_dim and 0 <= grid_y < 2*self.grid_rad / self.cell_dim:
-                grid[grid_y, grid_x] += 1
+                self.grid[grid_y, grid_x] += 1
 
-        grid = np.where(grid < sensitivity, 0, 1)
+        self.grid = np.where(self.grid < sensitivity, 0, 1)
 
-        return grid
-
+        return self.grid
 
     def shortest_path(self, grid_pos, grid_dest, grid):
         """
@@ -127,7 +127,6 @@ class PathFinder:
 
         return encoded_list
     
-
     def generate_coordinate_nodes_grid(self,path, initial_position):
         x, y = initial_position
         self.x_route = []
@@ -148,7 +147,6 @@ class PathFinder:
 
         return
     
-
     def generate_coordinate_nodes_car(self,path, initial_position):
         x, y = initial_position.copy()
         coordinate_nodes = [initial_position]
@@ -166,7 +164,6 @@ class PathFinder:
             coordinate_nodes.append((x, y))
 
         return coordinate_nodes
-
 
     def path_to_seq(self, orient, path):
         """
@@ -207,7 +204,6 @@ class PathFinder:
                     i += 1
         return car_instructions
 
-
     def instructions_to_go_x_y(self, pos_car, orientation, obst):
         """
             Calculates the shortest route
@@ -237,8 +233,39 @@ class PathFinder:
 
         instr = self.path_to_seq(orientation, path)
         print(len(path))
+
+
         self.generate_coordinate_nodes_grid(path, start)
+        self.generate_list_of_obstacles_for_website()
         
         return float(instr[0])
     
     
+    def find_positive_coordinates(self, grid): 
+            coordinates = [] 
+            for i in range(len(grid)): 
+                for j in range(len(grid[i])): 
+                    if grid[i][j] == 1: 
+                        coordinates.append((i, j)) 
+            return coordinates 
+ 
+ 
+    # 0,0 in the bottom left, (19,19) in the top right 
+    def generate_list_of_obstacles_for_website(self): 
+
+
+        if self.grid is not None: 
+            obstacle_cell = self.find_positive_coordinates(self.grid) 
+            transformed_coordinates = [] 
+            for coord in obstacle_cell: 
+                transformed_x = coord[1] 
+                transformed_y = len(self.grid) -1 - coord[0] 
+                transformed_coordinates.append((transformed_x, transformed_y)) 
+            return transformed_coordinates
+        return None
+    
+    def website_to_grid(self, point, ): 
+        x, y = len(self.grid)-1 - point[1], point[0]
+        return x, y
+
+

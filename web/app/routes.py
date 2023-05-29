@@ -155,22 +155,16 @@ def get_graph_movement():
             
         espT._sendPath_Instruction()
         response_data = {
-        'x_car': espT.slam_data.curr_x_car,
-        'y_car': espT.slam_data.curr_y_car,
-        'x_route': espT.path_finder.x_route,
-        'y_route': espT.path_finder.y_route
-         }
-        print(espT.path_finder.x_route)
+        'gridData': espT.path_finder.generate_list_of_obstacles_for_website(),  
+        'pathX': espT.path_finder.x_route,
+        'pathY': espT.path_finder.y_route
+        }
+        print(f"obs :{espT.path_finder.generate_list_of_obstacles_for_website()}")
+        print(f"path x :{espT.path_finder.x_route}")
         print(espT.path_finder.y_route)
         return jsonify(data=json.dumps(response_data))
     
-    newData = {
-        'gridData': [(10, 10), (3, 2), (2, 3), (3, 3)],  # Example grid coordinates to be grayed out
-        'pathX': [0, 1, 1, 1, 1],
-        'pathY': [1, 1, 2, 3, 4],
-        }
-
-    return jsonify(data=json.dumps(newData))
+    return jsonify(data=json.dumps())
     
 ############ SETTING API ############
 @main.route('/update_kmean_slider', methods=['POST'])
