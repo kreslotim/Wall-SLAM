@@ -5,7 +5,7 @@ class SlamData:
     def __init__(self):
         # INPUT
         self.numberOfObsInOneGo = 50
-        self.delete_distance_if_no_distance = 1
+        self.delete_distance_if_no_distance = 2000
         self.delete_distance_linear_equation = 10
         self.max_distance_detection = 2000
         self.number_min_of_obstacle = 1

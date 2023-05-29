@@ -77,11 +77,13 @@ class ESP32Connection:
             if self.connected:
                 # Receive data from the client socket
                 data = self.recv_socket.recv(48)
-                data_decoded = struct.unpack('ffffffffffff', data)
 
                 if data:
-                    self.recv_socket.send("200".encode())
-
+                    try :
+                         data_decoded = struct.unpack('ffffffffffff', data)
+                    except Exception as e:
+                         print("Connection error :", e)
+                         print(len(data))
                     # Use the data 
                     distanceFront = data_decoded[2]
                     distanceBack = data_decoded[3]
@@ -111,7 +113,6 @@ class ESP32Connection:
 
                     #TODO Flo do you still want this ??
 
-                    self.output.append((timeOfReading, 'Position ', x_car, y_car))  
                     self.output.append((timeOfReading, 'Obstacle found at ', distanceFront, ' mm, looking at ', orientation)) 
                     # Log it
                     timeOfRep = round( time.time() - self.time, 2)

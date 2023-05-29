@@ -115,8 +115,8 @@ def get_graph_obs_raw():
     response_data = {
         'x_car': espT.slam_data.curr_x_car,
         'y_car': espT.slam_data.curr_y_car,
-        'x_obs': espT.slam_data.list_of_100_x_obs,
-        'y_obs': espT.slam_data.list_of_100_y_obs
+        'x_obs': espT.slam_data.list_of_100_x_obs.copy(),
+        'y_obs': espT.slam_data.list_of_100_y_obs.copy()
     }
     espT.slam_data._clear_temp_list()
     return jsonify(data=json.dumps(response_data))
