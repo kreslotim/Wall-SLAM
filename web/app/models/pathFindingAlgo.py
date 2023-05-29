@@ -54,7 +54,7 @@ class PathFinder:
         return grid
 
 
-    def shortest_path(grid_pos, grid_dest, grid):
+    def shortest_path(self, grid_pos, grid_dest, grid):
         """
         Finds the shortest path between two cells of the grid with minimal turns
         :param grid_pos: departure cell
@@ -84,7 +84,7 @@ class PathFinder:
 
             # Check if the current position is the destination
             if current_pos == grid_dest:
-                return path
+                return path if len(path) != 0 else [-1]
 
             x, y = current_pos
 
@@ -129,10 +129,9 @@ class PathFinder:
     
 
     def generate_coordinate_nodes_grid(self,path, initial_position):
-        x, y = initial_position.copy()
-        coordinate_x_nodes = [x]
-        coordinate_y_nodes = [y]
-
+        x, y = initial_position
+        self.x_route = []
+        self.y_route = []
                             
         for instruction in path:
             if instruction == "N":
@@ -144,10 +143,10 @@ class PathFinder:
             elif instruction == "E":
                 x += 1
 
-            coordinate_x_nodes.append(x)
-            coordinate_y_nodes.append(y)
+            self.x_route.append(x)
+            self.y_route.append(y)
 
-        return coordinate_x_nodes, coordinate_y_nodes
+        return
     
 
     def generate_coordinate_nodes_car(self,path, initial_position):
@@ -176,7 +175,7 @@ class PathFinder:
         :return: array of instructions to the car to execute, e.g. [1,4,..] can be changed  in
                 def path_to_seq(orient, path)
         """
-        current_orientation = orient
+        current_orientation = int(orient)
         global_instructions = self.encode_directions(path)
         car_instructions = []
 
@@ -203,7 +202,7 @@ class PathFinder:
                     car_instructions.append(3)
                     current_orientation =  (current_orientation + 270) % 360
 
-                while i < len(global_instructions) and current_orientation == global_instructions[i]:
+            while i < len(global_instructions) and current_orientation == global_instructions[i]:
                     car_instructions.append(1)
                     i += 1
         return car_instructions
@@ -237,8 +236,8 @@ class PathFinder:
             return float(404)
 
         instr = self.path_to_seq(orientation, path)
-        
-        self.x_route, self.y_route = self.generate_coordinate_nodes_grid(path)
+        print(len(path))
+        self.generate_coordinate_nodes_grid(path, start)
         
         return float(instr[0])
     

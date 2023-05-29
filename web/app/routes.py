@@ -152,16 +152,16 @@ def get_graph_movement():
             print("pass")
             togo_coordinates = json.loads(togo)
             espT.path_finder.setTarget_xy(togo_coordinates)
-            espT._sendPath_Instruction()
             
-    
+        espT._sendPath_Instruction()
         response_data = {
         'x_car': espT.slam_data.curr_x_car,
         'y_car': espT.slam_data.curr_y_car,
         'x_route': espT.path_finder.x_route,
         'y_route': espT.path_finder.y_route
          }
-
+        print(espT.path_finder.x_route)
+        print(espT.path_finder.y_route)
         return jsonify(data=json.dumps(response_data))
     
     return jsonify({'message': 'not connected'}, 200)
