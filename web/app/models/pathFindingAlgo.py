@@ -17,9 +17,9 @@ class PathFinder:
         self.grid_rad = 100
         self.cell_dim = 10
 
-    def _setTarget_xy(self, target_x, target_y):
-        self.target_x=target_x
-        self.target_y=target_y
+    def setTarget_xy(self, coordinates):
+        self.target_x=coordinates[0]
+        self.target_y=coordinates[1]
 
     def car_to_grid_coor(self, car_pos, grid_rad, cell_width):
         return (int((grid_rad - car_pos[1]) / cell_width), int((car_pos[0] + grid_rad) / cell_width))
