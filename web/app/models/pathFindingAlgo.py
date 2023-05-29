@@ -17,7 +17,7 @@ class PathFinder:
         self.grid_rad = 100
         self.cell_dim = 10
 
-        self.grid = None
+        self.grid = []
 
     def setTarget_xy(self, coordinates):
         self.target_x=coordinates[0]
@@ -129,8 +129,9 @@ class PathFinder:
     
     def generate_coordinate_nodes_grid(self,path, initial_position):
         x, y = initial_position
-        self.x_route = []
-        self.y_route = []
+        t_x, t_y = self.grid_to_website((x,y))
+        self.x_route = [t_x]
+        self.y_route = [t_y]
                             
         for instruction in path:
             if instruction == "N":
@@ -142,8 +143,9 @@ class PathFinder:
             elif instruction == "E":
                 x += 1
 
-            self.x_route.append(x)
-            self.y_route.append(y)
+            transformed_x, transformed_y = self.grid_to_website((x,y))
+            self.x_route.append(transformed_x)
+            self.y_route.append(transformed_y)
 
         return
     
@@ -221,7 +223,7 @@ class PathFinder:
 
             """
         start = self.car_to_grid_coor(pos_car, 100, 10)
-        end = self.car_to_grid_coor([self.target_x, self.target_y], 100, 10)
+        end = self.website_to_grid([self.target_x, self.target_y])
 
         grid = self.generateGrid(obst)
         path = self.shortest_path(start, end, grid)
@@ -252,20 +254,21 @@ class PathFinder:
  
     # 0,0 in the bottom left, (19,19) in the top right 
     def generate_list_of_obstacles_for_website(self): 
-
-
-        if self.grid is not None: 
+        if len(self.grid) != 0: 
             obstacle_cell = self.find_positive_coordinates(self.grid) 
             transformed_coordinates = [] 
             for coord in obstacle_cell: 
-                transformed_x = coord[1] 
-                transformed_y = len(self.grid) -1 - coord[0] 
+                transformed_x, transformed_y = self.grid_to_website(coord)
                 transformed_coordinates.append((transformed_x, transformed_y)) 
             return transformed_coordinates
         return None
     
-    def website_to_grid(self, point, ): 
+    def website_to_grid(self, point): 
         x, y = len(self.grid)-1 - point[1], point[0]
+        return x, y
+    
+    def grid_to_website(self, point): 
+        x, y =  point[1] , len(self.grid)- 1 - point[0]
         return x, y
 
 

@@ -21,10 +21,9 @@ send_port = 8889
 
 # Initial robot position and obstacle data
 
-global togoX 
-togoX = 1
-global togoY
-togoY = 0
+global togo
+togoX = (0,0)
+
 
 
 startTime= time.time()
@@ -137,23 +136,23 @@ def get_graph_redundancy():
     return jsonify(data=json.dumps(response_data))
 @main.route('/get-graph-kmeans', methods=['GET'])
 def get_graph_kmeans():
-    global cluster_chart
+    global cluster_chart, togo
     mapJson, togo = cluster_chart.generate_chart_json(espT.slam_data.list_of_obs)
+
     print(togo)
     return jsonify(mapJson)
 
 @main.route('/get-graph-movement', methods=['POST'])
 def get_graph_movement():
+    global togo
     print("run")
-    togo = request.form.get('togo')
-  
+
     if espT.connected:
         if togo:
             print("pass")
-            togo_coordinates = json.loads(togo)
+            togo_coordinates = togo
             espT.path_finder.setTarget_xy(togo_coordinates)
             
-        espT._sendPath_Instruction()
         response_data = {
         'gridData': espT.path_finder.generate_list_of_obstacles_for_website(),  
         'pathX': espT.path_finder.x_route,
