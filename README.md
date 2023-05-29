@@ -115,10 +115,7 @@ Also using tracks could turn out to be a bad idea, because tracks slip when tour
 spot, resulting in screwed up data for odometry (=”use of data from motion sensors to
 estimate change in position over time”).
 
-Solution: We added an IMU sensor to check the rotational information. In case this does
-not work, we need to consider a simplified design of the chassis, a bit like an automatic
-hoover. (That is, only two wheels and one stabilizing thing in front/back).
-After all, there is a reason why those vacuum cleaners are built the way they are.
+Solution: We added an IMU sensor to check the rotational information.
 Now, if it still has problems on the localizing part, we need modifying the area. to map
 and setting up some kind of orientation system (reflective tape around cylinders is common
 way in industrial environments, an easier way would be to simply add a grid like pattern
