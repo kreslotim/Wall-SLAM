@@ -26,6 +26,7 @@ togoX = (0,0)
 
 
 
+
 startTime= time.time()
 
 espT = ESP32Connection(send_port=send_port,recv_port=recv_port)
@@ -144,23 +145,22 @@ def get_graph_kmeans():
 
 @main.route('/get-graph-movement', methods=['POST'])
 def get_graph_movement():
-    global togo
-    print("run")
 
     if espT.connected:
-        if togo:
-            print("pass")
+        if 'togo' in request.form:
+            togo = json.loads(request.form['togo'])
             togo_coordinates = togo
+            print(f"togo coordinates :{togo_coordinates}")
             espT.path_finder.setTarget_xy(togo_coordinates)
             
-        response_data = {
+        response_data = {   
         'gridData': espT.path_finder.generate_list_of_obstacles_for_website(),  
         'pathX': espT.path_finder.x_route,
         'pathY': espT.path_finder.y_route
         }
         print(f"obs :{espT.path_finder.generate_list_of_obstacles_for_website()}")
         print(f"path x :{espT.path_finder.x_route}")
-        print(espT.path_finder.y_route)
+        print(f"path y :{espT.path_finder.y_route}")
         return jsonify(data=json.dumps(response_data))
     
     return jsonify(data=json.dumps())

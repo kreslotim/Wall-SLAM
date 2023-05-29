@@ -18,6 +18,7 @@ class PathFinder:
         self.cell_dim = 10
 
         self.grid = []
+        self.generateGrid([])
 
     def setTarget_xy(self, coordinates):
         self.target_x=coordinates[0]
@@ -195,10 +196,10 @@ class PathFinder:
                     car_instructions.append(4)
                     current_orientation = (current_orientation + 180) % 360
                 elif (current_orientation + 90) % 360 == global_instructions[i]:
-                    car_instructions.append(4)
+                    car_instructions.append(3)
                     current_orientation = (current_orientation + 90) % 360
                 else:
-                    car_instructions.append(3)
+                    car_instructions.append(4)
                     current_orientation =  (current_orientation + 270) % 360
 
             while i < len(global_instructions) and current_orientation == global_instructions[i]:
@@ -234,7 +235,6 @@ class PathFinder:
             return float(404)
 
         instr = self.path_to_seq(orientation, path)
-        print(len(path))
 
 
         self.generate_coordinate_nodes_grid(path, start)

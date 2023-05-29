@@ -58,6 +58,9 @@ class ESP32Connection:
         self.running = True
         connectLoop = threading.Thread(target=self.thread_connect) 
         listenLoop = threading.Thread(target=self._listen)
+        pathLoop = threading.Thread(target=self._sendPath_Instruction)
+
+        pathLoop.start()
         connectLoop.start()
         listenLoop.start()
 
@@ -68,7 +71,7 @@ class ESP32Connection:
                 self.info.append((timeOfRep, "Connection Thread Reconnecting ..."))
                 self.connected = False
                 self._connect()
-            time.sleep(1)
+            threading.Event().wait(1)  # Wait for 1 seconds
         timeOfRep = round( time.time() - self.time, 2)
         self.info.append((timeOfRep, "Connection Thread Stopped"))
 
@@ -250,13 +253,24 @@ class ESP32Connection:
     
 ############ PATH FINDING ############
     def _sendPath_Instruction(self):
-        pos_car = (self.slam_data.curr_x_car, self.slam_data.curr_y_car)
-        
-        # Calculate the best path and send the instrucitions
-        actionNumber = self.path_finder.instructions_to_go_x_y(pos_car, self.slam_data.perfect_orientation, self.slam_data.list_of_obs)
+        while self.running:
+            if self.connected :
+                pos_car = (self.slam_data.curr_x_car, self.slam_data.curr_y_car)
+                
+                # Calculate the best path and send the instrucitions
+                actionNumber = self.path_finder.instructions_to_go_x_y(pos_car, self.slam_data.perfect_orientation, self.slam_data.list_of_obs)
+                print(f"actionNumber : {actionNumber}")
 
-        if actionNumber != 404 :
-            self._send_actionNumber(actionNumber)
+                if actionNumber != 404 :
+                    ...
+                    #self._send_actionNumber(actionNumber)
+            threading.Event().wait(5)  
+
+        timeOfRep = round( time.time() - self.time, 2)
+        self.info.append((timeOfRep, "Listen Thread stopped")) 
+        
+
+
 ############ HELPER METHOD ############
 
     def _is_socket_alive(self):
