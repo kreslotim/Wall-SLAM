@@ -22,8 +22,6 @@ under the direction of Prof. Koch, and under the supervision of Federico Stella 
 
 Our [project proposal](https://github.com/kreslotim/Wall-SLAM/blob/main/proposal/proposal.md), can be useful to witness some deviations in our project from our expectations.
 
-<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/0f135479-1f77-4d47-b0ea-490682e34bce" width = 700/>
-
 Our project involves building a robot that will perform Simultaneous Localization and Mapping
 (SLAM). SLAM is a crucial technology for robotic systems that need to move in dynamic and
 unknown environments. Robots equipped with SLAM can map and navigate their surroundings
