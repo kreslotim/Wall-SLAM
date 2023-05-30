@@ -4,12 +4,16 @@ import math
 import numpy as np
 
 class PathFinder:
-    def __init__(self, obs, cell_dim = 1, grid_rad = 100):
+    def __init__(self, obs, cell_dim = 10, grid_rad = 100):
+
         # "Radius" of the square grid cm
         self.cell_dim = cell_dim
         self.obs = obs
-        self.grid = self.generateGrid(obs,grid_rad)
+        self.grid = self._generateGrid(obs,grid_rad)
 
+        self.list_of_obstacles_in_grid = self.generate_list_of_obstacles_for_website()
+        self.path = []
+        
     def _generateGrid(self, obs, grid_rad):
         """
         Generate grid from collected obstacle scans
@@ -28,13 +32,13 @@ class PathFinder:
         obstacle_coordinates = obs.copy()
         
         # Sensitivity (obstacle points per block, think of it as a threshold)
-        sensitivity = 3
+        sensitivity = 1
 
         # Iterate through the list of obstacle coordinates
         for obstacle in obstacle_coordinates:
             # Convert obstacle coordinates to grid coordinates
-            grid_x = self.car_to_grid_coor(obstacle)
-            grid_y = self.car_to_grid(obstacle)
+            grid_x, grid_y = self.car_to_grid(obstacle)
+            print(grid_x,grid_y)
 
             # Increment the value of the corresponding grid cell, ensure that its valid too
             if 0 <= grid_x < 2*grid_rad / self.cell_dim and 0 <= grid_y < 2*grid_rad / self.cell_dim:
@@ -77,11 +81,11 @@ class PathFinder:
 
             # Check if the current position is the destination
             if current_pos == togo_position:
-                path = []
+                self.path = []
                 while current_pos in previous:
-                    path.append( previous[current_pos])
+                    self.path.append( previous[current_pos])
                     current_pos = previous[current_pos]
-                return path
+                return self.path.copy()
 
             x, y = current_pos
 
@@ -94,20 +98,68 @@ class PathFinder:
                 # Check if the new position is within the grid boundaries
                 if 0 <= new_x < rows and 0 <= new_y < cols:
                     new_pos = (new_x, new_y)
-                    cost = 1  # Assuming each step has a cost of 1
-
+                       # Calculate the cost based on movement direction
+                    if dx != 0 and dy != 0:
+                        # Diagonal movement (turn)
+                        cost = 10000  # Higher cost for turns
+                    else:
+                        # Straight movement
+                        cost = 1
                     # Calculate the new distance from the starting position
                     new_dist = current_dist + cost
+                    if self.grid[new_x][new_y]==0:
 
-                    # Update the distance if it's shorter than the previously recorded distance
-                    if new_pos not in distances or new_dist < distances[new_pos]:
-                        distances[new_pos] = new_dist
-                        previous[new_pos] = current_pos
-                        heapq.heappush(queue, (new_dist, new_pos))
+                        # Update the distance if it's shorter than the previously recorded distance
+                        if new_pos not in distances or new_dist < distances[new_pos]:
+                            distances[new_pos] = new_dist
+                            previous[new_pos] = current_pos
+                            heapq.heappush(queue, (new_dist, new_pos))
 
         # If there is no path to the destination
         return [-1]
 
+
+    def path_to_actionNumber(self, current_orr=180):
+        """
+        Produce a sequence of instruction that the car need to follow.
+
+        Arguments: 
+            path: a sequence of coordinate that represent a path
+        Returns:
+            actionNumber: a sequence of action to send to the robot that need to perform them
+            y: coordinate y in the grid
+        """
+        # 1 : move, 4 : turn left, 3 : turn right
+        path = self.path.copy()
+        if path[0] == -1 :
+            return -2
+        
+        action = []
+        while len(path) > 1:
+            axe = 1 if path[0][0] - path[1][0] == 0 else 0
+            moved = 0
+
+            if path[0][axe] - path[1][axe] > 0:
+                togo_orr = 90 + axe*90# relative orr
+            if path[0][axe] - path[1][axe] < 0:
+                togo_orr =  270 -axe*270 
+            if path[0][axe] - path[1][axe] == 0:
+                togo_orr = 0
+                
+            while moved == 0:
+                if current_orr == togo_orr :
+                    action.append(1)
+                    moved = 1
+                    path.pop(0)
+                    
+                if current_orr < togo_orr :
+                    action.append(3)
+                    current_orr = current_orr + 90
+
+                if current_orr > togo_orr :
+                    action.append(4)
+                    current_orr = current_orr - 90
+        return action
 ######## TRANSFORMATION #############
 
     def car_to_grid(self, point_car):
@@ -120,11 +172,14 @@ class PathFinder:
             x: coordinate x in the grid
             y: coordinate y in the grid
         """
-        x = math.floor(point_car[0] + (len(self.grid[0])*self.cell_dim)/2)
-        y = math.floor(point_car[1] + (len(self.grid[0])*self.cell_dim)/2)
+        x = point_car[0] + (len(self.grid[0])*self.cell_dim)/2
+        y = point_car[1] + (len(self.grid[0])*self.cell_dim)/2
+
+        x = math.floor(x/self.cell_dim)
+        y = math.floor(y/self.cell_dim)
         return x,y
     
-    def get_in_grid(self, point_grid):
+    def get_in_grid_coords(self, point_grid):
         """
         Gets the content of the grid at (x,y). Since grid is constructed with [0,0] bottom left but in a array with [0,0] top left. This method allows you to make a transition.
 
@@ -137,32 +192,14 @@ class PathFinder:
         y = point_grid[1]
         return self.grid[x][y]
     
-
-    def path_to_actionNumber(self, path, current_orr=0):
-        """
-        Produce a sequence of instruction that the car need to follow.
-
-        Arguments: 
-            path: a sequence of coordinate that represent a path
-        Returns:
-            actionNumber: a sequence of action to send to the robot that need to perform them
-            y: coordinate y in the grid
-        """
-        # 1 : move, 2 : turn left, 3 : turn right
-        action = []
-        while len(path) > 1:
-            axe = 0
-            if path[0][0] - path[1][0] == 0:
-                axe = 1
-            
-            if path[0][axe] - path[1][axe] > 0:
-                if current_orr == 0 :
-                    action.append(0)
-                if current_orr == 90:
-                    action.append(0)
-                if current_orr == 180:
-                    action.append(0)
-                if current_orr == 270:
-                    action.append(0)
-   
-        return 
+    def generate_list_of_obstacles_for_website(self): 
+        if len(self.grid) != 0: 
+            obstacle_cell = self.find_positive_coordinates(self.grid)  
+            return obstacle_cell
+        return []
+    
+    def find_positive_coordinates(self, grid):
+        grid = np.array(grid)
+        coordinates = np.argwhere(grid == 1)
+        return [(x, y) for x, y in coordinates]
+ 

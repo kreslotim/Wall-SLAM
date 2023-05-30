@@ -257,13 +257,12 @@ class ESP32Connection:
             if self.connected :
                 point_car = (self.slam_data.curr_x_car, self.slam_data.curr_y_car)
                 
-                # Calculate the best path and send the instrucitions
-                actionNumber = self.path_finder.instructions_to_go_x_y(point_car, self.slam_data.perfect_orientation, self.slam_data.list_of_obs)
+                # Calculate the best path and send the instructions
+                actionNumber = self.path_finder.path_to_actionNumber(int(self.slam_data.perfect_orientation))
                 print(f"actionNumber : {actionNumber}")
 
-                if actionNumber != 404 :
+                if actionNumber != -2 :
                     ...
-                    #self._send_actionNumber(actionNumber)
             threading.Event().wait(5)  
 
         timeOfRep = round( time.time() - self.time, 2)

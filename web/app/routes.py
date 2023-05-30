@@ -125,8 +125,7 @@ def get_graph_obs_raw():
 @main.route('/get-graph-redundancy', methods=['GET'])
 def get_graph_redundancy():
     list_of_obs = espT.slam_data._filter_obstacles(number_min_of_obstacle, in_radius)
-    x_obs = [point[0] for point in list_of_obs]
-    y_obs = [point[1] for point in list_of_obs]
+    x_obs, y_obs = zip(*list_of_obs)
    
     response_data = {
         'x_car': espT.slam_data.curr_x_car,
@@ -154,14 +153,16 @@ def get_graph_movement():
             print(f"togo coordinates :{togo_coordinates}")
             espT.path_finder.setTarget_xy_in_website(togo_coordinates)
             
+        x_route, y_route = zip(*espT.path_finder.path)
+
         response_data = {   
-        'gridData': espT.path_finder.generate_list_of_obstacles_for_website(),  
-        'pathX': espT.path_finder.x_route,
-        'pathY': espT.path_finder.y_route
+        'gridData': espT.path_finder.list_of_obstacles_in_grid,  
+        'pathX': x_route,
+        'pathY': y_route
         }
-        print(f"obs :{espT.path_finder.generate_list_of_obstacles_for_website()}")
-        print(f"path x :{espT.path_finder.x_route}")
-        print(f"path y :{espT.path_finder.y_route}")
+        print(f"obs :{espT.path_finder.list_of_obstacles_in_grid}")
+        print(f"path x :{x_route}")
+        print(f"path y :{y_route}")
         return jsonify(data=json.dumps(response_data))
     
     return jsonify(data=json.dumps())
