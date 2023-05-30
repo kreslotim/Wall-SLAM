@@ -112,7 +112,7 @@ class PathFinder:
 
     def car_to_grid(self, point_car):
         """
-        Compute the car coordinates with in the referentiel of the grid
+        Compute the car coordinates with in the referentiel of the grid such as [0,0] of the grid is in the bottom left.
 
         Arguments: 
             point_car: cooridnates of the car such as (x,y) 
@@ -124,10 +124,18 @@ class PathFinder:
         y = math.floor(point_car[1] + (len(self.grid[0])*self.cell_dim)/2)
         return x,y
     
-    def fetch_in_grid(self, point_grid):
-        x = point_grid[0]-1
+    def get_in_grid(self, point_grid):
+        """
+        Gets the content of the grid at (x,y). Since grid is constructed with [0,0] bottom left but in a array with [0,0] top left. This method allows you to make a transition.
+
+        Arguments: 
+            point_grid: cooridnates of the grid as (x,y) 
+        Returns:
+            grid_value: the content at the position of the grid 
+        """
+        x = -point_grid[0] - 1
         y = point_grid[1]
-        return self.grid(x,y)
+        return self.grid[x][y]
     
 
     def path_to_actionNumber(self, path, current_orr=0):
