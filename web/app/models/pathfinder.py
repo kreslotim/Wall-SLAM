@@ -1,5 +1,6 @@
 from collections import deque
 import heapq
+import math
 import numpy as np
 
 class PathFinder:
@@ -95,3 +96,23 @@ class PathFinder:
         # If there is no path to the destination
         return [-1]
 
+######## TRANSFORMATION #############
+
+    def car_to_grid(self, point_car):
+        """
+        Compute the car coordinates with in the referentiel of the grid
+
+        Arguments: 
+            point_car: cooridnates of the car such as (x,y) 
+        Returns:
+            x: coordinate x in the grid
+            y: coordinate y in the grid
+        """
+        x = math.floor(point_car[0] + (len(self.grid[0])*self.cell_dim)/2)
+        y = math.floor(point_car[1] + (len(self.grid[0])*self.cell_dim)/2)
+        return x,y
+    
+    def fetch_in_grid(self, point_grid):
+        x = point_grid[0]-1
+        y = point_grid[1]
+        return self.grid(x,y)
