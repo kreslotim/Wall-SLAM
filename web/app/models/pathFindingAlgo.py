@@ -195,7 +195,7 @@ class PathFinder:
     
     def generate_coordinate_path_in_website(self,path, initial_position):
         x, y = initial_position
-        t_x,t_y = self.grid_to_website(x,y)
+        t_x,t_y = self.grid_to_website((x,y))
         self.x_route = [t_x]
         self.y_route = [t_y]
                             
@@ -213,7 +213,7 @@ class PathFinder:
                 elif instruction == "E":
                     x += 1
 
-                website_x, website_y = self.grid_to_website(x,y)
+                website_x, website_y = self.grid_to_website((x,y))
                 self.x_route.append(website_x)
                 self.y_route.append(website_y)
 
