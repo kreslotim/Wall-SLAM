@@ -4,7 +4,6 @@ import numpy as np
 
 class PathFinder:
     def __init__(self, obs, cell_dim = 1, grid_rad = 100):
-
         # "Radius" of the square grid cm
         self.cell_dim = cell_dim
         self.obs = obs
@@ -12,9 +11,15 @@ class PathFinder:
 
 
   
-    def generateGrid(self, obs, grid_rad):
+    def _generateGrid(self, obs, grid_rad):
         """
         Generate grid from collected obstacle scans
+
+        Arguments: 
+            obs :  raw list of obstacles in car coordinates  
+            grid_rad : The wanted radius of the grid
+        Returns:
+            grid (Array) : The grid with obstacle if present, if an obstacle is present the cell index will be 1.
 
         :param obst: raw list of obstacles in car coordinates  
         :return: sampled grid with cells set to 1 or 0
@@ -41,29 +46,38 @@ class PathFinder:
         return self.grid
    
 
-    def dijkstra_shortest_path(self):
+    def dijkstra_shortest_path(self, current_position, togo_position):
+        """
+        Dijkstra algorithm that search for the optimal path
+        
+        Arguments: 
+            current_position : the current cell the robot occupy
+            togo_position : the cell that we wish to travel to
+        Returns:
+            paths (array): a list of index of cell to travel to that is optimal
+        """
+
         rows = len(self.grid)
         cols = len(self.grid[0])
 
         # Create a priority queue for Dijkstra's algorithm
-        queue = [(0, (grid_pos))]
+        queue = [(0, (current_position))]
         heapq.heapify(queue)
 
         # Create a dictionary to track distances from the starting position
-        distances = {grid_pos: 0}
+        distances = {current_position: 0}
 
         # Create a dictionary to track the previous positions in the shortest path
         previous = {}
 
         # Define possible directions: up, down, left, right
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-        direction_names = ['N', 'S', 'W', 'E']
 
         while queue:
             current_dist, current_pos = heapq.heappop(queue)
 
             # Check if the current position is the destination
-            if current_pos == grid_dest:
+            if current_pos == togo_position:
                 path = []
                 while current_pos in previous:
                     path.append( previous[current_pos])
