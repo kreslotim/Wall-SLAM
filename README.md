@@ -23,9 +23,6 @@ under the direction of Prof. Koch, and under the supervision of Federico Stella 
 Our [project proposal](https://github.com/kreslotim/Wall-SLAM/blob/main/proposal/proposal.md), can be useful to witness some deviations in our project from our expectations.
 
 
-https://github.com/kreslotim/Wall-SLAM/assets/56829239/bd50d811-d2bb-4c29-996b-88d53e182a70
-
-
 
 
 Our project involves building a robot that will perform Simultaneous Localization and Mapping
