@@ -5,8 +5,8 @@ import numpy as np
 class PathFinder:
     def __init__(self, obs):
         # Target position
-        self.target_x = 0
-        self.target_y = 0 
+        self.pos = None
+        self.togo = None
 
         # Target route
         self.x_route = []
@@ -16,7 +16,7 @@ class PathFinder:
         self.grid_rad = 100
         self.cell_dim = 1
         self.obs = obs
-        self.grid = generateGrid()
+        self.grid = generateGrid(obs)
 
 
   
@@ -49,16 +49,12 @@ class PathFinder:
         return self.grid
    
 
-    def dijkstra_shortest_path(self, grid_pos, grid_dest, grid):
-        rows = len(grid)
-        cols = len(grid[0])
-
-        # Check for trivial case: the current position is the destination
-        if grid_pos == grid_dest or grid[grid_dest[0]][grid_dest[1]] == 1:
-            return [-1]
+    def dijkstra_shortest_path(self):
+        rows = len(self.grid)
+        cols = len(self.grid[0])
 
         # Create a priority queue for Dijkstra's algorithm
-        queue = [(0, grid_pos)]
+        queue = [(0, (grid_pos))]
         heapq.heapify(queue)
 
         # Create a dictionary to track distances from the starting position
