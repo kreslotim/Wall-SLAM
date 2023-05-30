@@ -3,24 +3,16 @@ import heapq
 import numpy as np
 
 class PathFinder:
-    def __init__(self, obs):
-        # Target position
-        self.pos = None
-        self.togo = None
-
-        # Target route
-        self.x_route = []
-        self.y_route = []
+    def __init__(self, obs, cell_dim = 1, grid_rad = 100):
 
         # "Radius" of the square grid cm
-        self.grid_rad = 100
-        self.cell_dim = 1
+        self.cell_dim = cell_dim
         self.obs = obs
-        self.grid = generateGrid(obs)
+        self.grid = self.generateGrid(obs,grid_rad)
 
 
   
-    def generateGrid(self, obs):
+    def generateGrid(self, obs, grid_rad):
         """
         Generate grid from collected obstacle scans
 
@@ -28,7 +20,7 @@ class PathFinder:
         :return: sampled grid with cells set to 1 or 0
         """
         # Initialize the 2D array representing the grid map
-        self.grid = np.zeros((int(2*self.grid_rad / self.cell_dim), int(2*self.grid_rad / self.cell_dim)))
+        self.grid = np.zeros((int(2*grid_rad / self.cell_dim), int(2*grid_rad / self.cell_dim)))
         obstacle_coordinates = obs.copy()
         
         # Sensitivity (obstacle points per block, think of it as a threshold)
@@ -41,7 +33,7 @@ class PathFinder:
             grid_y = self.car_to_grid_coor(obstacle, 100, 10)[1]
 
             # Increment the value of the corresponding grid cell, ensure that its valid too
-            if 0 <= grid_x < 2*self.grid_rad / self.cell_dim and 0 <= grid_y < 2*self.grid_rad / self.cell_dim:
+            if 0 <= grid_x < 2*grid_rad / self.cell_dim and 0 <= grid_y < 2*grid_rad / self.cell_dim:
                 self.grid[grid_y, grid_x] += 1
 
         self.grid = np.where(self.grid < sensitivity, 0, 1)
