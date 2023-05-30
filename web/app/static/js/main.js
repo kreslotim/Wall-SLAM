@@ -844,12 +844,27 @@ Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
     
           // Update end trace
           endTrace.x = [newData.pathX.at(-1)];
+          endTrace.y = [newData.pathY.at(-1)];
+
     
           // Update allData array
           allData = [gridTrace, pathTrace, startTrace, endTrace];
 
                 // Redraw the plot
           Plotly.newPlot('graph-movement', allData, layout, { displayModeBar: false });
+
+          document.getElementById('graph-movement').on('plotly_click', function(eventData) {
+            // Retrieve the clicked point's coordinates
+            var togoX = eventData.points[0].x;
+            var togoY = eventData.points[0].y;
+            
+            // Update the togo coordinates
+            togo = [togoX, togoY];
+            console.log(togo);
+
+            // Call the updateMap() function to update the graph
+            updateMap();
+          });
         },
         error: function (error) {
           console.log(error);
@@ -860,16 +875,9 @@ Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
     Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
   }
 
-      // Function to handle the click event
-      function handleClick(eventData) {
-        // Retrieve the clicked point's coordinates
-        togo[0] = eventData.points[0].x;
-        togo[1] = eventData.points[0].y;
-        updateMap();
-      }
+ 
       // Attach the click event handler to the plot
-    var graphMovement = document.getElementById('graph-movement');
-    graphMovement.on('plotly_click', handleClick);
+ 
       // Call updateMap() when the button is clicked
      $('#reset-movement').click(function() {
       reset();

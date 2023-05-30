@@ -21,10 +21,10 @@ send_port = 8889
 
 # Initial robot position and obstacle data
 
-global togoX 
-togoX = 1
-global togoY
-togoY = 0
+global togo
+togoX = (0,0)
+
+
 
 
 startTime= time.time()
@@ -138,40 +138,33 @@ def get_graph_redundancy():
     return jsonify(data=json.dumps(response_data))
 @main.route('/get-graph-kmeans', methods=['GET'])
 def get_graph_kmeans():
-    global cluster_chart
+    global cluster_chart, togo
     mapJson, togo = cluster_chart.generate_chart_json(espT.slam_data.list_of_obs)
+
     print(togo)
     return jsonify(mapJson)
 
 @main.route('/get-graph-movement', methods=['POST'])
 def get_graph_movement():
-    print("run")
-    togo = request.form.get('togo')
-  
-    if espT.connected:
-        if togo:
-            print("pass")
-            togo_coordinates = json.loads(togo)
-            espT.path_finder.setTarget_xy(togo_coordinates)
-            espT._sendPath_Instruction()
-            
-    
-        response_data = {
-        'x_car': espT.slam_data.curr_x_car,
-        'y_car': espT.slam_data.curr_y_car,
-        'x_route': espT.path_finder.x_route,
-        'y_route': espT.path_finder.y_route
-         }
 
+    if espT.connected:
+        if 'togo' in request.form:
+            togo = json.loads(request.form['togo'])
+            togo_coordinates = togo
+            print(f"togo coordinates :{togo_coordinates}")
+            espT.path_finder.setTarget_xy(togo_coordinates)
+            
+        response_data = {   
+        'gridData': espT.path_finder.generate_list_of_obstacles_for_website(),  
+        'pathX': espT.path_finder.x_route,
+        'pathY': espT.path_finder.y_route
+        }
+        print(f"obs :{espT.path_finder.generate_list_of_obstacles_for_website()}")
+        print(f"path x :{espT.path_finder.x_route}")
+        print(f"path y :{espT.path_finder.y_route}")
         return jsonify(data=json.dumps(response_data))
     
-    newData = {
-        'gridData': [(10, 10), (3, 2), (2, 3), (3, 3)],  # Example grid coordinates to be grayed out
-        'pathX': [0, 1, 1, 1, 1],
-        'pathY': [1, 1, 2, 3, 4],
-        }
-
-    return jsonify(data=json.dumps(newData))
+    return jsonify(data=json.dumps())
     
 ############ SETTING API ############
 @main.route('/update_kmean_slider', methods=['POST'])
