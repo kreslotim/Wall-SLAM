@@ -20,6 +20,9 @@ TaskHandle_t Task1;
 sensors_event_t event;
 sensors_event_t aevent, mevent;
 float heading;
+float prevYaw = 0;
+float yaw;
+float gyroZ;
 int distanceSonarFront = 0;
 int16_t lidarDistanceFront;
 int16_t lidarDistanceBack;
@@ -28,6 +31,7 @@ int servoAngle=1;
 int numberOfConnectionOld = 0;
 float actionNumber = 0;
 float orientationMag = 0;
+float orientationGyro = 0;
 int goToOrientation = 0;
 float curr_x = 0;
 float curr_y = 0;
@@ -35,6 +39,7 @@ unsigned long startTime; // Variable to store the start time
 unsigned long elapsedTime;
 uint32_t timestamp;
 int direction = 1;
+
 
 const float ACCELERATION_STEPPER = 250.0;
 const float MAX_SPEED_STEPPER = 2000;
@@ -285,6 +290,8 @@ void getHeading() {
   gy = gyro.gyro.y * SENSORS_RADS_TO_DPS;
   gz = gyro.gyro.z * SENSORS_RADS_TO_DPS;
 
+  gyroZ = gz;
+
   // Update the SensorFusion filter
   filter.update(gx, gy, gz, 
                 accel.acceleration.x, accel.acceleration.y, accel.acceleration.z, 
@@ -376,6 +383,10 @@ void sendData() {
 }
 
 void updateSensors() {
+
+  //Update Timer
+  elapsedTime = (float)(millis() - startTime);
+
   // Ultrasonic Update
   distanceSonarFront = frontUltrasonic.ping_cm();
 
@@ -389,9 +400,10 @@ void updateSensors() {
 
   // Orientation Update
   orientationMag = atan2(mevent.magnetic.y, mevent.magnetic.x) * 180 / PI;
+  yaw = prevYaw + gyroZ * (elapsedTime * 1000);
+  prevYaw = yaw;
 
-  //Update Timer
-  elapsedTime = (float)(millis() - startTime);
+  
 }
 
 void packData() {
