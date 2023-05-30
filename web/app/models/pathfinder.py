@@ -10,8 +10,6 @@ class PathFinder:
         self.obs = obs
         self.grid = self.generateGrid(obs,grid_rad)
 
-
-  
     def _generateGrid(self, obs, grid_rad):
         """
         Generate grid from collected obstacle scans
@@ -35,8 +33,8 @@ class PathFinder:
         # Iterate through the list of obstacle coordinates
         for obstacle in obstacle_coordinates:
             # Convert obstacle coordinates to grid coordinates
-            grid_x = self.car_to_grid_coor(obstacle, 100, 10)[0]
-            grid_y = self.car_to_grid_coor(obstacle, 100, 10)[1]
+            grid_x = self.car_to_grid_coor(obstacle)
+            grid_y = self.car_to_grid(obstacle)
 
             # Increment the value of the corresponding grid cell, ensure that its valid too
             if 0 <= grid_x < 2*grid_rad / self.cell_dim and 0 <= grid_y < 2*grid_rad / self.cell_dim:
@@ -114,7 +112,7 @@ class PathFinder:
 
     def car_to_grid(self, point_car):
         """
-        Compute the car coordinates with in the referentiel of the grid such as [0,0] of the grid is in the bottom left.
+        Compute the car coordinates with in the referentiel of the grid
 
         Arguments: 
             point_car: cooridnates of the car such as (x,y) 
@@ -126,16 +124,37 @@ class PathFinder:
         y = math.floor(point_car[1] + (len(self.grid[0])*self.cell_dim)/2)
         return x,y
     
-    def get_in_grid(self, point_grid):
+    def fetch_in_grid(self, point_grid):
+        x = point_grid[0]-1
+        y = point_grid[1]
+        return self.grid(x,y)
+    
+
+    def path_to_actionNumber(self, path, current_orr=0):
         """
-        Gets the content of the grid at (x,y). Since grid is constructed with [0,0] bottom left but in a array with [0,0] top left. This method allows you to make a transition.
+        Produce a sequence of instruction that the car need to follow.
 
         Arguments: 
-            point_grid: cooridnates of the grid as (x,y) 
+            path: a sequence of coordinate that represent a path
         Returns:
-            grid_value: the content at the position of the grid 
+            actionNumber: a sequence of action to send to the robot that need to perform them
+            y: coordinate y in the grid
         """
-        x = -point_grid[0] - 1
-        y = point_grid[1]
-        return self.grid[x][y]
-    
+        # 1 : move, 2 : turn left, 3 : turn right
+        action = []
+        while len(path) > 1:
+            axe = 0
+            if path[0][0] - path[1][0] == 0:
+                axe = 1
+            
+            if path[0][axe] - path[1][axe] > 0:
+                if current_orr == 0 :
+                    action.append(0)
+                if current_orr == 90:
+                    action.append(0)
+                if current_orr == 180:
+                    action.append(0)
+                if current_orr == 270:
+                    action.append(0)
+   
+        return 
