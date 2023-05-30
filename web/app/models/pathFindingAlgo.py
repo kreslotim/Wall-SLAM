@@ -20,13 +20,38 @@ class PathFinder:
         self.grid = []
         self.generateGrid([])
 
-    def setTarget_xy(self, coordinates):
-        self.target_x=coordinates[0]
-        self.target_y=coordinates[1]
+    def instructions_to_go_x_y(self, point_car, orientation, obst):
+        """
+            Calculates the shortest route
+                :param obst: list of obstacles
+                :param orientation: initial orientation of robot (N=0, W=90, ...)
+                :param dest_car: car destination (x,y) tuple (cm)
+                :param pos_car: initial car position (x,y) tuple (cm)
 
-    def car_to_grid_coor(self, car_pos, grid_rad, cell_width):
-        return (int((grid_rad - car_pos[1]) / cell_width), int((car_pos[0] + grid_rad) / cell_width))
-      
+            Returns:
+                array of instructions to the car e.g. [1,4,..]  can be modified in
+                def path_to_seq(orient, path)
+
+                IMPORTANT: returns an empty array in all error cases
+                (same start & destination, destination is an obstacle, ...)
+
+            """
+        start = self.car_to_grid(point_car)
+        end = [self.target_x, self.target_y]
+
+        # Finding the optimal path 
+        grid = self.generateGrid(obst)
+        path = self.shortest_path(start, end, grid)
+        instr = self.path_to_seq(orientation, path)
+
+        # Mapping path and obstacles
+        self.generate_coordinate_path_in_website(path, start)
+        self.generate_list_of_obstacles_for_website()
+        
+        return float(instr[0])
+
+######## HELPER METHODS TO FIND AND SEND PATH #############
+
     def generateGrid(self, obst):
         """
         Generate grid from collected obstacle scans
@@ -44,8 +69,7 @@ class PathFinder:
         # Iterate through the list of obstacle coordinates
         for obstacle in obstacle_coordinates:
             # Convert obstacle coordinates to grid coordinates
-            grid_x = self.car_to_grid_coor(obstacle, 100, 10)[0]
-            grid_y = self.car_to_grid_coor(obstacle, 100, 10)[1]
+            grid_x, grid_y = self.car_to_grid(obstacle)
 
             # Increment the value of the corresponding grid cell, ensure that its valid too
             if 0 <= grid_x < 2*self.grid_rad / self.cell_dim and 0 <= grid_y < 2*self.grid_rad / self.cell_dim:
@@ -68,7 +92,7 @@ class PathFinder:
 
         # Check for trivial case: the current position is the destination
         if grid_pos == grid_dest or grid[grid_dest[0]][grid_dest[1]] == 1:
-            return [-1]
+            return [404]
 
         # Create a queue for BFS algo
         queue = deque([(grid_pos, [])])
@@ -111,7 +135,7 @@ class PathFinder:
                         visited.add(new_pos)
 
         # If there is no path to the destination
-        return [-1]
+        return [404]
 
     def encode_directions(self, path):
         """
@@ -128,46 +152,6 @@ class PathFinder:
 
         return encoded_list
     
-    def generate_coordinate_nodes_grid(self,path, initial_position):
-        x, y = initial_position
-        t_x, t_y = self.grid_to_website((x,y))
-        self.x_route = [t_x]
-        self.y_route = [t_y]
-                            
-        for instruction in path:
-            if instruction == "N":
-                y -= 1
-            elif instruction == "S":
-                y += 1
-            elif instruction == "W":
-                x -= 1
-            elif instruction == "E":
-                x += 1
-
-            transformed_x, transformed_y = self.grid_to_website((x,y))
-            self.x_route.append(transformed_x)
-            self.y_route.append(transformed_y)
-
-        return
-    
-    def generate_coordinate_nodes_car(self,path, initial_position):
-        x, y = initial_position.copy()
-        coordinate_nodes = [initial_position]
-
-        for instruction in path:
-            if instruction == "N":
-                y += 10
-            elif instruction == "S":
-                y -= 10
-            elif instruction == "W":
-                x -= 10
-            elif instruction == "E":
-                x += 10
-
-            coordinate_nodes.append((x, y))
-
-        return coordinate_nodes
-
     def path_to_seq(self, orient, path):
         """
         :param orient: orientation: initial orientation of robot (N=0, W=90, ...)
@@ -207,52 +191,34 @@ class PathFinder:
                     i += 1
         return car_instructions
 
-    def instructions_to_go_x_y(self, pos_car, orientation, obst):
-        """
-            Calculates the shortest route
-                :param obst: list of obstacles
-                :param orientation: initial orientation of robot (N=0, W=90, ...)
-                :param dest_car: car destination (x,y) tuple (cm)
-                :param pos_car: initial car position (x,y) tuple (cm)
-
-            Returns:
-                array of instructions to the car e.g. [1,4,..]  can be modified in
-                def path_to_seq(orient, path)
-
-                IMPORTANT: returns an empty array in all error cases
-                (same start & destination, destination is an obstacle, ...)
-
-            """
-        start = self.car_to_grid_coor(pos_car, 100, 10)
-        end = self.website_to_grid([self.target_x, self.target_y])
-
-        grid = self.generateGrid(obst)
-        path = self.shortest_path(start, end, grid)
-
-        if path[0] == -1:
+######## COORDINATES FOR WEBSITE #############
+    
+    def generate_coordinate_path_in_website(self,path, initial_position):
+        x, y = initial_position
+        t_x,t_y = self.grid_to_website(x,y)
+        self.x_route = [t_x]
+        self.y_route = [t_y]
+                            
+        if path[0] == 404 :
             self.x_route = []
-            self.y_route = []
-            return float(404)
+            self.y_route = [] 
+        else :
+            for instruction in path:
+                if instruction == "N":
+                    y -= 1
+                elif instruction == "S":
+                    y += 1
+                elif instruction == "W":
+                    x -= 1
+                elif instruction == "E":
+                    x += 1
 
-        instr = self.path_to_seq(orientation, path)
+                website_x, website_y = self.grid_to_website(x,y)
+                self.x_route.append(website_x)
+                self.y_route.append(website_y)
 
-
-        self.generate_coordinate_nodes_grid(path, start)
-        self.generate_list_of_obstacles_for_website()
-        
-        return float(instr[0])
+        return self.x_route, self.y_route
     
-    
-    def find_positive_coordinates(self, grid): 
-            coordinates = [] 
-            for i in range(len(grid)): 
-                for j in range(len(grid[i])): 
-                    if grid[i][j] == 1: 
-                        coordinates.append((i, j)) 
-            return coordinates 
- 
- 
-    # 0,0 in the bottom left, (19,19) in the top right 
     def generate_list_of_obstacles_for_website(self): 
         if len(self.grid) != 0: 
             obstacle_cell = self.find_positive_coordinates(self.grid) 
@@ -263,12 +229,33 @@ class PathFinder:
             return transformed_coordinates
         return None
     
-    def website_to_grid(self, point): 
-        x, y = len(self.grid)-1 - point[1], point[0]
+    def find_positive_coordinates(self, grid):
+        grid = np.array(grid)
+        coordinates = np.argwhere(grid == 1)
+        return [(x, y) for x, y in coordinates]
+ 
+######## TRANSFORMATION #############
+
+    def website_to_grid(self, point_website): 
+        x = len(self.grid)-1 - point_website[1]
+        y = point_website[0]
         return x, y
     
-    def grid_to_website(self, point): 
-        x, y =  point[1] , len(self.grid)- 1 - point[0]
+    def grid_to_website(self, point_grid): 
+        x, =  point_grid[1] 
+        y =len(self.grid)- 1 - point_grid[0]
         return x, y
+    
+    def car_to_grid(self, point_car):
+        x = int((self.grid_rad - point_car[1]) / self.cell_width)
+        y = int((point_car[0] + self.grid_rad) / self.cell_width)
+        return x;y
 
+######## SETTER #############
+
+    def setTarget_xy_in_website(self, coordinates):
+        self.website_to_grid(coordinates)
+        self.target_x = coordinates[0]
+        self.target_y = coordinates[1]
+        print(f"New Target in grid coord {[self.target_x, self.target_y]} ")
 

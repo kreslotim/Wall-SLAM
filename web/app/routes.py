@@ -151,7 +151,7 @@ def get_graph_movement():
             togo = json.loads(request.form['togo'])
             togo_coordinates = togo
             print(f"togo coordinates :{togo_coordinates}")
-            espT.path_finder.setTarget_xy(togo_coordinates)
+            espT.path_finder.setTarget_xy_in_website(togo_coordinates)
             
         response_data = {   
         'gridData': espT.path_finder.generate_list_of_obstacles_for_website(),  

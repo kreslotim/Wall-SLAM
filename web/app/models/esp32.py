@@ -255,10 +255,10 @@ class ESP32Connection:
     def _sendPath_Instruction(self):
         while self.running:
             if self.connected :
-                pos_car = (self.slam_data.curr_x_car, self.slam_data.curr_y_car)
+                point_car = (self.slam_data.curr_x_car, self.slam_data.curr_y_car)
                 
                 # Calculate the best path and send the instrucitions
-                actionNumber = self.path_finder.instructions_to_go_x_y(pos_car, self.slam_data.perfect_orientation, self.slam_data.list_of_obs)
+                actionNumber = self.path_finder.instructions_to_go_x_y(point_car, self.slam_data.perfect_orientation, self.slam_data.list_of_obs)
                 print(f"actionNumber : {actionNumber}")
 
                 if actionNumber != 404 :
