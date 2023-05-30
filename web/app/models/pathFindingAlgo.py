@@ -247,9 +247,9 @@ class PathFinder:
         return x, y
     
     def car_to_grid(self, point_car):
-        x = int((self.grid_rad - point_car[1]) / self.cell_width)
-        y = int((point_car[0] + self.grid_rad) / self.cell_width)
-        return x;y
+        x = int((self.grid_rad - point_car[1]) / self.cell_dim)
+        y = int((point_car[0] + self.grid_rad) / self.cell_dim)
+        return x,y
 
 ######## SETTER #############
 
