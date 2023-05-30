@@ -242,7 +242,7 @@ class PathFinder:
         return x, y
     
     def grid_to_website(self, point_grid): 
-        x, =  point_grid[1] 
+        x =  point_grid[1] 
         y =len(self.grid)- 1 - point_grid[0]
         return x, y
     
