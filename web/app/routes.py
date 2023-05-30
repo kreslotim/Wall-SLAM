@@ -58,8 +58,10 @@ def index():
 ############ MOVEMENT API ############
 @main.route('/post-move', methods=['POST'])
 def post_move():
-    direction = request.args.get('direction')
+    direction = request.form.get('direction')
     repCode = 0
+    print("moving")
+    print(direction)
 
     if direction == 'forward':
         repCode = espT._sendMove_Forward()
@@ -78,7 +80,6 @@ def post_move():
         pass
     else:
         repCode = 404
-    
     if repCode == 404:
          return jsonify({'message': 'Unable to send Command', 'espStatus' : repCode })
     return jsonify({'message': 'Command received', 'espStatus' : repCode })
