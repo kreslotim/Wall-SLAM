@@ -16,26 +16,88 @@ June 2023
     • 0.8 Progress documentation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
     • 0.9 References . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
 
-## 0.1 Description & Overview
-Wall-SLAM is a project that we have elaborated within the course CS-358 Making Intelligent Things, 
-under the direction of Prof. Koch, and under the supervision of Federico Stella and Anirudhh Ramesh.
+## Description
+Wall-SLAM is a project that we have elaborated within the course CS-358 Making Intelligent Things, under the direction of Prof. Koch and under the supervision of Federico Stella and Anirudhh Ramesh.
+This report outlines the key features, methodology, challenges faced, and a detailed "How To Build" guide.
 
 Our [project proposal](https://github.com/kreslotim/Wall-SLAM/blob/main/proposal/proposal.md), can be useful to witness some deviations in our project from our expectations.
 
-Our project involves building a robot that will perform Simultaneous Localization and Mapping
-(SLAM). SLAM is a crucial technology for robotic systems that need to move in dynamic and
-unknown environments. Robots equipped with SLAM can map and navigate their surroundings
-without human intervention, making them valuable for various applications such as warehouse
-automation, search and rescue operations, etc... In general, the sensors used on SLAM robot are
-quite expensive and big so our objective would also be to reduce the size and price.
+The primary objective of the project was to build a cost-effective and compact SLAM robot capable of mapping unknown and dynamic environments. 
 
-We will utilize an ultrasonic sensors system (see following section for the sensor discussion)
-to implement the SLAM algorithm, and we will develop a software program that will render the
-robot autonomous via Wi-Fi. This will require integrating various components of the robot, such
-as the motor control system, the ultrasonic sensor system, and the Wi-Fi communication module.
+## Overview
+[small video and demo of all functionaltites]
 
-Overall, the project consists of deploying an autonomous robot that will map its surrounding
-area using SLAM algorithm with an end goal of displaying a cohesive 2D-map of the area.
+We utilized the data from the distance sensors (Ultrasonic and LIDAR), IMU (Inertial Measurement Unit) sensor, and Stepper motors to estimate the robot's pose (position and orientation) and simultaneously construct a map of the environment. This involved integrating data from different sensors using techniques such as sensor calibration, fusion and Kalman filtering algorithms.
+
+## Components and supplies
+- ESP32 
+- NXP Precision 9DoF IMU 
+- VL53L1X Time of Flight Distance Sensor (2x)
+- HC-SR04 Ultrasonic Sensor
+- 180-Degree Servo
+- Stepper motor 28byj-48 (2x)
+- ULN2003 motor driver (2x)
+- XL6009E1 DC-DC Voltage Converter - 5V 
+- 9V Battery supply
+- Power Switch
+- 3D Prints (STLs)
+
+
+## 3D Design
+As zealous devotees of the enchanting Disney's figure Wall-E, we couldn't resist the temptation to transform our prototype into his spitting image. But, alas, our professor promptly intervened, bursting our bubble of whimsy with a witty remark. With a mischievous twinkle in his eye, he playfully reminded us that while Wall-E excelled in garbage collection and exuded undeniable cuteness, our project's aspirations extended beyond those realms. Thus, we bid farewell to our beloved Wall-E robot, sparing it from a destiny of cuteness overload and instead refocusing our efforts on more practical endeavors.
+
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/6667b767-95a2-45b7-8b5e-17c26d23500b" width = 400/>
+
+Given that our intentions did not encompass teaching our robot to engage in garbage collection or vacuuming activities, we decided to shift our focus towards functionality that would enable mapping of the surrounding environment, akin to modern autonomous vacuum cleaners. Furthermore, we chose to retain the concept of tracks with wheels, as it offered enhanced precision in movement and rotation, while opting for rubber tracks to minimize slippage during maneuvering.
+
+### Sketches
+Initially, we engaged in the process of conceptualizing our ideas through sketches to determine the optimal arrangement of electronic components. Our primary objective was to achieve a compact design that would streamline the assembly process and expedite 3D printing requirements. This approach was aimed at optimizing the overall efficiency of the construction phase.
+
+We initiated the development process by focusing on the chassis design. Subsequently, we proceeded to devise an arrangement strategy. The robot incorporated two stepper motors along with their corresponding drivers, a servo, a battery, and a micro-controller. For the initial prototype, we positioned both stepper motors at the rear section of the chassis. In order to counterbalance the weight distribution, the batteries and the micro-controller were placed at the front section. Lastly, the servo, responsible for holding the sensors, was centrally positioned within the chassis.
+<img src = "https://user-images.githubusercontent.com/56829239/232310112-f7f68b36-d2c5-4ecf-8979-ef074a0ed3eb.png" width = 700/>
+This approach was promptly dismissed as it became apparent that in order to facilitate turning, both motors needed to rotate in opposite directions, necessitating the rotation of the entire car around its vertical axis. 
+
+The rotation of the machine necessitates the alignment of the servo and the primary axis of rotation. This alignment is crucial during turning maneuvers as the distance sensors are required to scan in close proximity to the adjacent wall. By maintaining the sensors in close proximity to the central axis of rotation, the objective is to minimize noise and optimize the accuracy of the scanning process.
+
+Consequently, we proposed an alternative design to address this limitation.
+<img src = "https://user-images.githubusercontent.com/56829239/232310079-931594a3-6049-4ff0-9cc0-58b74d3c37e4.png" width = 700/>
+This design greatly appealed to us, and we made the decision to proceed in this particular direction. During our exploration on the web, we chanced upon a toy named [SMARS](https://www.smarsfan.com/) (Screwed/Screwless Modular Assembleable Robotic System), which seemed to align closely with our envisioned requirements. We found inspiration in its design and opted to incorporate a chassis that closely resembled to SMARS. To assess the feasibility of the track concept, we even went as far as designing the entire SMARS idea to evaluate its effectiveness.
+
+<img src = "https://github.com/kreslotim/Wall-SLAM/blob/main/Pictures/ezgif-4-9122e21e39.gif">
+
+Having appreciated the remarkable ingenuity behind the notion of using the printing filament as a means to securely bind the tracks together, as well as the exceptional functionality of this approach in practical implementation, we wholeheartedly adopted this design for our project. Consequently, this decision entailed the utilization of the same wheels, as the tracks had been meticulously tailored to ensure precise compatibility with these specific wheel components. This deliberate alignment not only guaranteed optimal performance but also facilitated seamless integration between the tracks and wheels, thereby fortifying the overall effectiveness of our system.
+
+The subsequent focus of our attention revolved around the development of the chassis, and the incorporation of the battery, the motors and the sensors.  
+
+As soon as we agreed on the placement of all the components, we started designing in 3D.
+In order to leverage the collaborative design features, we opted to use Fusion 360, enabling effective teamwork during the design process. Minor design changes have been made in Freecad, in order to save time.
+
+Here's what we've come up with.
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22" width = 700/>
+
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46" width = 700/>
+
+Now we will explain the choice we've made for positioning the electronic pieces.
+The parts that are highlighted in green are those that we designed ourselves. The Ultrasonic sensor's frame as well as the wheels and the tracks were borrowed from SMARS project, because they fit our requirements well.
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/9eac749d-10e7-4cae-a3eb-60efbaca4600" width = 700/>
+While we adopted the wheel design from SMARS, we had to adapt it's axle mount to fit the rectangular axle of the motor we are using. Furthermore, it is essential to align the axle of the slave wheel with the motor's axle to ensure that both wheels are at the same level.
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/3dcc6850-5950-4f5f-9a45-e38546c61ef8" width = 700/>
+
+In order to optimize the efficiency of the printing and assembly process, we strategically positioned all the components in close proximity to one another, ensuring minimal wasted space on the chassis.
+
+As the heaviest electronic component of the entire construction, the battery serves as a central anchor within the overall design. By positioning it at the center, we establish a stable foundation upon which the remaining components, i.e. the servo and the lidars sensors are securely mounted and connected.
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/f2b20805-2bfe-478f-b751-ee17c3dc3ad8" width = 700/>
+
+The cover slides over the battery and encases the servo on top.
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c" width = 700/>
+
+The servo, in return, holds both lidars (distance sensors) that are sneaked on the servo's arm.
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83" width = 700/>
+## Assembly
+
+Once
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a" width = 700/>
+
 
 ## 0.2 How are we going to build it ?
 ### Obstacle detection
