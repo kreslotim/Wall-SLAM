@@ -91,7 +91,6 @@ class PathFinder:
 
             # Get the previous position
             prev_pos = previous.get(current_pos)
-            print(f" prev : {prev_pos} current : {current_pos}")
 
             # Explore all possible directions
             for i in range(4):
@@ -115,10 +114,8 @@ class PathFinder:
                             prev_dy = y-prev_pos[1]
                         if (dx == prev_dx or dy == prev_dy):
                             direction_cost = 0 
-                            print("same deplacement !")
                         else:
                             direction_cost = 1000000000000000
-                            print("uhhh")
                            
 
                         # Calculate the Manhattan distance between positions
