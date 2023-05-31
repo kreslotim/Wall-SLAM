@@ -54,6 +54,7 @@ Given that our intentions did not encompass teaching our robot to engage in garb
 Initially, we engaged in the process of conceptualizing our ideas through sketches to determine the optimal arrangement of electronic components. Our primary objective was to achieve a compact design that would streamline the assembly process and expedite 3D printing requirements. This approach was aimed at optimizing the overall efficiency of the construction phase.
 
 We initiated the development process by focusing on the chassis design. Subsequently, we proceeded to devise an arrangement strategy. The robot incorporated two stepper motors along with their corresponding drivers, a servo, a battery, and a micro-controller. For the initial prototype, we positioned both stepper motors at the rear section of the chassis. In order to counterbalance the weight distribution, the batteries and the micro-controller were placed at the front section. Lastly, the servo, responsible for holding the sensors, was centrally positioned within the chassis.
+
 <img src = "https://user-images.githubusercontent.com/56829239/232310112-f7f68b36-d2c5-4ecf-8979-ef074a0ed3eb.png" width = 700/>
 This approach was promptly dismissed as it became apparent that in order to facilitate turning, both motors needed to rotate in opposite directions, necessitating the rotation of the entire car around its vertical axis. 
 
