@@ -62,6 +62,7 @@ The rotation of the machine necessitates the alignment of the servo and the prim
 
 Consequently, we proposed an alternative design to address this limitation.
 <img src = "https://user-images.githubusercontent.com/56829239/232310079-931594a3-6049-4ff0-9cc0-58b74d3c37e4.png" width = 700/>
+
 This design greatly appealed to us, and we made the decision to proceed in this particular direction. During our exploration on the web, we chanced upon a toy named [SMARS](https://www.smarsfan.com/) (Screwed/Screwless Modular Assembleable Robotic System), which seemed to align closely with our envisioned requirements. We found inspiration in its design and opted to incorporate a chassis that closely resembled to SMARS. To assess the feasibility of the track concept, we even went as far as designing the entire SMARS idea to evaluate its effectiveness.
 
 <img src = "https://github.com/kreslotim/Wall-SLAM/blob/main/Pictures/ezgif-4-9122e21e39.gif">
