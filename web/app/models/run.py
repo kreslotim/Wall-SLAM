@@ -1,11 +1,12 @@
-import plotly.graph_objects as go
-import matplotlib.pyplot as plt
-from pathfinder import PathFinder
-
+import pywifi
+import time
 obs = [[10,0],[0,10],[-10,0]]  # Example obstacle coordinates
 grid_rad = 100  # Example grid radius
 
-path_finder = PathFinder(obs, cell_dim=10, grid_rad=grid_rad)
+
+    iface.disconnect()  # Disconnect from any existing Wi-Fi connection
+    time.sleep(1)
+
 
 current_position = (0,0)  # Example current position
 

@@ -26,37 +26,15 @@ function sendMovementCommand(direction) {
 /* --------------- Graph Function --------------- */
   
 $(document).ready(function() {
-  var [updateCom,resetCom] = initGraphCom(); // Call the function to initialize the graph
-  var [updateRedundancy,resetRedundancy] = initGraphRedundancy();
-  var [updateNoise, resetNoise] = initGraphNoise();
-  var [updateKmeans,resetKmeans] = initKmeanGraph();
-  
-  var [updateDistance,resetDistance] = initDistance();
-  var [updateGyro,resetOrientation] = initGyro();
-  var [updateMovement,resetMovement] = initMouvement();
-  masterUpdate(updateDistance,updateCom,updateRedundancy,updateNoise,updateKmeans,updateGyro,updateMovement);
-  // Call updateMap() when the button is clicked
-  $('#update-master').click(function() {
-    updateCom();
-    updateRedundancy();
-    updateNoise();
-    updateKmeans();
-    updateDistance();
-    updateGyro();
-    updateMovement();
-  })
-  $('#reset-master').click(function() {
-    resetCom();
-    resetRedundancy();
-    resetNoise();
-    resetKmeans();
-    resetDistance();
-    resetOrientation();
-    resetMovement();
-  })
-  initKmeanSlider();
-
+  initGraphCom(); // Call the function to initialize the graph
+  initGraphRedundancy();
+  initGraphNoise();
+  initKmeanGraph();
+  initDistance();
+  initMouvement();
 });
+
+
 function toggleUpdate(name, updateFunction) {
   var progressIntervalId; // Variable to hold the progress interval ID
   var progressValue = 0; // Current progress value
@@ -120,174 +98,38 @@ function toggleUpdate(name, updateFunction) {
   });
 }
 
-function masterUpdate(...updateArray){
-  // Master Control
 
-   // Update Label
-   const slider = document.getElementById('slider-frequency-master');
-  
-    slider.addEventListener('change', function() {
-      const labels = document.getElementsByClassName('label-frequency');
-      const inputs = document.getElementsByClassName('slider-frequency');
-      for (var i = 0; i < labels.length; i++) {
-          var label = labels[i];
-          var input = inputs[i];
-          label.innerText = this.value;
-          input.value = this.value;
-      }
-      });
-    
-  
- 
-    var progressIntervalId; // Variable to hold the progress interval ID
-    var progressValue = 0; // Current progress value
-    var intervalId; // Variable to hold the interval ID
-  
-    // Function to update the progress bar
-    function updateProgressBar() {
-      progressValue += 10; // Increase progress value by 10
-      if (progressValue >= 100) progressValue = 0;
-      var progressBar = document.getElementsByClassName('pb');
-      for (var i = 0; i < progressBar.length; i++) {
-        progressBar[i].style.width = progressValue + '%'; // Update progress bar width
-        progressBar[i].innerHTML = progressValue + '%';
-        progressBar[i].setAttribute('aria-valuenow', progressValue); // Update aria-valuenow attribute
-      }
-      if (!intervalId) {
-        clearInterval(progressIntervalId); // Clear the progress interval when it reaches 100%
-        progressValue = 0; // Reset progress value
-        for (var i = 0; i < progressBar.length; i++) {
-          progressBar[i].style.width = '0%'; // Reset progress bar width
-        }
-        var progressContainers = document.getElementsByClassName('pdiv');
-        for (var i = 0; i < progressContainers.length; i++) {
-          progressContainers[i].style.display = 'none'; // Hide the progress bar
-          
-        }
-      }
-    }
-    function allUpdate() {
-      for (var i = 0; i < updateArray.length; i++) {
-        updateArray[i]();
-      }
-    }
-    // Toggle button event listener
-    document.getElementById('tg-update-master').addEventListener('click', function() {
-      if (intervalId) {
-        // If interval is active, clear it and deactivate the toggle button
-        clearInterval(intervalId);
-        intervalId = null;
-        clearInterval(progressIntervalId);
-        this.innerHTML = 'Toggle Update';
-        var progressContainers = document.getElementsByClassName('pdiv');
-        for (var i = 0; i < progressContainers.length; i++) {
-          progressContainers[i].style.display = 'none'; // Hide the progress bar
-        
-        }
-          // Reset individual toggle buttons to "off" mode
-        var toggleButtons = document.getElementsByClassName('tg-update');
-        for (var i = 0; i < toggleButtons.length; i++) {
-          if (toggleButtons[i] !== this) {
-            toggleButtons[i].innerHTML = 'Toggle Update';
-          }
-        }
-        var bar = document.getElementsByClassName('pb');
-        for (var i = 0; i < bar.length; i++) {
-          if (bar[i] !== this) {
-            bar[i].style.width = '0%'; // Reset progress bar width
-          }
-        }
-      
-        progressValue = 0; // Reset progress value
-      } else {
-        const updateSlider = document.getElementById('slider-frequency-master').value;
-        timeInterval = parseInt(updateSlider) * 1000;
-        console.log(timeInterval);
-        // If interval is inactive, start it and activate the toggle button
-        intervalId = setInterval(allUpdate, timeInterval);
-        progressIntervalId = setInterval(updateProgressBar, timeInterval / 10); // Update progress bar every 10% of the timeInterval
-        this.innerHTML = 'Stop Update';
-        var progressContainers = document.getElementsByClassName('pdiv');
-        for (var i = 0; i < progressContainers.length; i++) {
-          progressContainers[i].style.display = 'block'; // Show the progress bar
-        }
-         // Reset individual toggle buttons to "off" mode
-        var toggleButtons = document.getElementsByClassName('tg-update');
-        for (var i = 0; i < toggleButtons.length; i++) {
-          if (toggleButtons[i] !== this) {
-            toggleButtons[i].innerHTML = 'Stop Update';
-          }
-        }
-      }
-    });
-}
 
 function initDistance(){
 
 
   toggleUpdate("distance",updateMap);
-    // Sample data
-  var time = []; // Time points
-  var distance1 = []; // Distance values for series 1
-  var distance2 = []; // Distance values for series 2
-  var distance3 = []; // Distance values for series 3
 
-  // Data traces
-  var trace1 = {
-    x: time,
-    y: distance1,
-    mode: 'lines',
-    name: 'Distance 1'
-  };
-
-  var trace2 = {
-    x: time,
-    y: distance2,
-    mode: 'lines',
-    name: 'Distance 2'
-  };
-
-  var trace3 = {
-    x: time,
-    y: distance3,
-    mode: 'lines',
-    name: 'Distance 3'
-  };
-
-  // Layout configuration
-  var layout = {
-    xaxis: {
-      title: 'Time'
-    },
-    yaxis: {
-      title: 'Distance'
-    },
-    margin: {
-      t: 10, // Top margin
-      l: 40, // Left margin
-      r: 20, // Right margin
-      b: 40  // Bottom margin
-    },
-  };
-
-  // Combine the traces into an array
-  var data = [trace1, trace2, trace3];
-
-  // Create the line chart
-  Plotly.newPlot('graph-distance', data, layout, { displayModeBar: false });
   function updateMap() {
     $.ajax({
       url: '/get-graph-distance',
       type: 'GET',
       success: function(data) {
-          // var newChartData = JSON.parse(data);
-          // Plotly.newPlot('graph-distance', newChartData.data, newChartData.layout);
+           var newChartData = JSON.parse(data.data);
+
+            time = newChartData.time;
+            magTrace.y = newChartData.mag;
+            magTrace.x = time;
+            gyroTrace.y = newChartData.gyro;
+            gyroTrace.x= time;
+            kalmanTrace.y = newChartData.kalman;
+            kalmanTrace.x = time;
+            data = [magTrace, gyroTrace, kalmanTrace];
+            console.log(data)
+           
+           Plotly.newPlot('graph-distance', data, layout);
         }
       
     });
   }
   function reset(){
-    Plotly.newPlot('graph-distance', data, layout, { displayModeBar: false });
+    var noData = [];
+    Plotly.newPlot('graph-distance', noData, layout, { displayModeBar: false });
   }
   // Call updateMap() when the button is clicked
   $('#update-distance').click(function() {
@@ -298,101 +140,7 @@ function initDistance(){
   })
   return [updateMap, reset];
   }
-function initGyro(){
-  toggleUpdate("orientation",updateMap);
-  // Sample data
-  var angles = [30, 150, 270]; // Angles for three objects (in degrees)
-  // Data traces
-  var trace1 = {
-    r: [1],
-    theta: [angles[0]],
-    mode: 'markers',
-    name: 'Object 1',
-    marker: {
-      size: 10,
-      symbol: 'circle'
-    },
-    type: 'scatterpolar'
-  };
 
-  var trace2 = {
-    r: [1],
-    theta: [angles[1]],
-    mode: 'markers',
-    name: 'Object 2',
-    marker: {
-      size: 10,
-      symbol: 'circle'
-    },
-    type: 'scatterpolar'
-  };
-
-  var trace3 = {
-    r: [1],
-    theta: [angles[2]],
-    mode: 'markers',
-    name: 'Object 3',
-    marker: {
-      size: 10,
-      symbol: 'circle'
-    },
-    type: 'scatterpolar'
-  };
-
-  // Combine the traces into an array
-  var data = [trace1, trace2, trace3];
-
-  // Layout configuration
-  var layout = {
-    margin: {
-      t: 10, // Top margin
-      l: 40, // Left margin
-      r: 20, // Right margin
-      b: 40  // Bottom margin
-    },
-    polar: {
-      radialaxis: {
-        visible: false,
-        range: [0, 1] // Set the range of the radial axis
-      },
-      angularaxis: {
-        tickmode: 'array',
-        tickvals: [0, 45, 90, 135, 180, 225, 270, 315], // Set custom tick values for the angular axis (in degrees)
-        ticktext: ['0°', '45°', '90°', '135°', '180°', '225°', '270°', '315°'], // Set custom tick labels for the angular axis
-        direction: 'clockwise' // Set the direction of the angular axis
-      }
-    },
-    showlegend: true,
-  };
-
-
-
-  // Create the 3D chart
-  Plotly.newPlot('graph-orientation', data, layout,{ displayModeBar: false });
-  function updateMap() {
-    $.ajax({
-      url: '/get-graph-orientation',
-      type: 'GET',
-      success: function(data) {
-          // var newChartData = JSON.parse(data);
-          // Plotly.newPlot('graph-distance', newChartData.data, newChartData.layout);
-        }
-      
-    });
-  }
-  function reset(){
-    Plotly.newPlot('graph-orientation', data, layout,{ displayModeBar: false });
-  }
-  // Call updateMap() when the button is clicked
-  $('#update-orientation').click(function() {
-      updateMap();
-    })
-    $('#reset-orientation').click(function() {
-     reset();
-    })
-  return [updateMap, reset];
-
-}
 function initGraphCom() {
   toggleUpdate("com",updateMap);
   var layout = {
@@ -413,7 +161,8 @@ function initGraphCom() {
   };
   var data = [
     { x: [], y: [], type: 'bar', name: 'Sent' },
-    { x: [], y: [], type: 'bar', name: 'Received' }
+    { x: [], y: [], type: 'bar', name: 'Received' },
+    { x: [], y: [], type: 'bar', name: 'Obstacle Detected' }
   ];
   
   Plotly.newPlot('graph-com', data, layout, { displayModeBar: false });
@@ -421,15 +170,64 @@ function initGraphCom() {
     $.ajax({
       url: '/get-graph-com',
       type: 'GET',
-      success: function(data) {
-          // var newChartData = JSON.parse(data);
-          // Plotly.newPlot('graph-distance', newChartData.data, newChartData.layout);
-        }
+      success: function(response) {
+        console.log(response.data)
+        var newChartData = JSON.parse(response.data);
+      var sentData = newChartData.sent;
+      var receivedData = newChartData.received;
+      var obstacleData = newChartData.obs;
+
+      // Find the minimum and maximum values of the received data
+      var minReceived = Math.floor(Math.min(...receivedData));
+      var maxReceived = Math.floor(Math.max(...receivedData));
       
+      // Create the x-axis values as an array of seconds
+      var seconds = [];
+      for (var i = minReceived; i <= maxReceived; i++) {
+        seconds.push(i);
+      }
+      
+
+      console.log("min : " + minReceived)
+      console.log("max : " + maxReceived)
+      console.log(seconds)
+
+      
+      var sentValues = countPoints(sentData, seconds);
+      var receivedValues = countPoints(receivedData, seconds);
+      var obsValues = countPoints(obstacleData,seconds)
+
+      var data = [
+        { x: seconds, y: sentValues, type: 'bar', name: 'Sent' },
+        { x: seconds, y: receivedValues, type: 'bar', name: 'Received' },
+        { x: seconds, y: obsValues, type: 'bar', name: 'Obstacle Detected' }
+      ];
+      console.log(data)
+      
+      Plotly.newPlot('graph-com', data, layout, { displayModeBar: false });
+      }
     });
   }
+ // Helper function to count the number of points within each second
+ function countPoints(data, seconds) {
+  var count = Array(seconds.length).fill(0);
+  
+  for (var i = 0; i < data.length; i++) {
+    var time = Math.floor(data[i]);
+    var index = seconds.indexOf(time);
+    
+    if (index !== -1) {
+      count[index] += 1;
+    }
+  }
+  
+  return count;
+}
+
+
   function reset(){
-    Plotly.newPlot('graph-com', data, layout, { displayModeBar: false });
+    var noData = [];
+    Plotly.newPlot('graph-com', noData, layout, { displayModeBar: false });
   }
    // Call updateMap() when the button is clicked
    $('#update-com').click(function() {
@@ -496,7 +294,8 @@ function initGraphRedundancy() {
     });
   }
   function reset(){
-    Plotly.newPlot('graph-redundancy', data, layout,{ displayModeBar: false });
+    var noData = [];
+    Plotly.newPlot('graph-redundancy', noData, layout, { displayModeBar: false });
   }
    // Call updateMap() when the button is clicked
    $('#update-redundancy').click(function() {
@@ -570,7 +369,8 @@ function initGraphNoise() {
     }
   
   function reset(){
-    Plotly.newPlot('graph-obs-raw', data, layout,{ displayModeBar: false });
+    var noData = [];
+    Plotly.newPlot('graph-obs-raw', noData, layout, { displayModeBar: false });
   }
        // Call updateMap() when the button is clicked
    $('#update-obs-raw').click(function() {
@@ -615,28 +415,10 @@ function initKmeanGraph() {
     });
   }
   function reset(){
-    Plotly.newPlot('graph-kmeans', chartData, layout, config,{ displayModeBar: false });
+    var noData = [];
+    Plotly.newPlot('graph-kmeans', noData, layout, { displayModeBar: false });
   }
 
-
-  var progressIntervalId; // Variable to hold the progress interval ID
-  var progressValue = 0; // Current progress value
-  var intervalId; // Variable to hold the interval ID
-
-   // Function to update the progress bar
-   function updateProgressBar() {
-    progressValue += 10; // Increase progress value by 10
-    if (progressValue >= 100) progressValue=0;
-    document.getElementById('progressBar').style.width = progressValue + '%'; // Update progress bar width
-    document.getElementById('progressBar').innerHTML = progressValue + '%'; 
-    document.getElementById('progressBar').setAttribute('aria-valuenow', progressValue); // Update aria-valuenow attribute
-    if (!intervalId) {
-      clearInterval(progressIntervalId); // Clear the progress interval when it reaches 100%
-      progressValue = 0; // Reset progress value
-      document.getElementById('progressBar').style.width = '0%'; // Reset progress bar width
-      document.getElementsByClassName('progress')[0].style.display = 'none'; // Hide the progress bar
-    }
-  }
 
   // Call updateMap() at an interval
 
@@ -885,7 +667,8 @@ function initMouvement(){
 
 
   function reset(){
-    Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
+    var noData = [];
+    Plotly.newPlot('graph-movement', noData, layout, { displayModeBar: false });
   }
 
  
