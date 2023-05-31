@@ -43,11 +43,6 @@ class ESP32Connection:
         self.path_finder = PathFinder([])
         self.action_instruction_list = []
 
-        pathLoop = threading.Thread(target=self._sendPath_Instruction)
-
-        pathLoop.start()
-        
-
     
 ######## Thread Looping #############
 
@@ -261,10 +256,10 @@ class ESP32Connection:
             if  not self.connected :
                 actionNumber = self.map_all()
                 print(f"actionNumber : {actionNumber}")
-                #self._send_actionNumber(actionNumber[0])
 
-                if actionNumber != -2 :
-                    ...
+                if actionNumber != -1 :
+                    self._send_actionNumber(actionNumber[-1])
+
             threading.Event().wait(5)  
 
         timeOfRep = round( time.time() - self.time, 2)
@@ -282,7 +277,7 @@ class ESP32Connection:
     
     def map_all(self) :
             point_car = self.path_finder.car_to_grid((self.slam_data.curr_x_car, self.slam_data.curr_y_car))
-            self.path_finder.generateGrid([[0,0],[0,0],[0,0],[10,0],[10,0],[10,0],[10,10],[10,10],[10,10],[-10,0],[-10,0],[-10,0]])
+            self.path_finder.generateGrid(self.slam_data.list_of_obs)
             self.path_finder.dijkstra_shortest_path(point_car)
             actionNumber = self.path_finder.path_to_actionNumber(int(self.slam_data.perfect_orientation))
             return actionNumber

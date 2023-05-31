@@ -773,8 +773,8 @@ function initMouvement(){
 
   // Define the layout
   var layout = {
-    xaxis: { title: 'X' },
-    yaxis: { title: 'Y' },
+    xaxis: { title: 'Y' },
+    yaxis: { title: 'X' },
     margin: {
       t: 10, // Top margin
       l: 40, // Left margin

@@ -2,7 +2,7 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 from pathfinder import PathFinder
 
-obs = [[0,0],[0,0],[0,0],[10,0],[10,0],[10,0],[10,10],[10,10],[10,10],[-10,0],[-10,0],[-10,0]]  # Example obstacle coordinates
+obs = [[10,0],[0,10],[-10,0]]  # Example obstacle coordinates
 grid_rad = 100  # Example grid radius
 
 path_finder = PathFinder(obs, cell_dim=10, grid_rad=grid_rad)
@@ -20,9 +20,18 @@ action_numbers = path_finder.path_to_actionNumber(current_orr=0)
 obstacles_for_website = path_finder.generate_list_of_obstacles_for_website()
 print(f"########")
 
+for s in obs:
+    print(path_finder.car_to_grid(s))
 print(f"Car position in car : {current_position}")
 print(f"Car position in grid : {path_finder.car_to_grid(current_position)}")
-print(f"Car position in web : {path_finder.get_in_array_coords(path_finder.car_to_grid(current_position))}")
+print(f"Togo in grid : {path_finder.togo_position}")
+
+
+print("########")
+for s in obs:
+    print(path_finder.get_in_grid_coords(path_finder.car_to_grid(s)))
+print(f"Car position in web : {path_finder.get_in_grid_coords(path_finder.car_to_grid(current_position))}")
+
 
 
 
@@ -31,7 +40,8 @@ print("Shortest Path:", path)
 print("Obstacles for Website:", obstacles_for_website)
 
 for this in path :
-    print(path_finder.get_in_grid_coords(this))
+    if this != -1:
+        print(path_finder.get_in_grid_coords(this))
 # Plotting the grid with obstacles
 
 # Plotting the obstacles
@@ -46,7 +56,7 @@ plt.xlabel('Grid Y')
 plt.ylabel('Grid X')
 
 # Display the path
-if path:
+if path and path[0] != -1 :
     path_x = [coord[1] for coord in path]  # Reversed indexing
     path_y = [coord[0] for coord in path]  # Reversed indexing
     plt.plot(path_y, path_x, color='red', linewidth=2)

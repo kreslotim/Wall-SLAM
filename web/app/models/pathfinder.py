@@ -62,6 +62,9 @@ class PathFinder:
         """
         print(f"Car Position : {current_position}")
         print(f"Togo Position : {self.togo_position}")
+        
+        if self.grid[current_position[1]][current_position[0]] == 1:
+            return [-1]
 
 
         rows = len(self.grid)
@@ -85,9 +88,9 @@ class PathFinder:
 
             # Check if the current position is the destination
             if current_pos == self.togo_position:
-                self.path = [self.get_in_array_coords(current_pos)]
+                self.path = [self.get_in_grid_coords(current_pos)]
                 while current_pos in previous:
-                    self.path.append(self.get_in_array_coords(previous[current_pos]))
+                    self.path.append(self.get_in_grid_coords(previous[current_pos]))
                     current_pos = previous[current_pos]
 
                 self.path.reverse()
@@ -108,7 +111,7 @@ class PathFinder:
                 if 0 <= new_x < rows and 0 <= new_y < cols:
                     new_pos = (new_x, new_y)
                     
-                    if self.grid[new_x][new_y] == 0:
+                    if self.grid[new_y][new_x] == 0:
                         # Calculate the cost for changing directions
                         if prev_pos is None :
                             # Current Orrientation, todo get it.
@@ -201,9 +204,9 @@ class PathFinder:
         x = math.floor(x/self.cell_dim)
         y = math.floor(y/self.cell_dim)
         
-        return x,y
+        return self.get_in_array_coords((x,y))
     
-    def get_in_grid_coords(self, point_grid):
+    def get_in_array_coords(self, point_grid):
         """
         Gets the content of the grid at (x,y). Since grid is constructed with [0,0] bottom left but in a array with [0,0] top left. This method allows you to make a transition.
 
@@ -212,12 +215,12 @@ class PathFinder:
         Returns:
             grid_value: the content at the position of the grid 
         """
-        y = len(self.grid) -point_grid[0] - 1
+        y = len(self.grid) - point_grid[0] - 1
         x = point_grid[1] 
         return x,y
     
     
-    def get_in_array_coords(self, point_array):
+    def get_in_grid_coords(self, point_array):
         """
         Gets the content of the grid at (x, y) based on array coordinates, where [0, 0] is the top left.
 
@@ -277,6 +280,6 @@ class PathFinder:
         return self.grid
     
     def setTarget_xy_in_website(self, coordinates):
-        self.togo_position = self.get_in_grid_coords((coordinates[0],coordinates[1]))
+        self.togo_position = self.get_in_array_coords((coordinates[0],coordinates[1]))
         print(f"Website coord : {coordinates} ")
  
