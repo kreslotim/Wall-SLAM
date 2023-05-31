@@ -105,7 +105,55 @@ function initDistance(){
 
 
   toggleUpdate("distance",updateMap);
-
+    // Sample data
+    var time = []; // Time points
+    var mag = []; // Distance values for series 1
+    var gyro = []; // Distance values for series 2
+    var kalman = []; // Distance values for series 3
+  
+    // Data traces
+    var magTrace = {
+      x: time,
+      y: mag,
+      mode: 'lines',
+      name: 'Mag'
+    };
+  
+    var gyroTrace = {
+      x: time,
+      y: gyro,
+      mode: 'lines',
+      name: 'Gyro'
+    };
+  
+    var kalmanTrace = {
+      x: time,
+      y: kalman,
+      mode: 'lines',
+      name: 'Kalman'
+    };
+  
+    // Layout configuration
+    var layout = {
+      xaxis: {
+        title: 'Time'
+      },
+      yaxis: {
+        title: 'Orientation'
+      },
+      margin: {
+        t: 10, // Top margin
+        l: 40, // Left margin
+        r: 20, // Right margin
+        b: 40  // Bottom margin
+      },
+    };
+  
+    // Combine the traces into an array
+    var data = [magTrace, gyroTrace, kalmanTrace];
+  
+    // Create the line chart
+    Plotly.newPlot('graph-distance', data, layout, { displayModeBar: false });
   function updateMap() {
     $.ajax({
       url: '/get-graph-distance',
