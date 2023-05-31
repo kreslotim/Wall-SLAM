@@ -59,36 +59,8 @@
                         
             </div>
         </div>
-        <div class="col card mx-2 my-2">  
-            <div class="card-body">
-                <h5 class="card-tile">orientation Correction using Kalman</h5>
-                <hr>
-                <div class="mt-4 setting" style="display: block;">
-                    <div class="d-flex">
-                        <button id="reset-orientation" class="mx-1 btn btn-primary reset">Reset</button>
-                        <button id="update-orientation" class="mx-1 btn btn-primary update">Update</button>
-                        <button id="tg-update-orientation" class="mx-1 btn btn-primary tg-update">Toggle Update</button>
-                        <div class="mx-auto">
-                            <div class="d-flex">
-                                <p class='mx-2 my-auto'> <span id="label-frequency-orientation" class="label-frequency" >10</span>s</p>
-                                <input type="range" min="2" max="100" value="10" step="1" class="slider slider-frequency" id="slider-frequency-orientation" style="width:100px;" >
-                            </div>
-                            <div class="progress pdiv my-auto" id="progress-orientation" style="display: none;">
-                                <div id="pb-orientation" class="progress-bar pb" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                       
-                    </div>
-                    
-                    <div class="row mx-auto my-2"> 
-                      
-                    </div>       
-                </div>
-                                   
-                <div id="graph-orientation" style="height: 200px;"></div>
-                        
-            </div>
-        </div>    <div class="col card mx-2 my-2">  
+    
+           <div class="col card mx-2 my-2">  
             <div class="card-body">
                 <h5 class="card-tile">com Correction using Kalman</h5>
                 <hr>
@@ -118,8 +90,6 @@
                         
             </div>
         </div>
-    </div>
-    <div class="row mx-2">
         <div class="col card mx-2 my-2">  
             <div class="card-body">
                 <h5 class="card-tile">obs-raw Correction using Kalman</h5>
@@ -150,6 +120,9 @@
                         
             </div>
         </div>
+    </div>
+    <div class="row mx-2">
+
         <div class="col card mx-2 my-2">  
             <div class="card-body">
                 <h5 class="card-tile">redundancy Correction using Kalman</h5>

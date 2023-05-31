@@ -86,7 +86,6 @@ class ESP32Connection():
                 self.recv_socket.send("200".encode())
                 self.recv_stat.append([1, time.time()-self.time])
                 # Print the received data
-                print(f"Received data: {data_decoded}")
  
     def _send_actionNumber(self, actionNumber):
         try:
