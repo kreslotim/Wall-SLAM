@@ -42,7 +42,7 @@ class PathFinder:
             grid_x, grid_y = self.car_to_grid(obstacle)
 
             # Increment the value of the corresponding grid cell, ensure that its valid too
-            if 0 <= grid_x < 2*grid_rad / self.cell_dim and 0 <= grid_y < 2*grid_rad / self.cell_dim:
+            if 0 <= grid_x < len(self.grid) and 0 <= grid_y < len(self.grid):
                 self.grid[grid_x, grid_y] += 1
 
         self.grid = np.where(self.grid < sensitivity, 0, 1)
@@ -108,7 +108,7 @@ class PathFinder:
                 if 0 <= new_x < rows and 0 <= new_y < cols:
                     new_pos = (new_x, new_y)
                     
-                    if self.grid[new_x][new_y]==0:
+                    if self.grid[new_x][new_y] == 0:
                         # Calculate the cost for changing directions
                         if prev_pos is None :
                             # Current Orrientation, todo get it.
@@ -173,11 +173,11 @@ class PathFinder:
                     path.pop(0)
                     
                 if current_orr < togo_orr :
-                    action.append(3)
+                    action.append(4)
                     current_orr = current_orr + 90
 
                 if current_orr > togo_orr :
-                    action.append(4)
+                    action.append(3)
                     current_orr = current_orr - 90
         return action
     
@@ -200,9 +200,7 @@ class PathFinder:
 
         x = math.floor(x/self.cell_dim)
         y = math.floor(y/self.cell_dim)
-
-        x = len(self.grid) + (-x - 1) 
-
+        
         return x,y
     
     def get_in_grid_coords(self, point_grid):
@@ -214,8 +212,8 @@ class PathFinder:
         Returns:
             grid_value: the content at the position of the grid 
         """
-        x = len(self.grid) + (-point_grid[1] - 1) 
-        y = point_grid[0]
+        y = len(self.grid) -point_grid[0] - 1
+        x = point_grid[1] 
         return x,y
     
     
@@ -228,19 +226,10 @@ class PathFinder:
         Returns:
             grid_value: the content at the position of the grid
         """
-        x = point_array[1]
-        y = len(self.grid) -point_array[0] - 1
+        y = point_array[0]
+        x = len(self.grid) - point_array[1] - 1
         return x, y
-    
-    def convert_path_to_array_coords(self):
-        """
-        Converts the coordinates in self.path from grid coordinates to array coordinates.
-        """
-        array_path = []
-        for point_grid in self.path:
-            point_array = self.get_in_array_coords(point_grid)
-            array_path.append(point_array)
-        self.path = array_path
+
     
     def generate_list_of_obstacles_for_website(self): 
         if len(self.grid) != 0: 
@@ -266,10 +255,13 @@ class PathFinder:
         :param obst: raw list of obstacles in car coordinates  
         :return: sampled grid with cells set to 1 or 0
         """
+        self.grid = np.zeros((len(self.grid),len(self.grid)))
+        
         obstacle_coordinates = obs.copy()
         
         # Sensitivity (obstacle points per block, think of it as a threshold)
         sensitivity = 1
+
 
         # Iterate through the list of obstacle coordinates
         for obstacle in obstacle_coordinates:
@@ -277,7 +269,7 @@ class PathFinder:
             grid_x, grid_y = self.car_to_grid(obstacle)
 
             # Increment the value of the corresponding grid cell, ensure that its valid too
-            if 0 <= grid_x < len(self.grid)/2 and 0 <= grid_y < len(self.grid)/2:
+            if 0 <= grid_x < len(self.grid) and 0 <= grid_y < len(self.grid):
                 self.grid[grid_y, grid_x] += 1
 
         self.grid = np.where(self.grid < sensitivity, 0, 1)

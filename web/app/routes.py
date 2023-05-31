@@ -154,7 +154,7 @@ def get_graph_movement():
         x_route = [coord[0] for coord in espT.path_finder.path]
         y_route = [coord[1] for coord in espT.path_finder.path]
 
-
+        print(espT.path_finder.generate_list_of_obstacles_for_website())
         response_data = {   
         'gridData': espT.path_finder.generate_list_of_obstacles_for_website(),  
         'pathX': x_route,

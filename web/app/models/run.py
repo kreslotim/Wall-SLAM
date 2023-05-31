@@ -2,26 +2,36 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 from pathfinder import PathFinder
 
-obs = [[0,0],[0,0],[0,0]]  # Example obstacle coordinates
+obs = [[0,0],[0,0],[0,0],[10,0],[10,0],[10,0],[10,10],[10,10],[10,10],[-10,0],[-10,0],[-10,0]]  # Example obstacle coordinates
 grid_rad = 100  # Example grid radius
 
 path_finder = PathFinder(obs, cell_dim=10, grid_rad=grid_rad)
 
-current_position = (10,10)  # Example current position
-print(f"c : {path_finder.car_to_grid(current_position)}")
+current_position = (0,0)  # Example current position
 
-path_finder.setTarget_xy_in_website((5,5))  # Example target position
-print(path_finder.togo_position)
+path_finder.setTarget_xy_in_website((0,0))  # Example target position
 
-path = path_finder.dijkstra_shortest_path(path_finder.car_to_grid(current_position))
-print("Shortest Path:", path)
+path = path_finder.dijkstra_shortest_path(path_finder.car_to_grid(current_position)).copy()
+
 
 action_numbers = path_finder.path_to_actionNumber(current_orr=0)
-print("Action Numbers:", action_numbers)
+#print("Action Numbers:", action_numbers)
 
 obstacles_for_website = path_finder.generate_list_of_obstacles_for_website()
+print(f"########")
+
+print(f"Car position in car : {current_position}")
+print(f"Car position in grid : {path_finder.car_to_grid(current_position)}")
+print(f"Car position in web : {path_finder.get_in_array_coords(path_finder.car_to_grid(current_position))}")
+
+
+
+print(f"Togo in grid : {path_finder.togo_position}")
+print("Shortest Path:", path)
 print("Obstacles for Website:", obstacles_for_website)
 
+for this in path :
+    print(path_finder.get_in_grid_coords(this))
 # Plotting the grid with obstacles
 
 # Plotting the obstacles

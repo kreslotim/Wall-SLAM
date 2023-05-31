@@ -257,11 +257,11 @@ class ESP32Connection:
     
 ############ PATH FINDING ############
     def _sendPath_Instruction(self):
-        while self.running:
-            if  self.connected :
+        while not self.running:
+            if  not self.connected :
                 actionNumber = self.map_all()
                 print(f"actionNumber : {actionNumber}")
-                self._send_actionNumber(actionNumber[0])
+                #self._send_actionNumber(actionNumber[0])
 
                 if actionNumber != -2 :
                     ...
@@ -282,7 +282,7 @@ class ESP32Connection:
     
     def map_all(self) :
             point_car = self.path_finder.car_to_grid((self.slam_data.curr_x_car, self.slam_data.curr_y_car))
-            self.path_finder.generateGrid(self.slam_data.list_of_obs)
+            self.path_finder.generateGrid([[0,0],[0,0],[0,0],[10,0],[10,0],[10,0],[10,10],[10,10],[10,10],[-10,0],[-10,0],[-10,0]])
             self.path_finder.dijkstra_shortest_path(point_car)
             actionNumber = self.path_finder.path_to_actionNumber(int(self.slam_data.perfect_orientation))
             return actionNumber
