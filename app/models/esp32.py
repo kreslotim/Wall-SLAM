@@ -21,7 +21,7 @@ class ESP32Connection():
         self.obstacle = {}
         self.time = time.time()
         self.running = False
-        self.start_thread()
+        #self.start_thread()
     
 ######## Thread Looping #############
 

@@ -212,12 +212,14 @@ def update_switch_state_data():
     settingChewbaccaAuto = (sSettingChewbaccaAuto == "true")
     settingDataESP = (sSettingDataESP == "true")
     settingDataSIM = (sSettingDataSIM == "true")
-
+    print("updating")
     if not settingConnection and sSettingConnection == "true":
         espT.start_thread()
+        print("launching")
 
     if sSettingConnection == "false" and settingConnection:
         espT.stop_thread()
+        print("stopping")
        
     settingConnection = (sSettingConnection == "true")
 

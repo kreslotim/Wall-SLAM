@@ -1,43 +1,35 @@
-import plotly.graph_objects as go
-import matplotlib.pyplot as plt
-from pathfinder import PathFinder
+import pywifi
+import time
 
-obs = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (2, 0), (1, 0), (2,3), (0,0)]  # Example obstacle coordinates
-grid_rad = 100  # Example grid radius
+def connect_to_wifi(ssid, password):
+    wifi = pywifi.PyWiFi()  # Create a PyWiFi object
+    iface = wifi.interfaces()[0]  # Get the first available network interface
 
-path_finder = PathFinder(obs, cell_dim=10, grid_rad=grid_rad)
+    iface.disconnect()  # Disconnect from any existing Wi-Fi connection
+    time.sleep(1)
 
-current_position = (0, 0)  # Example current position
-togo_position = (15, 10)  # Example target position
+    profile = pywifi.Profile()  # Create a new Wi-Fi profile
+    profile.ssid = ssid  # Set the SSID (Wi-Fi network name)
+    profile.auth = pywifi.const.AUTH_ALG_OPEN  # Set the authentication algorithm
 
-path = path_finder.dijkstra_shortest_path(current_position, togo_position)
-print("Shortest Path:", path)
+    # Set the encryption type and password (comment out if the network is not password-protected)
+    profile.akm.append(pywifi.const.AKM_TYPE_WPA2PSK)
+    profile.cipher = pywifi.const.CIPHER_TYPE_CCMP
+    profile.key = password
 
-action_numbers = path_finder.path_to_actionNumber(current_orr=0)
-print("Action Numbers:", action_numbers)
+    iface.remove_all_network_profiles()  # Remove all existing profiles
+    temp_profile = iface.add_network_profile(profile)  # Add the new profile
 
-obstacles_for_website = path_finder.generate_list_of_obstacles_for_website()
-print("Obstacles for Website:", obstacles_for_website)
+    iface.connect(temp_profile)  # Connect to the network
+    time.sleep(5)  # Wait for the connection to establish
 
-# Plotting the grid with obstacles
-plt.imshow(path_finder.grid, cmap='binary', origin='lower')
+    if iface.status() == pywifi.const.IFACE_CONNECTED:  # Check if connection is successful
+        print("Connected to Wi-Fi!")
+        return True
+    else:
+        return False
 
-# Plotting the obstacles
-if obstacles_for_website:
-    obstacles_x = [coord[0] for coord in obstacles_for_website]
-    obstacles_y = [coord[1] for coord in obstacles_for_website]
-    plt.scatter(obstacles_y, obstacles_x, color='blue', marker='s', s=50)
-
-# Setting the grid and axes labels
-plt.grid(True)
-plt.xlabel('Grid Y')
-plt.ylabel('Grid X')
-
-# Display the path
-if path:
-    path_x = [coord[1] for coord in path]  # Reversed indexing
-    path_y = [coord[0] for coord in path]  # Reversed indexing
-    plt.plot(path_y, path_x, color='red', linewidth=2)
-
-# Display the plot
-plt.show()
+# Usage
+ssid = "espWifi2"
+password = "0123456789A"
+connect_to_wifi(ssid, password)

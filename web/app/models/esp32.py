@@ -116,6 +116,7 @@ class ESP32Connection:
                 self.get_info.close()
                 self.espIP = client_address[0]
             except Exception as e:
+                print(f" fail at start {e}")
                 self.start_thread()
 
 
@@ -132,12 +133,14 @@ class ESP32Connection:
         listenLoop = threading.Thread(target=self._listen)
         pathLoop = threading.Thread(target=self._sendPath_Instruction)
 
-        pathLoop.start()
+        #pathLoop.start()
         connectLoop.start()
         listenLoop.start()
 
     def thread_connect(self):
         while self.running:
+            print(f"We are {self.connected}")
+            print(f"sock alive ? {self._is_socket_alive()}")
             if not self.connected :
                 timeOfRep = round( time.time() - self.time, 2)
                 self.info.append((timeOfRep, "Connection Thread Reconnecting ..."))
@@ -150,26 +153,33 @@ class ESP32Connection:
     def _listen(self):
         while self.running:
             if self.connected:
-                # Receive data from the client socket
-                data = self.recv_socket.recv(48)
+                try:
+                    # Receive data from the client socket
+                    data = self.recv_socket.recv(48)
 
-                if data:
-                    try :
-                         data_decoded = struct.unpack('ffffffffffff', data)
-                    except Exception as e:
+                
+
+                    if data:
+                        print(data)
+                        try :
+                            data_decoded = struct.unpack('ffffffffffff', data)
+                        except Exception as e:
+                            print("Connection error :", e)
+                            print(len(data))
+                        # Use the data 
+                        distanceFront = data_decoded[2]
+                        distanceBack = data_decoded[3]
+                        orientation = data_decoded[4]
+                        self.slam_data.curr_x_car = data_decoded[5]
+                        self.slam_data.curr_y_car = data_decoded[6]
+                        timeOfReading = data_decoded[7]/10000
+                        angleMap = data_decoded[8]
+                        angleGyro = data_decoded[9]
+                        angleKalman = data_decoded[10]
+                        self.slam_data.add_orr(angleMap,angleGyro,angleKalman, timeOfReading)
+
+                except Exception as e:
                          print("Connection error :", e)
-                         print(len(data))
-                    # Use the data 
-                    distanceFront = data_decoded[2]
-                    distanceBack = data_decoded[3]
-                    orientation = data_decoded[4]
-                    self.slam_data.curr_x_car = data_decoded[5]
-                    self.slam_data.curr_y_car = data_decoded[6]
-                    timeOfReading = data_decoded[7]/10000
-                    angleMap = data_decoded[8]
-                    angleGyro = data_decoded[9]
-                    angleKalman = data_decoded[10]
-                    self.slam_data.add_orr(angleMap,angleGyro,angleKalman, timeOfReading)
 
 
 
@@ -203,8 +213,9 @@ class ESP32Connection:
             print("Connection error :", e)
             print("Reconnecting ...")
             # Check connection status
-            if not self.check_wifi_connection():
+            while not self.check_wifi_connection():
                 self.connect_to_wifi()
+                print("reconnecting to wifi")
 
             timeOfRep = round( time.time() - self.time, 2)
             self.errors.append((timeOfRep, e))
@@ -239,6 +250,7 @@ class ESP32Connection:
             except Exception as e:
                 print("Connection error :", e)
                 timeOfRep = round( time.time() - self.time, 2)
+                self.connected =False
                 self.errors.append((timeOfRep, e))
                 return 400
                 
