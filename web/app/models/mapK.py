@@ -106,6 +106,7 @@ class ClusterChart:
 
         # Initialize 'shapes' key with an empty list
         layout['shapes'] = []
+        rectangles = []  # Initialize an empty list to store the rectangles
 
         for label in np.unique(train_cluster_assignment):
             mask = train_cluster_assignment == label
@@ -126,6 +127,11 @@ class ClusterChart:
                 max_x = np.max(cluster_data[:, 0])
                 min_y = np.min(cluster_data[:, 1])
                 max_y = np.max(cluster_data[:, 1])
+                 # Append the rectangle coordinates to the rectangles list
+                rectangles.append(
+                    ( min_x,max_x,min_y, max_y)
+                )
+
 
                 # Create a unique color for the cluster based on its label
                 color = color_map(label)
@@ -173,7 +179,7 @@ class ClusterChart:
         })
         chart_data = {'data': data, 'layout': layout}
         chart_json = json.dumps(chart_data)
-        return chart_json, max_point
+        return chart_json, max_point, rectangles
     
 
     def find_furthest_point(self,grid_size, obstacles):

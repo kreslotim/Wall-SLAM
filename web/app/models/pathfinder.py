@@ -276,6 +276,31 @@ class PathFinder:
 
         return self.grid
     
+    def fill_grid(self, obs):
+        """
+        Fill the grid from not accessible cell
+
+        Arguments: 
+            obs :  list of obstacles in grid coordinates  
+        Returns:
+            grid (Array) : The grid with obstacle if present, if an obstacle is present the cell index will be 1.
+
+        """
+        self.grid = np.zeros((len(self.grid),len(self.grid)))
+        
+        obstacle_coordinates = obs.copy()
+        
+
+        # Iterate through the list of obstacle coordinates
+        for obstacle in obstacle_coordinates:
+            # Convert obstacle coordinates to grid coordinates
+            grid_x, grid_y = obstacle
+            # Increment the value of the corresponding grid cell, ensure that its valid too
+            if 0 <= grid_x < len(self.grid) and 0 <= grid_y < len(self.grid):
+                self.grid[grid_y, grid_x] = 1
+
+        return self.grid
+    
     def setTarget_xy_in_website(self, coordinates):
         self.togo_position = self.get_in_grid_coords((coordinates[0],coordinates[1]))
         print(f"Website coord : {coordinates} ")
