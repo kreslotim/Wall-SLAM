@@ -19,14 +19,21 @@ sensors_event_t aevent, mevent;
 int distanceSonarFront = 0;
 int16_t lidarDistanceFront;
 int16_t lidarDistanceBack;
-float dataSend[12];
+const short POINTS_PER_PACKET = 20;
+short point = 0;
+float dataSend[12 * POINTS_PER_PACKET];
 int servoAngle=1;
 int numberOfConnectionOld = 0;
 float actionNumber = 0;
 float orientation = 0;
 int goToOrientation = 0;
+
 float curr_x = 0;
 float curr_y = 0;
+
+float prev_x = 0;
+float prev_y = 0;
+
 unsigned long startTime; // Variable to store the start time
 unsigned long elapsedTime;
 int direction = 1;
@@ -41,6 +48,8 @@ const int16_t MIN_SONAR_DISTANCE = 40;  // in mm (in cm but we x10 the distance)
 const int SERVO_INIT_POS = 84;
 const int MAX_DISTANCE_SONAR = 400;
 const float DIST_PER_STEP = 0.06;  // in mm per step
+
+const float STM_Err = 0.0000612825;
 
 
 #define FULLSTEP 4
@@ -256,8 +265,6 @@ void readData() {
 }
 
 void sendData() {
-  packData();
-
   if (!sendClient.connected()){
     if(sendClient.connect(user_IP, SEND_DATA_PORT)) {
       Serial.println("Connected to server");
@@ -268,6 +275,16 @@ void sendData() {
     sendClient.flush();
     sendClient.write((byte*)dataSend, sizeof(dataSend));
     Serial.println("Data Sent");
+    point = 0;
+  }
+}
+
+void handleOutgoingData(){
+  if(point != POINTS_PER_PACKET){
+    packData();
+    return;
+  }else{
+    sendData();
   }
 }
 
@@ -290,27 +307,33 @@ void updateSensors() {
   elapsedTime = (float)(millis() - startTime);
 }
 
+void updatePosition(){
+  float distance =  0.001* STM_Err * stepperRight.currentPosition();
+  float rad_orient = PI * 0.00555555555 * orientation;
+  curr_x = prev_x + cos(rad_orient) * distance;
+  curr_y = prev_y + sin(rad_orient) * distance;
+}
+
 void packData() {
   updateSensors();
-  dataSend[0] = servo.read();
-  dataSend[1] = distanceSonarFront;
-  dataSend[2] = lidarDistanceFront;
-  dataSend[3] = lidarDistanceBack;
-  dataSend[4] = servo.read() + goToOrientation;
-  dataSend[5] = curr_x;
-  dataSend[6] = curr_y;
-  dataSend[7] = elapsedTime;
-  dataSend[8] = goToOrientation;
-  dataSend[9] = aevent.acceleration.z;
-  dataSend[10] = mevent.magnetic.x;
-  dataSend[11] = mevent.magnetic.y;
-  Serial.print("Orientation :");
-  Serial.print(goToOrientation);
+  updatePosition();
 
-  Serial.print( "Curr_X : ");
-  Serial.print(curr_x);
-  Serial.print("Curr_Y:" );
-  Serial.println(curr_y);
+  short pos = point * 12;
+
+  dataSend[pos + 0] = servo.read();
+  dataSend[pos + 1] = distanceSonarFront;
+  dataSend[pos + 2] = lidarDistanceFront;
+  dataSend[pos + 3] = lidarDistanceBack;
+  dataSend[pos + 4] = servo.read() + goToOrientation;
+  dataSend[pos + 5] = x;
+  dataSend[pos + 6] = y;
+  dataSend[pos + 7] = elapsedTime;
+  dataSend[pos + 8] = aevent.acceleration.y;
+  dataSend[pos + 9] = aevent.acceleration.z;
+  dataSend[pos + 10] = mevent.magnetic.x;
+  dataSend[pos + 11] = mevent.magnetic.y;
+
+  point++;
 }
 
 void rotateServo() {
@@ -409,10 +432,13 @@ void moveRight() {
   stepperRight.setCurrentPosition(0);
   stepperLeft.move(-STEPS_90_DEG);  // turn right 90 degrees
   stepperRight.move(-STEPS_90_DEG);
+  prev_x = curr_x;
+  prev_y = curr_y;
   while (stepperLeft.distanceToGo() != 0 || stepperRight.distanceToGo() != 0) {
     stepperLeft.run();
     stepperRight.run();
   }
+  stepperRight.setCurrentPosition(0);
   actionNumber = 0;
 }
 
@@ -423,10 +449,13 @@ void moveLeft() {
   stepperRight.setCurrentPosition(0);
   stepperLeft.move(STEPS_90_DEG);  // turn right 90 degrees
   stepperRight.move(STEPS_90_DEG);
+  prev_x = curr_x;
+  prev_y = curr_y;
   while (stepperLeft.distanceToGo() != 0 || stepperRight.distanceToGo() != 0) {
     stepperLeft.run();
     stepperRight.run();
   }
+  stepperRight.setCurrentPosition(0);
   actionNumber = 0;
 }
 
@@ -439,7 +468,7 @@ void Task1code(void* pvParameters) {
 
 void loop() {
   if(WiFi.softAPgetStationNum() == 1){
-    sendData();
+    handleOutgoingData();
     readData();
     delay(10);
   } 
