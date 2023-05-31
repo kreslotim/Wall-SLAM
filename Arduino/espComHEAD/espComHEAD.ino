@@ -20,11 +20,16 @@ TaskHandle_t Task1;
 sensors_event_t event;
 sensors_event_t aevent, mevent;
 float heading;
-float prevYaw = 0;
+float prevHeading;
+const int THRESHOLD_VALUE = 1;
+const int SPEED_INCREMENT = 100;
 float yaw;
+float initialMagHeading = 0;
 
 float gyroZ;
 float orientationMag = 0;
+// Define complementary filter variables
+unsigned long prevTimestamp = 0;
 
 int distanceSonarFront = 0;
 int16_t lidarDistanceFront;
@@ -48,7 +53,7 @@ const float CONST_SPEED_STEPPER = 500;
 const int STEPS_PER_REV = 2038;
 const int STEPS_90_DEG = 1740;
 const int16_t MIN_LIDAR_DISTANCE = 150;  // in mm
-const int16_t MIN_SONAR_DISTANCE = 15;  // in cm
+const int16_t MIN_SONAR_DISTANCE = 40;  // in mm (in cm but we x10 the distance)
 const int SERVO_INIT_POS = 84;
 const int MAX_DISTANCE_SONAR = 400;
 const float DIST_PER_STEP = 0.06;  // in mm per step
@@ -99,8 +104,8 @@ const float DIST_PER_STEP = 0.06;  // in mm per step
 Servo servo;
 
 // pick your filter! slower == better quality output
-//Adafruit_NXPSensorFusion filter; // slowest
-Adafruit_Madgwick filter;  // faster than NXP
+Adafruit_NXPSensorFusion filter; // slowest
+//Adafruit_Madgwick filter;  // faster than NXP
 //Adafruit_Mahony filter;  // fastest/smalleset
 
 // Create instance of Lidar
@@ -264,6 +269,11 @@ void setupIMUFusion() {
   timestamp = millis();
 
   Wire.setClock(400000); // 400KHz
+
+  sensors_event_t mag;
+  magnetometer->getEvent(&mag);
+  // Calculate the initial magnetometer heading
+  initialMagHeading = (180 * atan2(-mag.magnetic.y, mag.magnetic.x) / PI);
 }
 
 void getHeading() {
@@ -337,10 +347,14 @@ void getHeading() {
 void readLidar() {
   if (vl53Front.dataReady()) {
     lidarDistanceFront = vl53Front.distance();
+  } else {
+    lidarDistanceFront = -1;
   }
 
   if (vl53Back.dataReady()) {
     lidarDistanceBack = vl53Back.distance();
+  } else {
+    lidarDistanceBack = -1;
   }
 }
 
@@ -391,7 +405,7 @@ void updateSensors() {
   elapsedTime = (float)(millis() - startTime);
 
   // Ultrasonic Update
-  distanceSonarFront = frontUltrasonic.ping_cm();
+  distanceSonarFront = frontUltrasonic.ping_cm() * 10; 
 
   // Lidar Update
   rotateServo();
@@ -404,22 +418,27 @@ void updateSensors() {
   accelmag.getEvent(&aevent, &mevent);
 
   // Orientation Update
-  orientationMag = atan2(-mevent.magnetic.y, mevent.magnetic.x) * 180 / PI;
+  orientationMag = atan2(-mevent.magnetic.y, mevent.magnetic.x) * 180 / PI - initialMagHeading;
+
+  if (orientationMag < 0) {
+      orientationMag += 360;
+    } else if (orientationMag >= 360) {
+      orientationMag -= 360;
+    }
   
   unsigned long currentTimestamp = millis();
   float deltaTime = (currentTimestamp - prevTimestamp) / 1000.0; // Convert milliseconds to seconds
   prevTimestamp = currentTimestamp;
 
   // Update the yaw
-  yaw += (gyroZ * 180/PI) * deltaTime;
+  yaw -= (gyroZ * 180/PI) * deltaTime;
 
-  // Keep yaw within the range of 0 to 360 degrees
+   //Keep yaw within the range of 0 to 360 degrees
   if (yaw < 0) {
     yaw += 360;
   } else if (yaw >= 360) {
     yaw -= 360;
   }
-
   
 }
 
@@ -436,17 +455,13 @@ void packData() {
   dataSend[8] = orientationMag; // Mag or
   dataSend[9] = yaw;  // Gyro Or
   dataSend[10] = heading;
-  dataSend[11] = mevent.magnetic.y;
+  dataSend[11] = goToOrientation;
   Serial.print("Orientation :");
   Serial.print(goToOrientation);
 
-  Serial.print( "Curr_X : ");
-  Serial.print(curr_x);
-  Serial.print("Curr_Y:" );
-  Serial.println(curr_y);
-
-
-
+  Serial.println("magOrientation: "+ String(orientationMag));
+  Serial.println("gyroOrientation: "+ String(yaw));
+  Serial.println("Kalman heading: "+ String(heading));
 
 }
 
@@ -458,15 +473,16 @@ void rotateServo() {
 }
 
 void action(float actionNumber) {
+
   switch ((int)actionNumber) {
-    case -1:
-      dumbMapping();
-      break;
     case 0:
       stopMotors();
       break;
     case 1:
-      moveForward();
+      if (distanceSonarFront < MIN_SONAR_DISTANCE && actionNumber == 1) {
+        stopMotors();
+      }
+      else moveForward();
       break;
 
     case 2:
@@ -485,17 +501,14 @@ void action(float actionNumber) {
       break;
 
     default:
-      Serial.println("No output for the actionNumber");
-      break;
+      stepperLeft.run();
+      stepperRight.run();
   }
+
+  actionNumber = 0;
 }
 
-void dumbMapping(){
-  moveForward();
-  if (distanceSonarFront < MIN_SONAR_DISTANCE) {
-      moveLeft();
-  }
-}
+
 
 void stopMotors() {
   stepperLeft.setSpeed(0);
@@ -564,6 +577,44 @@ void moveLeft() {
   }
 }
 
+void correctHeading() {
+// Calculate the heading difference between the current and previous heading
+float headingDiff = heading - prevHeading;
+
+// Check if the heading difference exceeds a threshold value
+if (abs(headingDiff) > THRESHOLD_VALUE) {
+  // Adjust the speed of the motors
+  if (headingDiff > 0) {
+    // Increase the speed of the motors in the defeating direction
+    stepperRight.setSpeed(CONST_SPEED_STEPPER - SPEED_INCREMENT);
+    stepperLeft.setSpeed(-CONST_SPEED_STEPPER - SPEED_INCREMENT);
+    //stepperRight.setSpeed(0);
+    //stepperLeft.setSpeed(-CONST_SPEED_STEPPER - SPEED_INCREMENT);
+    stepperRight.runSpeed();
+    stepperLeft.runSpeed();
+    Serial.println("INCREMENT LEFT");
+  } else {
+    // Decrease the speed of the motors in the defeating direction
+    stepperRight.setSpeed(CONST_SPEED_STEPPER + SPEED_INCREMENT);
+    stepperLeft.setSpeed(-CONST_SPEED_STEPPER + SPEED_INCREMENT);
+    //stepperRight.setSpeed(CONST_SPEED_STEPPER + SPEED_INCREMENT);
+    //stepperLeft.setSpeed(0);
+    stepperRight.runSpeed();
+    stepperLeft.runSpeed();
+    Serial.println("INCREMENT RIGHT");
+  }
+} else {
+  // Reset the speeds to the constant values
+  stepperRight.setSpeed(CONST_SPEED_STEPPER);
+  stepperLeft.setSpeed(-CONST_SPEED_STEPPER);
+  stepperRight.runSpeed();
+  stepperLeft.runSpeed();
+  }
+
+  // Store the current heading as the previous heading for the next iteration
+  prevHeading = heading;
+}
+
 
 void Task1code(void* pvParameters) {
   for (;;) {
@@ -575,6 +626,6 @@ void loop() {
   if(WiFi.softAPgetStationNum() == 1){
     sendData();
     readData();
-    delay(10);
+    delay(100);
   } 
 }
