@@ -75,6 +75,7 @@ As soon as we agreed on the placement of all the components, we started designin
 In order to leverage the collaborative design features, we opted to use Fusion 360, enabling effective teamwork during the design process. Minor design changes have been made in Freecad, in order to save time.
 
 Here's what we've come up with.
+
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22" width = 700/>
 
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46" width = 700/>
@@ -88,6 +89,7 @@ While we adopted the wheel design from SMARS, we had to adapt it's axle mount to
 In order to optimize the efficiency of the printing and assembly process, we strategically positioned all the components in close proximity to one another, ensuring minimal wasted space on the chassis.
 
 As the heaviest electronic component of the entire construction, the battery serves as a central anchor within the overall design. By positioning it at the center, we establish a stable foundation upon which the remaining components, i.e. the servo and the lidars sensors are securely mounted and connected.
+
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/f2b20805-2bfe-478f-b751-ee17c3dc3ad8" width = 700/>
 
 The cover slides over the battery and encases the servo on top.
