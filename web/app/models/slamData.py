@@ -96,6 +96,7 @@ class SlamData:
         return len(self.list_of_100_orr) > self.numberOfObsInOneGo 
 
     def _clear_temp_list(self):
+        print("cleared")
         self.list_of_100_x_obs.clear()
         self.list_of_100_y_obs.clear()
         self.list_of_100_orr.clear()

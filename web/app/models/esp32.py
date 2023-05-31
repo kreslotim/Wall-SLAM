@@ -130,7 +130,7 @@ class ESP32Connection:
         listenLoop = threading.Thread(target=self._listen)
         pathLoop = threading.Thread(target=self._sendPath_Instruction)
 
-        #pathLoop.start()
+        pathLoop.start()
         connectLoop.start()
         listenLoop.start()
 
@@ -172,11 +172,13 @@ class ESP32Connection:
                         angleMap = data_decoded[8]
                         angleGyro = data_decoded[9]
                         angleKalman = data_decoded[10]
+                        self.slam_data.perfect_orientation = data_decoded[11]
+
                         self.slam_data.add_orr(angleMap,angleGyro,angleKalman, timeOfReading)
                         timeOfRep = round( time.time() - self.time, 2)
                         self.recv_stat.append(timeOfRep)
 
-                                            # Filter invalid distances to 0, to allow negative distances
+                        # Filter invalid distances to 0, to allow negative distances
                         if (distanceFront == -1) :
                             distanceFront = 0
                         else :
@@ -189,6 +191,12 @@ class ESP32Connection:
                             distanceBack = -distanceBack - 20
                             self.obs_stat.append(timeOfRep)
 
+                        # Adding obstacles with Front Lidar
+                        self.slam_data._add_and_delete_obstacle(self.slam_data.curr_x_car,  self.slam_data.curr_y_car, distanceFront, orientation)
+
+                        # Adding obstacles with Back Lidar
+                        self.slam_data._add_and_delete_obstacle(self.slam_data.curr_x_car,  self.slam_data.curr_y_car, distanceBack, orientation)
+                        
 
                 
                        
@@ -328,13 +336,13 @@ class ESP32Connection:
     
 ############ PATH FINDING ############
     def _sendPath_Instruction(self):
-        while not self.running:
-            if  not self.connected :
+        while self.running:
+            if  self.connected :
                 actionNumber = self.map_all()
                 print(f"actionNumber : {actionNumber}")
 
                 if actionNumber != -1 :
-                    self._send_actionNumber(actionNumber[-1])
+                    self._send_actionNumber(actionNumber[0])
 
             threading.Event().wait(5)  
 

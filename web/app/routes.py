@@ -145,9 +145,9 @@ def get_graph_obs_raw():
 
 @main.route('/get-graph-redundancy', methods=['GET'])
 def get_graph_redundancy():
-    list_of_obs = espT.slam_data._filter_obstacles(number_min_of_obstacle, in_radius)
-    x_obs = [coord[0] for coord in list_of_obs]
-    y_obs = [coord[1] for coord in list_of_obs]
+    #slist_of_obs = espT.slam_data._filter_obstacles(number_min_of_obstacle, in_radius)
+    x_obs = [coord[0] for coord in espT.slam_data.list_of_obs]
+    y_obs = [coord[1] for coord in espT.slam_data.list_of_obs]
     response_data = {
         'x_car': espT.slam_data.curr_x_car,
         'y_car': espT.slam_data.curr_y_car,
@@ -181,8 +181,9 @@ def get_graph_kmeans():
 @main.route('/get-graph-movement', methods=['POST'])
 def get_graph_movement():
         if 'togo' in request.form:
-            
-           
+            togo_coordinates = json.loads(request.form['togo'])
+            print(f"togo fro web:{togo_coordinates}")
+            espT.path_finder.setTarget_xy_in_website( togo_coordinates)
             espT.map_all()
             
         x_route = [coord[0] for coord in espT.path_finder.path]

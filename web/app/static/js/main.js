@@ -30,6 +30,7 @@ $(document).ready(function() {
   initGraphRedundancy();
   initGraphNoise();
   initKmeanGraph();
+  initKmeanSlider();
   initDistance();
   initMouvement();
 });
@@ -283,6 +284,7 @@ function initGraphRedundancy() {
 
       success: function(response) {
         var eventData = JSON.parse(response.data);
+        console.log(eventData)
         
         var x_car = eventData.x_car;
         var y_car = eventData.y_car;
