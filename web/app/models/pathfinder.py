@@ -6,6 +6,8 @@ import numpy as np
 class PathFinder:
     def __init__(self, obs, cell_dim = 10, grid_rad = 100):
 
+        self.togo_position = (10,10)
+
         # "Radius" of the square grid cm
         self.cell_dim = cell_dim
         self.obs = obs
@@ -41,14 +43,14 @@ class PathFinder:
 
             # Increment the value of the corresponding grid cell, ensure that its valid too
             if 0 <= grid_x < 2*grid_rad / self.cell_dim and 0 <= grid_y < 2*grid_rad / self.cell_dim:
-                self.grid[grid_y, grid_x] += 1
+                self.grid[grid_x, grid_y] += 1
 
         self.grid = np.where(self.grid < sensitivity, 0, 1)
 
         return self.grid
    
 
-    def dijkstra_shortest_path(self, current_position, togo_position):
+    def dijkstra_shortest_path(self, current_position):
         """
         Dijkstra algorithm that searches for the optimal path while avoiding turns at any cost.
 
@@ -58,6 +60,9 @@ class PathFinder:
         Returns:
             paths (array): a list of cell indices representing the optimal path
         """
+        print(f"Car Position : {current_position}")
+        print(f"Togo Position : {self.togo_position}")
+
 
         rows = len(self.grid)
         cols = len(self.grid[0])
@@ -73,17 +78,19 @@ class PathFinder:
         previous = {}
 
         # Define possible directions: up, down, left, right
-        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        directions = [(1, 0), (-1, 0), (0, -1), (0, 1)]
 
         while queue:
             current_dist, current_pos = heapq.heappop(queue)
 
             # Check if the current position is the destination
-            if current_pos == togo_position:
-                self.path = []
+            if current_pos == self.togo_position:
+                self.path = [self.get_in_array_coords(current_pos)]
                 while current_pos in previous:
-                    self.path.append(previous[current_pos])
+                    self.path.append(self.get_in_array_coords(previous[current_pos]))
                     current_pos = previous[current_pos]
+
+                self.path.reverse()
                 return self.path.copy()
 
             x, y = current_pos
@@ -114,14 +121,13 @@ class PathFinder:
                         if (dx == prev_dx or dy == prev_dy):
                             direction_cost = 0 
                         else:
-                            direction_cost = 1000000000000000
+                            direction_cost = 0
                            
 
-                        # Calculate the Manhattan distance between positions
-                        distance = abs(new_x - togo_position[0]) + abs(new_y - togo_position[1])
+                     
 
                         # Update the distance if it's shorter than the previously recorded distance
-                        new_dist = current_dist + 1 + direction_cost + distance
+                        new_dist = current_dist + 1 + direction_cost
                         if new_pos not in distances or new_dist < distances[new_pos]:
                             distances[new_pos] = new_dist
                             previous[new_pos] = current_pos
@@ -174,7 +180,10 @@ class PathFinder:
                     action.append(4)
                     current_orr = current_orr - 90
         return action
+    
 ######## TRANSFORMATION #############
+
+
 
     def car_to_grid(self, point_car):
         """
@@ -187,10 +196,13 @@ class PathFinder:
             y: coordinate y in the grid
         """
         x = point_car[0] + (len(self.grid[0])*self.cell_dim)/2
-        y = point_car[1] + (len(self.grid[0])*self.cell_dim)/2
+        y = point_car[1] + (len(self.grid[1])*self.cell_dim)/2
 
         x = math.floor(x/self.cell_dim)
         y = math.floor(y/self.cell_dim)
+
+        x = len(self.grid) + (-x - 1) 
+
         return x,y
     
     def get_in_grid_coords(self, point_grid):
@@ -202,9 +214,33 @@ class PathFinder:
         Returns:
             grid_value: the content at the position of the grid 
         """
-        x = -point_grid[0] - 1
-        y = point_grid[1]
-        return self.grid[x][y]
+        x = len(self.grid) + (-point_grid[1] - 1) 
+        y = point_grid[0]
+        return x,y
+    
+    
+    def get_in_array_coords(self, point_array):
+        """
+        Gets the content of the grid at (x, y) based on array coordinates, where [0, 0] is the top left.
+
+        Arguments:
+            point_array: coordinates of the grid in array format as (x, y)
+        Returns:
+            grid_value: the content at the position of the grid
+        """
+        x = point_array[1]
+        y = len(self.grid) -point_array[0] - 1
+        return x, y
+    
+    def convert_path_to_array_coords(self):
+        """
+        Converts the coordinates in self.path from grid coordinates to array coordinates.
+        """
+        array_path = []
+        for point_grid in self.path:
+            point_array = self.get_in_array_coords(point_grid)
+            array_path.append(point_array)
+        self.path = array_path
     
     def generate_list_of_obstacles_for_website(self): 
         if len(self.grid) != 0: 
@@ -215,7 +251,7 @@ class PathFinder:
     def find_positive_coordinates(self, grid):
         grid = np.array(grid)
         coordinates = np.argwhere(grid == 1)
-        return [(x, y) for x, y in coordinates]
+        return [self.get_in_array_coords((int(x), int(y))) for x, y in coordinates]
     
     def generateGrid(self, obs):
         """
@@ -247,4 +283,8 @@ class PathFinder:
         self.grid = np.where(self.grid < sensitivity, 0, 1)
 
         return self.grid
+    
+    def setTarget_xy_in_website(self, coordinates):
+        self.togo_position = self.get_in_grid_coords((coordinates[0],coordinates[1]))
+        print(f"Website coord : {coordinates} ")
  

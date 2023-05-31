@@ -145,29 +145,24 @@ def get_graph_kmeans():
 
 @main.route('/get-graph-movement', methods=['POST'])
 def get_graph_movement():
-
-    if espT.connected:
         if 'togo' in request.form:
-            togo = json.loads(request.form['togo'])
-            togo_coordinates = togo
-            print(f"togo coordinates :{togo_coordinates}")
-            espT.path_finder.dijkstra_shortest_path((espT.slam_data.curr_x_car,espT.slam_data.curr_y_car), togo_coordinates)
+            togo_coordinates = json.loads(request.form['togo'])
+            print(f"togo fro web:{togo_coordinates}")
+            espT.path_finder.setTarget_xy_in_website( togo_coordinates)
+            espT.map_all()
             
         x_route = [coord[0] for coord in espT.path_finder.path]
         y_route = [coord[1] for coord in espT.path_finder.path]
 
+
         response_data = {   
-        'gridData': espT.path_finder.list_of_obstacles_in_grid,  
+        'gridData': espT.path_finder.generate_list_of_obstacles_for_website(),  
         'pathX': x_route,
         'pathY': y_route
         }
-        print(f"obs :{espT.path_finder.list_of_obstacles_in_grid}")
-        print(f"path x :{x_route}")
-        print(f"path y :{y_route}")
+
         return jsonify(data=json.dumps(response_data))
-    
-    return jsonify(data=json.dumps())
-    
+        
 ############ SETTING API ############
 @main.route('/update_kmean_slider', methods=['POST'])
 def update_kmean_slider():

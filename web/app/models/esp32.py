@@ -42,6 +42,10 @@ class ESP32Connection:
         self.slam_data = SlamData()
         self.path_finder = PathFinder([])
         self.action_instruction_list = []
+
+        pathLoop = threading.Thread(target=self._sendPath_Instruction)
+
+        pathLoop.start()
         
 
     
@@ -139,7 +143,7 @@ class ESP32Connection:
 
             # wait for a client to connect
             self.recv_socket, client_address = recv_socket.accept()
-
+            #print(f"client address :{client_address}")
             timeOfRep = round( time.time() - self.time, 2)
             self.info.append((timeOfRep, 'Recv established successfully by', client_address))   
 
@@ -254,11 +258,10 @@ class ESP32Connection:
 ############ PATH FINDING ############
     def _sendPath_Instruction(self):
         while self.running:
-            if self.connected :
-                point_car = (self.slam_data.curr_x_car, self.slam_data.curr_y_car)
-                self.path_finder.generateGrid(self.slam_data.list_of_obs)
-                actionNumber = self.path_finder.path_to_actionNumber(int(self.slam_data.perfect_orientation))
+            if  self.connected :
+                actionNumber = self.map_all()
                 print(f"actionNumber : {actionNumber}")
+                self._send_actionNumber(actionNumber[0])
 
                 if actionNumber != -2 :
                     ...
@@ -276,4 +279,11 @@ class ESP32Connection:
             return False
         err = self.send_socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
         return err == 0
+    
+    def map_all(self) :
+            point_car = self.path_finder.car_to_grid((self.slam_data.curr_x_car, self.slam_data.curr_y_car))
+            self.path_finder.generateGrid(self.slam_data.list_of_obs)
+            self.path_finder.dijkstra_shortest_path(point_car)
+            actionNumber = self.path_finder.path_to_actionNumber(int(self.slam_data.perfect_orientation))
+            return actionNumber
     

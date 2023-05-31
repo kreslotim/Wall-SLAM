@@ -2,15 +2,18 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 from pathfinder import PathFinder
 
-obs = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (2, 0), (1, 0), (2,3), (0,0)]  # Example obstacle coordinates
+obs = [[0,0],[0,0],[0,0]]  # Example obstacle coordinates
 grid_rad = 100  # Example grid radius
 
 path_finder = PathFinder(obs, cell_dim=10, grid_rad=grid_rad)
 
-current_position = (0, 0)  # Example current position
-togo_position = (15, 10)  # Example target position
+current_position = (10,10)  # Example current position
+print(f"c : {path_finder.car_to_grid(current_position)}")
 
-path = path_finder.dijkstra_shortest_path(current_position, togo_position)
+path_finder.setTarget_xy_in_website((5,5))  # Example target position
+print(path_finder.togo_position)
+
+path = path_finder.dijkstra_shortest_path(path_finder.car_to_grid(current_position))
 print("Shortest Path:", path)
 
 action_numbers = path_finder.path_to_actionNumber(current_orr=0)
@@ -20,7 +23,6 @@ obstacles_for_website = path_finder.generate_list_of_obstacles_for_website()
 print("Obstacles for Website:", obstacles_for_website)
 
 # Plotting the grid with obstacles
-plt.imshow(path_finder.grid, cmap='binary', origin='lower')
 
 # Plotting the obstacles
 if obstacles_for_website:
