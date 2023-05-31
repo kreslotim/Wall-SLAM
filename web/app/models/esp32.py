@@ -3,9 +3,10 @@ import time
 import struct
 import threading
 from app.models.slamData import SlamData
-from app.models.pathFindingAlgo import PathFinder
 import pywifi
 import time
+from app.models.pathfinder import PathFinder
+
 
 
 class ESP32Connection:
@@ -45,7 +46,7 @@ class ESP32Connection:
 
         # Data variable
         self.slam_data = SlamData()
-        self.path_finder = PathFinder()
+        self.path_finder = PathFinder([])
         self.action_instruction_list = []
         self.ssid = "espWifi2"
         self.password = "0123456789A"
@@ -303,8 +304,7 @@ class ESP32Connection:
         while self.running:
             if self.connected :
                 point_car = (self.slam_data.curr_x_car, self.slam_data.curr_y_car)
-                
-                # Calculate the best path and send the instructions
+                self.path_finder.generateGrid(self.slam_data.list_of_obs)
                 actionNumber = self.path_finder.path_to_actionNumber(int(self.slam_data.perfect_orientation))
                 print(f"actionNumber : {actionNumber}")
 

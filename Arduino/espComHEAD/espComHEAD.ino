@@ -1,42 +1,46 @@
 #include <WiFi.h>
 #include <WebServer.h>
-#include <ArduinoJson.h>
 #include <NewPing.h>
 #include <ESP32Servo.h>
 #include "Adafruit_VL53L1X.h"
 #include <Adafruit_FXAS21002C.h>
 #include <Adafruit_FXOS8700.h>
 #include <Adafruit_Sensor.h>
+#include <Adafruit_Sensor_Calibration.h>
+#include <Adafruit_AHRS.h>
 #include <Wire.h>
 #include <AccelStepper.h>
 #include <WiFiUdp.h>
-
+// Create instance of IMU Sensor
+Adafruit_Sensor *accelerometer, *gyroscope, *magnetometer;
+#include "NXP_FXOS_FXAS.h"  // NXP 9-DoF breakout
 
 TaskHandle_t Task1;
 
 sensors_event_t event;
 sensors_event_t aevent, mevent;
+float heading;
+float prevYaw = 0;
+float yaw;
+
+float gyroZ;
+float orientationMag = 0;
+
 int distanceSonarFront = 0;
 int16_t lidarDistanceFront;
 int16_t lidarDistanceBack;
-const short POINTS_PER_PACKET = 20;
-short point = 0;
-float dataSend[12 * POINTS_PER_PACKET];
+float dataSend[12];
 int servoAngle=1;
 int numberOfConnectionOld = 0;
 float actionNumber = 0;
-float orientation = 0;
 int goToOrientation = 0;
-
 float curr_x = 0;
 float curr_y = 0;
-
-float prev_x = 0;
-float prev_y = 0;
-
 unsigned long startTime; // Variable to store the start time
 unsigned long elapsedTime;
+uint32_t timestamp;
 int direction = 1;
+
 
 const float ACCELERATION_STEPPER = 250.0;
 const float MAX_SPEED_STEPPER = 2000;
@@ -44,12 +48,10 @@ const float CONST_SPEED_STEPPER = 500;
 const int STEPS_PER_REV = 2038;
 const int STEPS_90_DEG = 1740;
 const int16_t MIN_LIDAR_DISTANCE = 150;  // in mm
-const int16_t MIN_SONAR_DISTANCE = 40;  // in mm (in cm but we x10 the distance)
+const int16_t MIN_SONAR_DISTANCE = 15;  // in cm
 const int SERVO_INIT_POS = 84;
 const int MAX_DISTANCE_SONAR = 400;
 const float DIST_PER_STEP = 0.06;  // in mm per step
-
-const float STM_Err = 0.0000612825;
 
 
 #define FULLSTEP 4
@@ -82,8 +84,24 @@ const float STM_Err = 0.0000612825;
 #define R_IN3 18
 #define R_IN4 19
 
+// IMU Settings
+#if defined(ADAFRUIT_SENSOR_CALIBRATION_USE_EEPROM)
+  Adafruit_Sensor_Calibration_EEPROM cal;
+#else
+  Adafruit_Sensor_Calibration_SDFat cal;
+#endif
+
+#define FILTER_UPDATE_RATE_HZ 100
+#define PRINT_EVERY_N_UPDATES 10
+//#define AHRS_DEBUG_OUTPUT
+
 // Create instance of Servo
 Servo servo;
+
+// pick your filter! slower == better quality output
+//Adafruit_NXPSensorFusion filter; // slowest
+Adafruit_Madgwick filter;  // faster than NXP
+//Adafruit_Mahony filter;  // fastest/smalleset
 
 // Create instance of Lidar
 Adafruit_VL53L1X vl53Front = Adafruit_VL53L1X(XSHUT_PIN, IRQ_PIN);
@@ -147,6 +165,9 @@ void setup() {
 
   // Setup Front/Back lidars and IMU
   setupLidarsAndIMU();
+
+  // Setup IMU Fusion algorithm
+  setupIMUFusion();
 
   // Motors Setup
   stepperLeft.setMaxSpeed(MAX_SPEED_STEPPER);
@@ -224,18 +245,102 @@ void setupLidarsAndIMU() {
   Serial.println(vl53Front.getTimingBudget());
 }
 
+void setupIMUFusion() {
+  while (!Serial) yield();
+
+  //if (!cal.begin()) {
+  //  Serial.println("Failed to initialize calibration helper");
+  //} else if (! cal.loadCalibration()) {
+  //  Serial.println("No calibration loaded/found");
+  //}
+
+  if (!init_sensors()) {
+    Serial.println("Failed to find sensors");
+    while (1) delay(10);
+  }
+
+  setup_sensors();
+  filter.begin(FILTER_UPDATE_RATE_HZ);
+  timestamp = millis();
+
+  Wire.setClock(400000); // 400KHz
+}
+
+void getHeading() {
+  
+  float gx, gy, gz;
+  static uint8_t counter = 0;
+
+  if ((millis() - timestamp) < (1000 / FILTER_UPDATE_RATE_HZ)) {
+    return;
+  }
+  timestamp = millis();
+  // Read the motion sensors
+  sensors_event_t accel, gyro, mag;
+  accelerometer->getEvent(&accel);
+  gyroscope->getEvent(&gyro);
+  magnetometer->getEvent(&mag);
+#if defined(AHRS_DEBUG_OUTPUT)
+  Serial.print("I2C took "); Serial.print(millis()-timestamp); Serial.println(" ms");
+#endif
+
+  cal.calibrate(mag);
+  cal.calibrate(accel);
+  cal.calibrate(gyro);
+  // Gyroscope needs to be converted from Rad/s to Degree/s
+  // the rest are not unit-important
+  gx = gyro.gyro.x * SENSORS_RADS_TO_DPS;
+  gy = gyro.gyro.y * SENSORS_RADS_TO_DPS;
+  gz = gyro.gyro.z * SENSORS_RADS_TO_DPS;
+
+  gyroZ = gz;
+
+  // Update the SensorFusion filter
+  filter.update(gx, gy, gz, 
+                accel.acceleration.x, accel.acceleration.y, accel.acceleration.z, 
+                mag.magnetic.x, mag.magnetic.y, mag.magnetic.z);
+#if defined(AHRS_DEBUG_OUTPUT)
+  Serial.print("Update took "); Serial.print(millis()-timestamp); Serial.println(" ms");
+#endif
+
+  // only print the calculated output once in a while
+  if (counter++ <= PRINT_EVERY_N_UPDATES) {
+    return;
+  }
+  // reset the counter
+  counter = 0;
+
+#if defined(AHRS_DEBUG_OUTPUT)
+  Serial.print("Raw: ");
+  Serial.print(accel.acceleration.x, 4); Serial.print(", ");
+  Serial.print(accel.acceleration.y, 4); Serial.print(", ");
+  Serial.print(accel.acceleration.z, 4); Serial.print(", ");
+  Serial.print(gx, 4); Serial.print(", ");
+  Serial.print(gy, 4); Serial.print(", ");
+  Serial.print(gz, 4); Serial.print(", ");
+  Serial.print(mag.magnetic.x, 4); Serial.print(", ");
+  Serial.print(mag.magnetic.y, 4); Serial.print(", ");
+  Serial.print(mag.magnetic.z, 4); Serial.println("");
+#endif
+
+  // print the heading
+  heading = filter.getYaw();
+  //Serial.print("Orientation: ");
+  //Serial.println(heading);
+  
+#if defined(AHRS_DEBUG_OUTPUT)
+  Serial.print("Took "); Serial.print(millis()-timestamp); Serial.println(" ms");
+#endif
+}
+
 
 void readLidar() {
   if (vl53Front.dataReady()) {
     lidarDistanceFront = vl53Front.distance();
-  } else {
-    lidarDistanceFront = -1;
   }
 
   if (vl53Back.dataReady()) {
     lidarDistanceBack = vl53Back.distance();
-  } else {
-    lidarDistanceBack = -1;
   }
 }
 
@@ -265,6 +370,8 @@ void readData() {
 }
 
 void sendData() {
+  packData();
+
   if (!sendClient.connected()){
     if(sendClient.connect(user_IP, SEND_DATA_PORT)) {
       Serial.println("Connected to server");
@@ -275,65 +382,72 @@ void sendData() {
     sendClient.flush();
     sendClient.write((byte*)dataSend, sizeof(dataSend));
     Serial.println("Data Sent");
-    point = 0;
-  }
-}
-
-void handleOutgoingData(){
-  if(point != POINTS_PER_PACKET){
-    packData();
-    return;
-  }else{
-    sendData();
   }
 }
 
 void updateSensors() {
+
+  //Update Timer
+  elapsedTime = (float)(millis() - startTime);
+
   // Ultrasonic Update
-  distanceSonarFront = frontUltrasonic.ping_cm() * 10;
+  distanceSonarFront = frontUltrasonic.ping_cm();
 
   // Lidar Update
   rotateServo();
   readLidar();
+
+  getHeading();
 
   // IMU Update
   gyro.getEvent(&event);
   accelmag.getEvent(&aevent, &mevent);
 
   // Orientation Update
-  orientation = atan2(mevent.magnetic.y, mevent.magnetic.x) * 180 / PI;
+  orientationMag = atan2(-mevent.magnetic.y, mevent.magnetic.x) * 180 / PI;
+  
+  unsigned long currentTimestamp = millis();
+  float deltaTime = (currentTimestamp - prevTimestamp) / 1000.0; // Convert milliseconds to seconds
+  prevTimestamp = currentTimestamp;
 
-  //Update Timer
-  elapsedTime = (float)(millis() - startTime);
-}
+  // Update the yaw
+  yaw += (gyroZ * 180/PI) * deltaTime;
 
-void updatePosition(){
-  float distance =  0.001* STM_Err * stepperRight.currentPosition();
-  float rad_orient = PI * 0.00555555555 * orientation;
-  curr_x = prev_x + cos(rad_orient) * distance;
-  curr_y = prev_y + sin(rad_orient) * distance;
+  // Keep yaw within the range of 0 to 360 degrees
+  if (yaw < 0) {
+    yaw += 360;
+  } else if (yaw >= 360) {
+    yaw -= 360;
+  }
+
+  
 }
 
 void packData() {
   updateSensors();
-  updatePosition();
+  dataSend[0] = servo.read();
+  dataSend[1] = distanceSonarFront;
+  dataSend[2] = lidarDistanceFront;
+  dataSend[3] = lidarDistanceBack;
+  dataSend[4] = servo.read() + goToOrientation;
+  dataSend[5] = curr_x;
+  dataSend[6] = curr_y;
+  dataSend[7] = elapsedTime;
+  dataSend[8] = orientationMag; // Mag or
+  dataSend[9] = yaw;  // Gyro Or
+  dataSend[10] = heading;
+  dataSend[11] = mevent.magnetic.y;
+  Serial.print("Orientation :");
+  Serial.print(goToOrientation);
 
-  short pos = point * 12;
+  Serial.print( "Curr_X : ");
+  Serial.print(curr_x);
+  Serial.print("Curr_Y:" );
+  Serial.println(curr_y);
 
-  dataSend[pos + 0] = servo.read();
-  dataSend[pos + 1] = distanceSonarFront;
-  dataSend[pos + 2] = lidarDistanceFront;
-  dataSend[pos + 3] = lidarDistanceBack;
-  dataSend[pos + 4] = servo.read() + goToOrientation;
-  dataSend[pos + 5] = x;
-  dataSend[pos + 6] = y;
-  dataSend[pos + 7] = elapsedTime;
-  dataSend[pos + 8] = aevent.acceleration.y;
-  dataSend[pos + 9] = aevent.acceleration.z;
-  dataSend[pos + 10] = mevent.magnetic.x;
-  dataSend[pos + 11] = mevent.magnetic.y;
 
-  point++;
+
+
 }
 
 void rotateServo() {
@@ -344,11 +458,6 @@ void rotateServo() {
 }
 
 void action(float actionNumber) {
-
-  if (distanceSonarFront < MIN_SONAR_DISTANCE && actionNumber == 1) {
-    stopMotors();
-  }
-
   switch ((int)actionNumber) {
     case -1:
       dumbMapping();
@@ -366,10 +475,13 @@ void action(float actionNumber) {
 
     case 3:
       moveRight();
+      actionNumber = 0;
       break;
 
     case 4:
       moveLeft();
+      actionNumber = 0;
+
       break;
 
     default:
@@ -432,14 +544,11 @@ void moveRight() {
   stepperRight.setCurrentPosition(0);
   stepperLeft.move(-STEPS_90_DEG);  // turn right 90 degrees
   stepperRight.move(-STEPS_90_DEG);
-  prev_x = curr_x;
-  prev_y = curr_y;
   while (stepperLeft.distanceToGo() != 0 || stepperRight.distanceToGo() != 0) {
     stepperLeft.run();
     stepperRight.run();
   }
-  stepperRight.setCurrentPosition(0);
-  actionNumber = 0;
+  
 }
 
 void moveLeft() {
@@ -449,14 +558,10 @@ void moveLeft() {
   stepperRight.setCurrentPosition(0);
   stepperLeft.move(STEPS_90_DEG);  // turn right 90 degrees
   stepperRight.move(STEPS_90_DEG);
-  prev_x = curr_x;
-  prev_y = curr_y;
   while (stepperLeft.distanceToGo() != 0 || stepperRight.distanceToGo() != 0) {
     stepperLeft.run();
     stepperRight.run();
   }
-  stepperRight.setCurrentPosition(0);
-  actionNumber = 0;
 }
 
 
@@ -468,7 +573,7 @@ void Task1code(void* pvParameters) {
 
 void loop() {
   if(WiFi.softAPgetStationNum() == 1){
-    handleOutgoingData();
+    sendData();
     readData();
     delay(10);
   } 

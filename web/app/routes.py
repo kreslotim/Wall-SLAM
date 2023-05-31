@@ -140,8 +140,8 @@ def get_graph_obs_raw():
 @main.route('/get-graph-redundancy', methods=['GET'])
 def get_graph_redundancy():
     list_of_obs = espT.slam_data._filter_obstacles(number_min_of_obstacle, in_radius)
-    x_obs, y_obs = zip(*list_of_obs)
-   
+    x_obs = [coord[0] for coord in list_of_obs]
+    y_obs = [coord[1] for coord in list_of_obs]
     response_data = {
         'x_car': espT.slam_data.curr_x_car,
         'y_car': espT.slam_data.curr_y_car,
@@ -160,6 +160,27 @@ def get_graph_kmeans():
 
 @main.route('/get-graph-movement', methods=['POST'])
 def get_graph_movement():
+
+    if espT.connected:
+        if 'togo' in request.form:
+            togo = json.loads(request.form['togo'])
+            togo_coordinates = togo
+            print(f"togo coordinates :{togo_coordinates}")
+            espT.path_finder.dijkstra_shortest_path((espT.slam_data.curr_x_car,espT.slam_data.curr_y_car), togo_coordinates)
+            
+        x_route = [coord[0] for coord in espT.path_finder.path]
+        y_route = [coord[1] for coord in espT.path_finder.path]
+
+        response_data = {   
+        'gridData': espT.path_finder.list_of_obstacles_in_grid,  
+        'pathX': x_route,
+        'pathY': y_route
+        }
+        print(f"obs :{espT.path_finder.list_of_obstacles_in_grid}")
+        print(f"path x :{x_route}")
+        print(f"path y :{y_route}")
+        return jsonify(data=json.dumps(response_data))
+    
 
     return jsonify(data=json.dumps())
     
