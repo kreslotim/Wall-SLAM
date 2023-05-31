@@ -9,7 +9,7 @@
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 #include <AccelStepper.h>
-#include <WiFiUdp.h>                        
+#include <WiFiUdp.h>
 
 
 TaskHandle_t Task1;
@@ -37,7 +37,7 @@ const float CONST_SPEED_STEPPER = 500;
 const int STEPS_PER_REV = 2038;
 const int STEPS_90_DEG = 1740;
 const int16_t MIN_LIDAR_DISTANCE = 150;  // in mm
-const int16_t MIN_SONAR_DISTANCE = 15;  // in cm
+const int16_t MIN_SONAR_DISTANCE = 40;  // in mm (in cm but we x10 the distance)
 const int SERVO_INIT_POS = 84;
 const int MAX_DISTANCE_SONAR = 400;
 const float DIST_PER_STEP = 0.06;  // in mm per step
@@ -219,10 +219,14 @@ void setupLidarsAndIMU() {
 void readLidar() {
   if (vl53Front.dataReady()) {
     lidarDistanceFront = vl53Front.distance();
+  } else {
+    lidarDistanceFront = -1;
   }
 
   if (vl53Back.dataReady()) {
     lidarDistanceBack = vl53Back.distance();
+  } else {
+    lidarDistanceBack = -1;
   }
 }
 
@@ -269,7 +273,7 @@ void sendData() {
 
 void updateSensors() {
   // Ultrasonic Update
-  distanceSonarFront = frontUltrasonic.ping_cm();
+  distanceSonarFront = frontUltrasonic.ping_cm() * 10;
 
   // Lidar Update
   rotateServo();
@@ -296,7 +300,7 @@ void packData() {
   dataSend[5] = curr_x;
   dataSend[6] = curr_y;
   dataSend[7] = elapsedTime;
-  dataSend[8] = aevent.acceleration.y;
+  dataSend[8] = goToOrientation;
   dataSend[9] = aevent.acceleration.z;
   dataSend[10] = mevent.magnetic.x;
   dataSend[11] = mevent.magnetic.y;
@@ -307,10 +311,6 @@ void packData() {
   Serial.print(curr_x);
   Serial.print("Curr_Y:" );
   Serial.println(curr_y);
-
-
-
-
 }
 
 void rotateServo() {
@@ -321,6 +321,11 @@ void rotateServo() {
 }
 
 void action(float actionNumber) {
+
+  if (distanceSonarFront < MIN_SONAR_DISTANCE && actionNumber == 1) {
+    stopMotors();
+  }
+
   switch ((int)actionNumber) {
     case -1:
       dumbMapping();
@@ -338,13 +343,10 @@ void action(float actionNumber) {
 
     case 3:
       moveRight();
-      actionNumber = 0;
       break;
 
     case 4:
       moveLeft();
-      actionNumber = 0;
-
       break;
 
     default:
@@ -411,7 +413,7 @@ void moveRight() {
     stepperLeft.run();
     stepperRight.run();
   }
-  
+  actionNumber = 0;
 }
 
 void moveLeft() {
@@ -425,6 +427,7 @@ void moveLeft() {
     stepperLeft.run();
     stepperRight.run();
   }
+  actionNumber = 0;
 }
 
 
