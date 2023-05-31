@@ -51,20 +51,20 @@ class PathFinder:
 
     def dijkstra_shortest_path(self, current_position, togo_position):
         """
-        Dijkstra algorithm that search for the optimal path
-        
-        Arguments: 
-            current_position : the current cell the robot occupy
-            togo_position : the cell that we wish to travel to
+        Dijkstra algorithm that searches for the optimal path while avoiding turns at any cost.
+
+        Arguments:
+            current_position: the current cell the robot occupies
+            togo_position: the cell that we wish to travel to
         Returns:
-            paths (array): a list of index of cell to travel to that is optimal
+            paths (array): a list of cell indices representing the optimal path
         """
 
         rows = len(self.grid)
         cols = len(self.grid[0])
 
         # Create a priority queue for Dijkstra's algorithm
-        queue = [(0, (current_position))]
+        queue = [(0, current_position)]
         heapq.heapify(queue)
 
         # Create a dictionary to track distances from the starting position
@@ -83,11 +83,15 @@ class PathFinder:
             if current_pos == togo_position:
                 self.path = []
                 while current_pos in previous:
-                    self.path.append( previous[current_pos])
+                    self.path.append(previous[current_pos])
                     current_pos = previous[current_pos]
                 return self.path.copy()
 
             x, y = current_pos
+
+            # Get the previous position
+            prev_pos = previous.get(current_pos)
+            print(f" prev : {prev_pos} current : {current_pos}")
 
             # Explore all possible directions
             for i in range(4):
@@ -98,18 +102,30 @@ class PathFinder:
                 # Check if the new position is within the grid boundaries
                 if 0 <= new_x < rows and 0 <= new_y < cols:
                     new_pos = (new_x, new_y)
-                       # Calculate the cost based on movement direction
-                    if dx != 0 and dy != 0:
-                        # Diagonal movement (turn)
-                        cost = 10000  # Higher cost for turns
-                    else:
-                        # Straight movement
-                        cost = 1
-                    # Calculate the new distance from the starting position
-                    new_dist = current_dist + cost
+                    
                     if self.grid[new_x][new_y]==0:
+                        # Calculate the cost for changing directions
+                        if prev_pos is None :
+                            # Current Orrientation, todo get it.
+                            prev_dx = 0
+                            prev_dy = 1
+                        else : 
+                           
+                            prev_dx = x-prev_pos[0]
+                            prev_dy = y-prev_pos[1]
+                        if (dx == prev_dx or dy == prev_dy):
+                            direction_cost = 0 
+                            print("same deplacement !")
+                        else:
+                            direction_cost = 1000000000000000
+                            print("uhhh")
+                           
+
+                        # Calculate the Manhattan distance between positions
+                        distance = abs(new_x - togo_position[0]) + abs(new_y - togo_position[1])
 
                         # Update the distance if it's shorter than the previously recorded distance
+                        new_dist = current_dist + 1 + direction_cost + distance
                         if new_pos not in distances or new_dist < distances[new_pos]:
                             distances[new_pos] = new_dist
                             previous[new_pos] = current_pos
@@ -117,7 +133,6 @@ class PathFinder:
 
         # If there is no path to the destination
         return [-1]
-
 
     def path_to_actionNumber(self, current_orr=180):
         """
