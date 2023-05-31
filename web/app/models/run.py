@@ -1,35 +1,66 @@
 import pywifi
 import time
+obs = [[10,0],[0,10],[-10,0]]  # Example obstacle coordinates
+grid_rad = 100  # Example grid radius
 
-def connect_to_wifi(ssid, password):
-    wifi = pywifi.PyWiFi()  # Create a PyWiFi object
-    iface = wifi.interfaces()[0]  # Get the first available network interface
 
     iface.disconnect()  # Disconnect from any existing Wi-Fi connection
     time.sleep(1)
 
-    profile = pywifi.Profile()  # Create a new Wi-Fi profile
-    profile.ssid = ssid  # Set the SSID (Wi-Fi network name)
-    profile.auth = pywifi.const.AUTH_ALG_OPEN  # Set the authentication algorithm
 
-    # Set the encryption type and password (comment out if the network is not password-protected)
-    profile.akm.append(pywifi.const.AKM_TYPE_WPA2PSK)
-    profile.cipher = pywifi.const.CIPHER_TYPE_CCMP
-    profile.key = password
+current_position = (0,0)  # Example current position
 
-    iface.remove_all_network_profiles()  # Remove all existing profiles
-    temp_profile = iface.add_network_profile(profile)  # Add the new profile
+path_finder.setTarget_xy_in_website((0,0))  # Example target position
 
-    iface.connect(temp_profile)  # Connect to the network
-    time.sleep(5)  # Wait for the connection to establish
+path = path_finder.dijkstra_shortest_path(path_finder.car_to_grid(current_position)).copy()
 
-    if iface.status() == pywifi.const.IFACE_CONNECTED:  # Check if connection is successful
-        print("Connected to Wi-Fi!")
-        return True
-    else:
-        return False
 
-# Usage
-ssid = "espWifi2"
-password = "0123456789A"
-connect_to_wifi(ssid, password)
+action_numbers = path_finder.path_to_actionNumber(current_orr=0)
+#print("Action Numbers:", action_numbers)
+
+obstacles_for_website = path_finder.generate_list_of_obstacles_for_website()
+print(f"########")
+
+for s in obs:
+    print(path_finder.car_to_grid(s))
+print(f"Car position in car : {current_position}")
+print(f"Car position in grid : {path_finder.car_to_grid(current_position)}")
+print(f"Togo in grid : {path_finder.togo_position}")
+
+
+print("########")
+for s in obs:
+    print(path_finder.get_in_grid_coords(path_finder.car_to_grid(s)))
+print(f"Car position in web : {path_finder.get_in_grid_coords(path_finder.car_to_grid(current_position))}")
+
+
+
+
+print(f"Togo in grid : {path_finder.togo_position}")
+print("Shortest Path:", path)
+print("Obstacles for Website:", obstacles_for_website)
+
+for this in path :
+    if this != -1:
+        print(path_finder.get_in_grid_coords(this))
+# Plotting the grid with obstacles
+
+# Plotting the obstacles
+if obstacles_for_website:
+    obstacles_x = [coord[0] for coord in obstacles_for_website]
+    obstacles_y = [coord[1] for coord in obstacles_for_website]
+    plt.scatter(obstacles_y, obstacles_x, color='blue', marker='s', s=50)
+
+# Setting the grid and axes labels
+plt.grid(True)
+plt.xlabel('Grid Y')
+plt.ylabel('Grid X')
+
+# Display the path
+if path and path[0] != -1 :
+    path_x = [coord[1] for coord in path]  # Reversed indexing
+    path_y = [coord[0] for coord in path]  # Reversed indexing
+    plt.plot(path_y, path_x, color='red', linewidth=2)
+
+# Display the plot
+plt.show()

@@ -159,37 +159,44 @@ def get_graph_redundancy():
 @main.route('/get-graph-kmeans', methods=['GET'])
 def get_graph_kmeans():
     global cluster_chart, togo
-    mapJson, togo = cluster_chart.generate_chart_json(espT.slam_data.list_of_obs)
+    mapJson, togo, rectangle = cluster_chart.generate_chart_json(espT.slam_data.list_of_obs)
 
-    print(togo)
+  # Generate the list of occupied cells
+    cells = []
+    for rec in rectangle:
+        print(rec)
+        min_x_grid, min_y_grid =  espT.path_finder.car_to_grid((rec[0], rec[2]))
+        max_x_grid, max_y_grid =  espT.path_finder.car_to_grid((rec[1],rec[3]))
+        for x in range(min_x_grid,max_x_grid+ 1):
+            for y in range(min_y_grid, max_y_grid + 1):
+                cells.append((x, y))
+    
+        espT.path_finder.fill_grid(cells)
+        espT.path_finder.togo_position = espT.path_finder.car_to_grid(togo)
+    print("Data calculated")
+    print(espT.path_finder.togo_position)
+    print(cells)
     return jsonify(mapJson)
 
 @main.route('/get-graph-movement', methods=['POST'])
 def get_graph_movement():
-
-    if espT.connected:
         if 'togo' in request.form:
-            togo = json.loads(request.form['togo'])
-            togo_coordinates = togo
-            print(f"togo coordinates :{togo_coordinates}")
-            espT.path_finder.dijkstra_shortest_path((espT.slam_data.curr_x_car,espT.slam_data.curr_y_car), togo_coordinates)
+            
+           
+            espT.map_all()
             
         x_route = [coord[0] for coord in espT.path_finder.path]
         y_route = [coord[1] for coord in espT.path_finder.path]
 
+        print(espT.path_finder.generate_list_of_obstacles_for_website())
         response_data = {   
-        'gridData': espT.path_finder.list_of_obstacles_in_grid,  
+        'gridData': espT.path_finder.generate_list_of_obstacles_for_website(),  
         'pathX': x_route,
         'pathY': y_route
         }
-        print(f"obs :{espT.path_finder.list_of_obstacles_in_grid}")
-        print(f"path x :{x_route}")
-        print(f"path y :{y_route}")
-        return jsonify(data=json.dumps(response_data))
-    
 
-    return jsonify(data=json.dumps())
-    
+        return jsonify(data=json.dumps(response_data))
+
 ############ SETTING API ############
 @main.route('/update_kmean_slider', methods=['POST'])
 def update_kmean_slider():

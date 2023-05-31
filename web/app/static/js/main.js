@@ -99,6 +99,7 @@ function toggleUpdate(name, updateFunction) {
 }
 
 
+
 function initDistance(){
 
 
@@ -486,122 +487,127 @@ $.ajax({
 };
 
 function initMouvement(){
-toggleUpdate("movement",updateMap);
-// Generate an empty 20x20 grid
-var numRows = 20;
-var numCols = 20;
-var data = Array.from({ length: numRows }, () => Array(numCols).fill(null));
+  // Generate an empty 20x20 grid
+  var numRows = 20;
+  var numCols = 20;
+  var data = Array.from({ length: numRows }, () => Array(numCols).fill(null));
 
 
-data[2][2] = 0; // Assign a value to represent the grayed-out cell
-data[3][2] = 0; // Assign a value to represent the grayed-out cell
-data[2][3] = 0; // Assign a value to represent the grayed-out cell
-data[3][3] = 0; // Assign a value to represent the grayed-out cell
+  data[2][2] = 0; // Assign a value to represent the grayed-out cell
+  data[3][2] = 0; // Assign a value to represent the grayed-out cell
+  data[2][3] = 0; // Assign a value to represent the grayed-out cell
+  data[3][3] = 0; // Assign a value to represent the grayed-out cell
 
-// Define the path coordinates
-var pathCoordinates = [
-  [0, 1], // Starting cell at row 0, column 1
-  [1, 1],  // Ending cell at row 1, column 1
-  [1, 2],  // Ending cell at row 1, column 1
-  [1, 3],  // Ending cell at row 1, column 1
-  [1, 4],  // Ending cell at row 1, column 1
-];
+  // Define the path coordinates
+  var pathCoordinates = [
+    [0, 1], // Starting cell at row 0, column 1
+    [1, 1],  // Ending cell at row 1, column 1
+    [1, 2],  // Ending cell at row 1, column 1
+    [1, 3],  // Ending cell at row 1, column 1
+    [1, 4],  // Ending cell at row 1, column 1
+  ];
 
-// Create the trace for the grid
-var gridTrace = {
-  z: data,
-  type: 'heatmap',
-  colorscale: [[0, 'gray'], [1, 'white']],
-  showscale: false
-};
+  // Create the trace for the grid
+  var gridTrace = {
+    z: data,
+    type: 'heatmap',
+    colorscale: [[0, 'gray'], [1, 'white']],
+    showscale: false
+  };
 
-// Create the trace for the path
-var pathTrace = {
-  x: pathCoordinates.map(coord => coord[1]), // Column coordinates
-  y: pathCoordinates.map(coord => coord[0]), // Row coordinates
-  mode: 'lines',
-  line: {
-    color: 'red',
-    width: 3
-  }
-};
-// Create the trace for the markers
-var startTrace = {
-  x: [pathCoordinates[0][1]], // Column coordinates of markers
-  y: [pathCoordinates[0][0]], // Row coordinates of markers
-  mode: 'markers',
-  marker: {
-    symbol: 'circle',
-    size: 10,
-    color: 'blue'
-  },
-  name: 'robot'
-};
-var endTrace = {
-  x: [pathCoordinates.at(-1)[1]], // Column coordinates of markers
-  y: [pathCoordinates.at(-1)[0]], // Row coordinates of markers
-  mode: 'markers',
-  marker: {
-    symbol: 'circle',
-    size: 10,
-    color: 'orange'
-  },
-  name: 'toGo'
-};
-// Define the data array with both traces
-var allData = [gridTrace, pathTrace,startTrace,endTrace];
+  // Create the trace for the path
+  var pathTrace = {
+    x: pathCoordinates.map(coord => coord[1]), // Column coordinates
+    y: pathCoordinates.map(coord => coord[0]), // Row coordinates
+    mode: 'lines',
+    line: {
+      color: 'red',
+      width: 3
+    }
+  };
 
-// Define the layout
-var layout = {
-  xaxis: { title: 'X' },
-  yaxis: { title: 'Y' },
-  margin: {
-    t: 10, // Top margin
-    l: 40, // Left margin
-    r: 20, // Right margin
-    b: 40  // Bottom margin
-  },
-};
+  // Create the trace for the markers
+  var startTrace = {
+    x: [pathCoordinates[0][1]], // Column coordinates of markers
+    y: [pathCoordinates[0][0]], // Row coordinates of markers
+    mode: 'markers',
+    marker: {
+      symbol: 'circle',
+      size: 10,
+      color: 'blue'
+    },
+    name: 'robot'
+  };
 
-// Create the plot
-Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
+  var endTrace = {
+    x: [pathCoordinates.at(-1)[1]], // Column coordinates of markers
+    y: [pathCoordinates.at(-1)[0]], // Row coordinates of markers
+    mode: 'markers',
+    marker: {
+      symbol: 'circle',
+      size: 10,
+      color: 'orange'
+    },
+    name: 'toGo'
+  };
+  // Define the data array with both traces
+  var allData = [gridTrace, pathTrace,startTrace,endTrace];
 
-/*
-  // Function to update the new trace data
-  function updatePath() {
-    $.ajax({
-      url: '/get_new_trace_data',
-      type: 'GET',
-      success: function(data) {
-        // TODO add a new trace, a single point from data.robot. 
-        var newPoints = data.points;
-        robot.x = [data.robot[0]];
-        robot.y = [data.robot[1]];
-        togo.x = [data.togo[0]];
-        togo.y = [data.togo[1]];
-        console.log(togo.x, togo.y)
-        path.x = newPoints.map(point => point[0]);
-        path.y = newPoints.map(point => point[1]);
-      
+  // Define the layout
+  var layout = {
+    xaxis: { title: 'Y' },
+    yaxis: { title: 'X' },
+    margin: {
+      t: 10, // Top margin
+      l: 40, // Left margin
+      r: 20, // Right margin
+      b: 40  // Bottom margin
+    },
+  };
 
-        Plotly.newPlot('map', chartData.data, chartData.layout,{ displayModeBar: false });
-      
-      },
-      error: function(error) {
-        console.log(error);
-      }
-    });
-  }
-  */
- var togo = [0,0]
+  var graphMovement = document.getElementById('graph-movement');
+
+  // Create the plot
+  Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
+
+  /*
+    // Function to update the new trace data
+    function updatePath() {
+      $.ajax({
+        url: '/get_new_trace_data',
+        type: 'GET',
+        success: function(data) {
+          // TODO add a new trace, a single point from data.robot. 
+          var newPoints = data.points;
+          robot.x = [data.robot[0]];
+          robot.y = [data.robot[1]];
+          togo.x = [data.togo[0]];
+          togo.y = [data.togo[1]];
+          console.log(togo.x, togo.y)
+          path.x = newPoints.map(point => point[0]);
+          path.y = newPoints.map(point => point[1]);
+        
+
+          Plotly.newPlot('map', chartData.data, chartData.layout,{ displayModeBar: false });
+        
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+    */
+  var togo = [0,0]
   function updateMap() {
+    toggleUpdate("movement",updateMap);
+
     $.ajax({
       url: '/get-graph-movement',
       type: 'POST',
       data: { togo: JSON.stringify(togo) }, // Send the togo coordinates as data
       success: function(response) {
         var newData = JSON.parse(response.data);
-        console.log(newData);
+          console.log(newData);
 
           // Update grid trace
           var numRows = 20;
@@ -628,31 +634,38 @@ Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
           endTrace.x = [newData.pathX.at(-1)];
           endTrace.y = [newData.pathY.at(-1)];
 
-    
           // Update allData array
           allData = [gridTrace, pathTrace, startTrace, endTrace];
 
-                // Redraw the plot
-          Plotly.newPlot('graph-movement', allData, layout, { displayModeBar: false });
+          // Redraw the plot
+          Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
 
-          document.getElementById('graph-movement').on('plotly_click', function(eventData) {
-            // Retrieve the clicked point's coordinates
-            var togoX = eventData.points[0].x;
-            var togoY = eventData.points[0].y;
-            
-            // Update the togo coordinates
-            togo = [togoX, togoY];
-            console.log(togo);
-
-            // Call the updateMap() function to update the graph
-            updateMap();
-          });
+          graphMovement.on('plotly_click', handlePlotlyClick);
+          
         },
         error: function (error) {
           console.log(error);
         }
     });
   }
+
+  function handlePlotlyClick(eventData) {
+            // Retrieve the clicked point's coordinates
+            var togoX = eventData.points[0].x;
+            var togoY = eventData.points[0].y;
+
+            // Update the togo coordinates
+            togo = [togoX, togoY];
+            console.log(togo);
+
+            // Call the updateMap() function to update the graph
+            updateMap();
+  }
+
+
+  graphMovement.on('plotly_click', handlePlotlyClick);
+
+
   function reset(){
     var noData = [];
     Plotly.newPlot('graph-movement', noData, layout, { displayModeBar: false });
@@ -662,21 +675,22 @@ Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
       // Attach the click event handler to the plot
  
       // Call updateMap() when the button is clicked
-     $('#reset-movement').click(function() {
-      reset();
-      });
+  $('#reset-movement').click(function() {
+    reset();
+  });
 
       
   $('#update-movement').click(function() {
     updateMap();
   });
     // Call updateMap() when the button is clicked
-   $('#reset-movement').click(function() {
+  $('#reset-movement').click(function() {
     reset();
-    });
+  });
 
   return [updateMap, reset];
-} 
+}
+
 
 /* --------------- Connection Status Checker --------------- */
 $(document).ready(function() {
