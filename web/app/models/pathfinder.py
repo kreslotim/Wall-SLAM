@@ -38,7 +38,6 @@ class PathFinder:
         for obstacle in obstacle_coordinates:
             # Convert obstacle coordinates to grid coordinates
             grid_x, grid_y = self.car_to_grid(obstacle)
-            print(grid_x,grid_y)
 
             # Increment the value of the corresponding grid cell, ensure that its valid too
             if 0 <= grid_x < 2*grid_rad / self.cell_dim and 0 <= grid_y < 2*grid_rad / self.cell_dim:
@@ -131,7 +130,10 @@ class PathFinder:
         """
         # 1 : move, 4 : turn left, 3 : turn right
         path = self.path.copy()
-        if path[0] == -1 :
+        if len(path) == 0:
+            return float(0)
+        
+        if path[0] == -1:
             return -2
         
         action = []
@@ -202,4 +204,35 @@ class PathFinder:
         grid = np.array(grid)
         coordinates = np.argwhere(grid == 1)
         return [(x, y) for x, y in coordinates]
+    
+    def generateGrid(self, obs):
+        """
+        Generate grid from collected obstacle scans
+
+        Arguments: 
+            obs :  raw list of obstacles in car coordinates  
+            grid_rad : The wanted radius of the grid
+        Returns:
+            grid (Array) : The grid with obstacle if present, if an obstacle is present the cell index will be 1.
+
+        :param obst: raw list of obstacles in car coordinates  
+        :return: sampled grid with cells set to 1 or 0
+        """
+        obstacle_coordinates = obs.copy()
+        
+        # Sensitivity (obstacle points per block, think of it as a threshold)
+        sensitivity = 1
+
+        # Iterate through the list of obstacle coordinates
+        for obstacle in obstacle_coordinates:
+            # Convert obstacle coordinates to grid coordinates
+            grid_x, grid_y = self.car_to_grid(obstacle)
+
+            # Increment the value of the corresponding grid cell, ensure that its valid too
+            if 0 <= grid_x < len(self.grid)/2 and 0 <= grid_y < len(self.grid)/2:
+                self.grid[grid_y, grid_x] += 1
+
+        self.grid = np.where(self.grid < sensitivity, 0, 1)
+
+        return self.grid
  
