@@ -30,6 +30,7 @@ togoX = (0,0)
 startTime= time.time()
 
 espT = ESP32Connection(send_port=send_port,recv_port=recv_port)
+espT.start_thread() # Always on
 global cluster_chart
 cluster_chart  =  ClusterChart()
 dataD = DummyData(10)
@@ -113,15 +114,20 @@ def get_graph_distance():
 def get_graph_com():
     print(" COM ")
     if espT.connected:
-        rec = espT.recv_stat
-        send=  espT.send_stat
-            
-        x_sent =[pair[0] for pair in rec]
-        x_received =[pair[1] for pair in rec]
-        y_sent = [pair[0] for pair in send]
-        y_received =[pair[1] for pair in send]
+            # Retrieve the time data for 'Sent' and 'Received' traces
+        sent_data = espT.send_stat
+        received_data =espT.recv_stat
+        obs_data= espT.obs_stat
         
-        return jsonify(x_sent=x_sent, y_sent=y_sent, x_received=x_received,y_received=y_received)
+        # Create a dictionary with the time data
+        chart_data = {
+            'sent': sent_data,
+            'received': received_data,
+            'obs': obs_data
+        }
+        
+        # Return the data as JSON
+        return jsonify(data=json.dumps(chart_data))
     
     return jsonify({'message': 'Command received'}, 200)
 

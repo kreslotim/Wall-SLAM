@@ -42,6 +42,7 @@ class ESP32Connection:
         # Statistic variable
         self.recv_stat = []
         self.send_stat = []
+        self.obs_stat = []
         self.time = time.time()
 
         # Data variable
@@ -100,9 +101,9 @@ class ESP32Connection:
         connected = False
         while not connected:
             connected = self.connect_to_wifi()
-            print("trying to connect")
+            print("trying to connect to the Wifi...")
        
-        print("done")
+        print("Connected to the Esp Wifi")
                     # create a socket object for receiving data from the
             # wait for a client to connect
         while self.espIP is None:
@@ -116,15 +117,11 @@ class ESP32Connection:
                 self.get_info.close()
                 self.espIP = client_address[0]
             except Exception as e:
-                print(f" fail at start {e}")
+                print(f"No information was sent by ESP, retrying... {e}")
                 self.start_thread()
 
 
-        print("got ip")
-
-        timeOfRep = round( time.time() - self.time, 2)
-        print(f"Recv established successfully by {self.espIP}") 
-
+        print(f"Got a first answer from the ESP, ip :{self.espIP}")
 
         timeOfRep = round( time.time() - self.time, 2)
         self.info.append((timeOfRep, "Starting threads ..."))
@@ -139,8 +136,7 @@ class ESP32Connection:
 
     def thread_connect(self):
         while self.running:
-            print(f"We are {self.connected}")
-            print(f"sock alive ? {self._is_socket_alive()}")
+            
             if not self.connected :
                 timeOfRep = round( time.time() - self.time, 2)
                 self.info.append((timeOfRep, "Connection Thread Reconnecting ..."))
@@ -160,7 +156,7 @@ class ESP32Connection:
                 
 
                     if data:
-                        print(data)
+                      
                         try :
                             data_decoded = struct.unpack('ffffffffffff', data)
                         except Exception as e:
@@ -177,6 +173,25 @@ class ESP32Connection:
                         angleGyro = data_decoded[9]
                         angleKalman = data_decoded[10]
                         self.slam_data.add_orr(angleMap,angleGyro,angleKalman, timeOfReading)
+                        timeOfRep = round( time.time() - self.time, 2)
+                        self.recv_stat.append(timeOfRep)
+
+                                            # Filter invalid distances to 0, to allow negative distances
+                        if (distanceFront == -1) :
+                            distanceFront = 0
+                        else :
+                            distanceFront += 20
+                            self.obs_stat.append(timeOfRep)
+
+                        if (distanceBack == -1) :
+                            distanceBack = 0
+                        else :
+                            distanceBack = -distanceBack - 20
+                            self.obs_stat.append(timeOfRep)
+
+
+                
+                       
 
                 except Exception as e:
                          print("Connection error :", e)
@@ -256,7 +271,7 @@ class ESP32Connection:
                 
 
             timeOfRep = round( time.time() - self.time, 2)
-            self.send_stat.append([1,timeOfRep]) # To make a graph about the number of packet send
+            self.send_stat.append(timeOfRep) # To make a graph about the number of packet send
             return 200
         return 400
     

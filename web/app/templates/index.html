@@ -5,33 +5,22 @@
 <div class="container-fluid">
     <div class="card m-2 mt-5 mb-5">
         <div class="card-body d-flex">
-            <h5> WALL-SLAM interface</h5>
-            <div class="form-check form-switch mx-4">
-                <input class="form-check-input" type="checkbox" id="connection-switch" onchange="SettingConnectionState()">
-                <label class="form-check-label" for="switch">Connection to ESP</label>
-                <p id="connection-message"></p>
-                <div class="d-flex">
-                    <button id="reset-master" class="mx-1 btn btn-primary reset">Reset</button>
-                    <button id="update-master" class="mx-1 btn btn-primary update">Update</button>
-                    <button id="tg-update-master" class="mx-1 btn btn-primary tg-update">Toggle Update</button>
-                    <div class="mx-auto">
-                        <div class="d-flex">
-                            <p class='mx-2 my-auto'> <span id="label-frequency-master" class="label-frequency" >10</span>s</p>
-                            <input type="range" min="2" max="100" value="10" step="1" class="slider slider-frequency" id="slider-frequency-master" style="width:100px;" >
-                        </div>
-                        <div class="progress pdiv my-auto" id="progress-master" style="display: none;">
-                            <div id="pb-master" class="progress-bar pb" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-            </div> 
-            <span class="badge connected-badge"></span>
-            <button id="toggleButtonHideSetting" class="mx-1 btn btn-primary"  onclick="settingHide()">Hide Off</button>
+            <h5 class="my-auto"> WALL-SLAM interface</h5>
+            <div class="my-auto mx-4 d-flex">
+                <div class="form-check form-switch mx-2 my-auto">
+                    <input class="form-check-input" type="checkbox" id="connection-switch" onchange="SettingConnectionState()" checked>
+                    <label class="form-check-label" for="switch">Connection to ESP</label>
+                    <p id="connection-message"></p>
+                </div> 
+                <h3><span class="badge connected-badge my-auto mx-2"></span></h3>
+                <button id="toggleButtonHideSetting" class="mx-2 btn btn-primary my-auto"  onclick="settingHide()">Hide Off</button>
+            </div>
         </div>
     </div>
     <div class="row mx-2">
         <div class="col card mx-2 my-2">  
             <div class="card-body">
-                <h5 class="card-tile">Distance Correction using Kalman</h5>
+                <h5 class="card-tile">Orrientation Correction using Kalman</h5>
                 <hr>
                 <div class="mt-4 setting" style="display: block;">
                     <div class="d-flex">
@@ -62,7 +51,7 @@
     
            <div class="col card mx-2 my-2">  
             <div class="card-body">
-                <h5 class="card-tile">com Correction using Kalman</h5>
+                <h5 class="card-tile">Communication frequency</h5>
                 <hr>
                 <div class="mt-4 setting" style="display: block;">
                     <div class="d-flex">
@@ -92,7 +81,7 @@
         </div>
         <div class="col card mx-2 my-2">  
             <div class="card-body">
-                <h5 class="card-tile">obs-raw Correction using Kalman</h5>
+                <h5 class="card-tile">Noisy obstacle detected</h5>
                 <hr>
                 <div class="mt-4 setting" style="display: block;">
                     <div class="d-flex">
@@ -125,7 +114,7 @@
 
         <div class="col card mx-2 my-2">  
             <div class="card-body">
-                <h5 class="card-tile">redundancy Correction using Kalman</h5>
+                <h5 class="card-tile">Redundancy Correction</h5>
                 <hr>
                 <div class="mt-4 setting" style="display: block;">
                     <div class="d-flex">
@@ -156,7 +145,7 @@
         <div class="col card mx-2 my-2">  
             <div class="card-body">
                 <div class="d-flex justify-content-between">
-                <h5 class="card-tile">Kmeans </h5>
+                <h5 class="card-tile">Kmeans on the obstacle </h5>
                 <div class="setting" style="display: block;">
                     <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
                         More Setting
@@ -267,7 +256,7 @@
 
                     <h5 clas="my-4"> 
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="connection-switch" onchange="SettingConnectionState()">
+                            <input class="form-check-input" type="checkbox" id="connection-switch" onchange="SettingConnectionState()" checked>
                             <label class="form-check-label" for="switch">Connection to ESP</label>
                             <p id="connection-message"></p>
                         </div> 
