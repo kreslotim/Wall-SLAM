@@ -15,6 +15,7 @@ class SlamData:
         self.list_of_obs = []
         self.list_of_100_x_obs = []
         self.list_of_100_y_obs = []
+        self.list_of_100_orr = []
 
         # Current Car coordinates
         self.curr_x_car = 0
@@ -22,7 +23,11 @@ class SlamData:
         self.perfect_orientation = 0
 
 
-    
+    def add_orr( self, magOrr, gryOrr, kalmanOrr, time):
+        self.list_of_100_orr.append((magOrr,gryOrr,kalmanOrr,time))
+        if len(self.list_of_100_orr) > self.numberOfObsInOneGo:
+            self._clear_temp_list()
+
     def _add_and_delete_obstacle(self, x_car, y_car, obs_distance, orientation):
 
         if obs_distance != 0 and -self.max_distance_detection < obs_distance < self.max_distance_detection:
@@ -87,9 +92,13 @@ class SlamData:
     def _is_ready_to_go(self):
         return len(self.list_of_100_x_obs) > self.numberOfObsInOneGo 
 
+    def _is_ready_to_go_orr(self):
+        return len(self.list_of_100_orr) > self.numberOfObsInOneGo 
+
     def _clear_temp_list(self):
         self.list_of_100_x_obs.clear()
         self.list_of_100_y_obs.clear()
+        self.list_of_100_orr.clear()
 
 
 ############ HELPER METHOD ############

@@ -88,12 +88,27 @@ def post_move():
 ############ GRAPH API ############ 
 @main.route('/get-graph-distance', methods=['GET'])
 def get_graph_distance():
-    print(" distance ")
-    return jsonify({'message': 'Command received'}, 200)
-@main.route('/get-graph-orientation', methods=['GET'])
-def get_graph_orientation():
-    print(" orientation ")
-    return jsonify({'message': 'Command received'}, 200)
+    list_of_obs = espT.slam_data.list_of_100_orr
+
+
+    # Create multiple arrays
+    result = [[t[i] for t in list_of_obs] for i in range(4)]
+
+    # Print the result
+    for sub_arr in result:
+        print(sub_arr) 
+        
+    response_data = {
+        'mag': result[0],
+        'gyro': result[1],
+        'kalman': result[2],
+        'time': result[3]
+    }
+
+
+    return jsonify(data=json.dumps(response_data))
+
+
 @main.route('/get-graph-com', methods=['GET'])
 def get_graph_com():
     print(" COM ")
@@ -146,25 +161,6 @@ def get_graph_kmeans():
 @main.route('/get-graph-movement', methods=['POST'])
 def get_graph_movement():
 
-    if espT.connected:
-        if 'togo' in request.form:
-            togo = json.loads(request.form['togo'])
-            togo_coordinates = togo
-            print(f"togo coordinates :{togo_coordinates}")
-            espT.path_finder.setTarget_xy_in_website(togo_coordinates)
-            
-        x_route, y_route = zip(*espT.path_finder.path)
-
-        response_data = {   
-        'gridData': espT.path_finder.list_of_obstacles_in_grid,  
-        'pathX': x_route,
-        'pathY': y_route
-        }
-        print(f"obs :{espT.path_finder.list_of_obstacles_in_grid}")
-        print(f"path x :{x_route}")
-        print(f"path y :{y_route}")
-        return jsonify(data=json.dumps(response_data))
-    
     return jsonify(data=json.dumps())
     
 ############ SETTING API ############

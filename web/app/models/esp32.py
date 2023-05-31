@@ -4,6 +4,8 @@ import struct
 import threading
 from app.models.slamData import SlamData
 from app.models.pathFindingAlgo import PathFinder
+import pywifi
+import time
 
 
 class ESP32Connection:
@@ -14,6 +16,9 @@ class ESP32Connection:
         # INPUT
         self.send_port = send_port
         self.recv_port = recv_port
+
+        
+     
 
         # Connection variable
         self.espIP = None
@@ -42,9 +47,46 @@ class ESP32Connection:
         self.slam_data = SlamData()
         self.path_finder = PathFinder()
         self.action_instruction_list = []
+        self.ssid = "espWifi2"
+        self.password = "0123456789A"
+
+        
         
 
-    
+
+ 
+    def connect_to_wifi(self):
+        ssid = self.ssid
+        password = self.password
+        wifi = pywifi.PyWiFi()  # Create a PyWiFi object
+        iface = wifi.interfaces()[0]  # Get the first available network interface
+
+        iface.disconnect()  # Disconnect from any existing Wi-Fi connection
+        time.sleep(1)
+
+        profile = pywifi.Profile()  # Create a new Wi-Fi profile
+        profile.ssid = ssid  # Set the SSID (Wi-Fi network name)
+        profile.auth = pywifi.const.AUTH_ALG_OPEN  # Set the authentication algorithm
+
+        # Set the encryption type and password (comment out if the network is not password-protected)
+        profile.akm.append(pywifi.const.AKM_TYPE_WPA2PSK)
+        profile.cipher = pywifi.const.CIPHER_TYPE_CCMP
+        profile.key = password
+
+        iface.remove_all_network_profiles()  # Remove all existing profiles
+        temp_profile = iface.add_network_profile(profile)  # Add the new profile
+
+        iface.connect(temp_profile)  # Connect to the network
+        time.sleep(5)  # Wait for the connection to establish
+
+        return iface.status() == pywifi.const.IFACE_CONNECTED
+
+    def check_wifi_connection(self):
+        wifi = pywifi.PyWiFi()  # Create a PyWiFi object
+        iface = wifi.interfaces()[0]  # Get the first available network interface
+        print(f" checking status  : { iface.status() == pywifi.const.IFACE_CONNECTED}")
+        return iface.status() == pywifi.const.IFACE_CONNECTED
+        
 ######## Thread Looping #############
 
     def stop_thread(self):
@@ -53,6 +95,35 @@ class ESP32Connection:
         self.running = False
 
     def start_thread(self):
+
+        connected = False
+        while not connected:
+            connected = self.connect_to_wifi()
+            print("trying to connect")
+       
+        print("done")
+                    # create a socket object for receiving data from the
+            # wait for a client to connect
+        while self.espIP is None:
+            try:
+                self.get_info= socket.socket()
+                self.get_info.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                self.get_info.bind(('0.0.0.0', self.recv_port))  # bind to a local address and port
+                self.get_info.settimeout(3.0)  # set a timeout of 10 seconds
+                self.get_info.listen(0)  # start listening for incoming connections
+                self.recv_socket, client_address = self.get_info.accept()
+                self.get_info.close()
+                self.espIP = client_address[0]
+            except Exception as e:
+                self.start_thread()
+
+
+        print("got ip")
+
+        timeOfRep = round( time.time() - self.time, 2)
+        print(f"Recv established successfully by {self.espIP}") 
+
+
         timeOfRep = round( time.time() - self.time, 2)
         self.info.append((timeOfRep, "Starting threads ..."))
         self.running = True
@@ -66,7 +137,7 @@ class ESP32Connection:
 
     def thread_connect(self):
         while self.running:
-            if not self._is_socket_alive() or not self.connected :
+            if not self.connected :
                 timeOfRep = round( time.time() - self.time, 2)
                 self.info.append((timeOfRep, "Connection Thread Reconnecting ..."))
                 self.connected = False
@@ -93,34 +164,12 @@ class ESP32Connection:
                     orientation = data_decoded[4]
                     self.slam_data.curr_x_car = data_decoded[5]
                     self.slam_data.curr_y_car = data_decoded[6]
-                    timeOfReading = data_decoded[7]
-                    self.slam_data.perfect_orientation = data_decoded[8]
+                    timeOfReading = data_decoded[7]/10000
+                    angleMap = data_decoded[8]
+                    angleGyro = data_decoded[9]
+                    angleKalman = data_decoded[10]
+                    self.slam_data.add_orr(angleMap,angleGyro,angleKalman, timeOfReading)
 
-                    # Filter invalid distances to 0, to allow negative distances
-                    if (distanceFront == -1) :
-                        distanceFront = 0
-                    else :
-                        distanceFront += 20
-
-                    if (distanceBack == -1) :
-                        distanceBack = 0
-                    else :
-                        distanceBack = -distanceBack - 20
-
-              
-                    # Adding obstacles with Front Lidar
-                    self.slam_data._add_and_delete_obstacle(self.slam_data.curr_x_car,  self.slam_data.curr_y_car, distanceFront, orientation)
-
-                    # Adding obstacles with Back Lidar
-                    self.slam_data._add_and_delete_obstacle(self.slam_data.curr_x_car,  self.slam_data.curr_y_car, distanceBack, orientation)
-
-                    #TODO Flo do you still want this ??
-
-                    self.output.append((timeOfReading, 'Obstacle found at ', distanceFront, ' mm, looking at ', orientation)) 
-                    # Log it
-                    timeOfRep = round( time.time() - self.time, 2)
-        
-                    #self.recv_stat.append([1, timeOfRep])
 
 
 
@@ -129,22 +178,15 @@ class ESP32Connection:
 
 ############ COMMUNICATION METHOD #############
 
+    
     def _connect(self):
         try:
-            # create a socket object for receiving data from the client
-            recv_socket = socket.socket()
-            recv_socket.bind(('0.0.0.0', self.recv_port))  # bind to a local address and port
-            recv_socket.listen(0)  # start listening for incoming connections
-            recv_socket.settimeout(5.0)  # set a timeout of 10 seconds
-
+            # create a socket object for receiving data from the
             # wait for a client to connect
-            self.recv_socket, client_address = recv_socket.accept()
 
             timeOfRep = round( time.time() - self.time, 2)
-            self.info.append((timeOfRep, 'Recv established successfully by', client_address))   
+        
 
-            recv_socket.close()
-            self.espIP = client_address[0]
 
             self.send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.send_socket.settimeout(5)  # set a timeout of 2 seconds
@@ -159,11 +201,16 @@ class ESP32Connection:
         except Exception as e:
             print("Connection error :", e)
             print("Reconnecting ...")
+            # Check connection status
+            if not self.check_wifi_connection():
+                self.connect_to_wifi()
+
             timeOfRep = round( time.time() - self.time, 2)
             self.errors.append((timeOfRep, e))
+            threading.Event().wait(5)  
 
             self.connected = False
-            time.sleep(1)
+            
 
     def _send_actionNumber(self, actionNumber):
         if self.connected:

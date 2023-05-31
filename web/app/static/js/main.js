@@ -32,9 +32,9 @@ $(document).ready(function() {
   var [updateKmeans,resetKmeans] = initKmeanGraph();
   
   var [updateDistance,resetDistance] = initDistance();
-  var [updateGyro,resetOrientation] = initGyro();
+
   var [updateMovement,resetMovement] = initMouvement();
-  masterUpdate(updateDistance,updateCom,updateRedundancy,updateNoise,updateKmeans,updateGyro,updateMovement);
+  masterUpdate(updateDistance,updateCom,updateRedundancy,updateNoise,updateKmeans,updateMovement);
   // Call updateMap() when the button is clicked
   $('#update-master').click(function() {
     updateCom();
@@ -42,7 +42,6 @@ $(document).ready(function() {
     updateNoise();
     updateKmeans();
     updateDistance();
-    updateGyro();
     updateMovement();
   })
   $('#reset-master').click(function() {
@@ -51,7 +50,6 @@ $(document).ready(function() {
     resetNoise();
     resetKmeans();
     resetDistance();
-    resetOrientation();
     resetMovement();
   })
   initKmeanSlider();
@@ -227,30 +225,30 @@ function initDistance(){
   toggleUpdate("distance",updateMap);
     // Sample data
   var time = []; // Time points
-  var distance1 = []; // Distance values for series 1
-  var distance2 = []; // Distance values for series 2
-  var distance3 = []; // Distance values for series 3
+  var mag = []; // Distance values for series 1
+  var gyro = []; // Distance values for series 2
+  var kalman = []; // Distance values for series 3
 
   // Data traces
-  var trace1 = {
+  var magTrace = {
     x: time,
-    y: distance1,
+    y: mag,
     mode: 'lines',
-    name: 'Distance 1'
+    name: 'Mag'
   };
 
-  var trace2 = {
+  var gyroTrace = {
     x: time,
-    y: distance2,
+    y: gyro,
     mode: 'lines',
-    name: 'Distance 2'
+    name: 'Gyro'
   };
 
-  var trace3 = {
+  var kalmanTrace = {
     x: time,
-    y: distance3,
+    y: kalman,
     mode: 'lines',
-    name: 'Distance 3'
+    name: 'Kalman'
   };
 
   // Layout configuration
@@ -259,7 +257,7 @@ function initDistance(){
       title: 'Time'
     },
     yaxis: {
-      title: 'Distance'
+      title: 'Orientation'
     },
     margin: {
       t: 10, // Top margin
@@ -270,7 +268,7 @@ function initDistance(){
   };
 
   // Combine the traces into an array
-  var data = [trace1, trace2, trace3];
+  var data = [magTrace, gyroTrace, kalmanTrace];
 
   // Create the line chart
   Plotly.newPlot('graph-distance', data, layout, { displayModeBar: false });
@@ -279,8 +277,19 @@ function initDistance(){
       url: '/get-graph-distance',
       type: 'GET',
       success: function(data) {
-          // var newChartData = JSON.parse(data);
-          // Plotly.newPlot('graph-distance', newChartData.data, newChartData.layout);
+           var newChartData = JSON.parse(data.data);
+
+            time = newChartData.time;
+            magTrace.y = newChartData.mag;
+            magTrace.x = time;
+            gyroTrace.y = newChartData.gyro;
+            gyroTrace.x= time;
+            kalmanTrace.y = newChartData.kalman;
+            kalmanTrace.x = time;
+            data = [magTrace, gyroTrace, kalmanTrace];
+            console.log(data)
+           
+           Plotly.newPlot('graph-distance', data, layout);
         }
       
     });
@@ -297,101 +306,7 @@ function initDistance(){
   })
   return [updateMap, reset];
   }
-function initGyro(){
-  toggleUpdate("orientation",updateMap);
-  // Sample data
-  var angles = [30, 150, 270]; // Angles for three objects (in degrees)
-  // Data traces
-  var trace1 = {
-    r: [1],
-    theta: [angles[0]],
-    mode: 'markers',
-    name: 'Object 1',
-    marker: {
-      size: 10,
-      symbol: 'circle'
-    },
-    type: 'scatterpolar'
-  };
 
-  var trace2 = {
-    r: [1],
-    theta: [angles[1]],
-    mode: 'markers',
-    name: 'Object 2',
-    marker: {
-      size: 10,
-      symbol: 'circle'
-    },
-    type: 'scatterpolar'
-  };
-
-  var trace3 = {
-    r: [1],
-    theta: [angles[2]],
-    mode: 'markers',
-    name: 'Object 3',
-    marker: {
-      size: 10,
-      symbol: 'circle'
-    },
-    type: 'scatterpolar'
-  };
-
-  // Combine the traces into an array
-  var data = [trace1, trace2, trace3];
-
-  // Layout configuration
-  var layout = {
-    margin: {
-      t: 10, // Top margin
-      l: 40, // Left margin
-      r: 20, // Right margin
-      b: 40  // Bottom margin
-    },
-    polar: {
-      radialaxis: {
-        visible: false,
-        range: [0, 1] // Set the range of the radial axis
-      },
-      angularaxis: {
-        tickmode: 'array',
-        tickvals: [0, 45, 90, 135, 180, 225, 270, 315], // Set custom tick values for the angular axis (in degrees)
-        ticktext: ['0°', '45°', '90°', '135°', '180°', '225°', '270°', '315°'], // Set custom tick labels for the angular axis
-        direction: 'clockwise' // Set the direction of the angular axis
-      }
-    },
-    showlegend: true,
-  };
-
-
-
-  // Create the 3D chart
-  Plotly.newPlot('graph-orientation', data, layout,{ displayModeBar: false });
-  function updateMap() {
-    $.ajax({
-      url: '/get-graph-orientation',
-      type: 'GET',
-      success: function(data) {
-          // var newChartData = JSON.parse(data);
-          // Plotly.newPlot('graph-distance', newChartData.data, newChartData.layout);
-        }
-      
-    });
-  }
-  function reset(){
-    Plotly.newPlot('graph-orientation', data, layout,{ displayModeBar: false });
-  }
-  // Call updateMap() when the button is clicked
-  $('#update-orientation').click(function() {
-      updateMap();
-    })
-    $('#reset-orientation').click(function() {
-     reset();
-    })
-  return [updateMap, reset];
-
-}
 function initGraphCom() {
   toggleUpdate("com",updateMap);
   var layout = {
