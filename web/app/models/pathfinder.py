@@ -176,11 +176,11 @@ class PathFinder:
                     path.pop(0)
                     
                 if current_orr < togo_orr :
-                    action.append(4)
+                    action.append(3)
                     current_orr = current_orr + 90
 
                 if current_orr > togo_orr :
-                    action.append(3)
+                    action.append(4)
                     current_orr = current_orr - 90
         return action
     

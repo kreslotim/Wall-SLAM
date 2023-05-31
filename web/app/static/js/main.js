@@ -220,7 +220,7 @@ function initGraphCom() {
       url: '/get-graph-com',
       type: 'GET',
       success: function(response) {
-        console.log(response.data)
+      
         var newChartData = JSON.parse(response.data);
       var sentData = newChartData.sent;
       var receivedData = newChartData.received;
@@ -237,9 +237,6 @@ function initGraphCom() {
       }
       
 
-      console.log("min : " + minReceived)
-      console.log("max : " + maxReceived)
-      console.log(seconds)
 
       
       var sentValues = countPoints(sentData, seconds);
@@ -251,7 +248,7 @@ function initGraphCom() {
         { x: seconds, y: receivedValues, type: 'bar', name: 'Received' },
         { x: seconds, y: obsValues, type: 'bar', name: 'Obstacle Detected' }
       ];
-      console.log(data)
+      
       
       Plotly.newPlot('graph-com', data, layout, { displayModeBar: false });
       }
@@ -413,7 +410,7 @@ function initGraphNoise() {
           var x_obs = eventData.x_obs;
           var y_obs = eventData.y_obs;
 
-          Plotly.extendTraces('graph-obs-raw', { x: [[x_car], x_obs], y: [[y_car], y_obs] }, [0, 1],{ displayModeBar: false });
+          Plotly.extendTraces('graph-obs-raw', { x: [[x_car], x_obs], y: [[y_car], y_obs] });
         }
       });
     }
