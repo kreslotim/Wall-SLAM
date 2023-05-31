@@ -82,8 +82,10 @@ Here's what we've come up with.
 
 Now we will explain the choice we've made for positioning the electronic pieces.
 The parts that are highlighted in green are those that we designed ourselves. The Ultrasonic sensor's frame as well as the wheels and the tracks were borrowed from SMARS project, because they fit our requirements well.
+
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/9eac749d-10e7-4cae-a3eb-60efbaca4600" width = 700/>
 While we adopted the wheel design from SMARS, we had to adapt it's axle mount to fit the rectangular axle of the motor we are using. Furthermore, it is essential to align the axle of the slave wheel with the motor's axle to ensure that both wheels are at the same level.
+
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/3dcc6850-5950-4f5f-9a45-e38546c61ef8" width = 700/>
 
 In order to optimize the efficiency of the printing and assembly process, we strategically positioned all the components in close proximity to one another, ensuring minimal wasted space on the chassis.
@@ -93,9 +95,11 @@ As the heaviest electronic component of the entire construction, the battery ser
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/f2b20805-2bfe-478f-b751-ee17c3dc3ad8" width = 700/>
 
 The cover slides over the battery and encases the servo on top.
+
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c" width = 700/>
 
 The servo, in return, holds both lidars (distance sensors) that are sneaked on the servo's arm.
+
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83" width = 700/>
 ## Assembly
 
