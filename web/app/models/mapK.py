@@ -11,6 +11,15 @@ import matplotlib.cm as cm
 
 class ClusterChart:
     def __init__(self, train_split=0.9, threshold=0.3, max_k = 40, filter=10):
+        """
+        Helper class to utilize kmeans.py in the application. 
+        It allows to generate a Plotly chart from its output
+        
+        Arguments: 
+            train_split (float): kmean hyperparameter from 0.5 to 1, how the train set of Kmean shall be set, 
+            threshold (float): kmean hyperparameter, the maximum of K we can try to find. Higher K, imply expensive query 
+            filter (int): kmean hyperparameter, the minium of data in a cluster. Help reduce noise since this filtering is done after cluster assignments.
+        """
         self.num_clusters = 0
         self.train_split = train_split
         self.threshold = threshold
@@ -19,6 +28,14 @@ class ClusterChart:
         self.kmeans = KMeans( max_k=max_k, filter = filter )
 
     def generate_shapes(self,num_shapes):
+        """
+        Generate a random data that will represent different geometrical shape
+        
+        Arguments: 
+            num_shapes (int): the number of shapes wanted. Note that a shape can have a single points, hence creating a noisy set.
+        Returns:
+            data (array): shape (N, 2) where N is the number of data samples, 2 is number of features x,y.
+        """
         X = []
         shape_names = ['Triangle', 'Circle', 'Square', 'Pentagon', 'Hexagon', 'Octagon']
         
@@ -60,6 +77,16 @@ class ClusterChart:
         
         return np.array(X)
     def generate_chart_json(self, data):
+        """
+        Generate a map from the given data, utilizing Kmean to find the cluster that will be represented as a rectangle
+        
+        Arguments: 
+            data (array): shape (N, 2) where N is the number of data samples, 2 is number of features x,y.
+        Returns:
+            data (json) : The Plotly data that can be use to create a graph filled with rectangle representing the cluster / obstacle
+            max_point (int, int): the point that is the further away from each cluster center.
+            rectangle (array) : The list of rectangle, containing the min and their max respectably
+        """
         # Example usage
         num_shapes = 25
 
@@ -183,6 +210,14 @@ class ClusterChart:
     
 
     def find_furthest_point(self,grid_size, obstacles):
+        """
+        Calculate the further away point from a set of point. The measure of distance is the Manhattan distance
+        Arguments: 
+            grid_size (int): the boundaries of the search
+            obstacles (array): the points we want to maximize the distance of
+        Returns:
+            max_point (int, int): the point that is the further away from each cluster center.
+        """
         # Calculate the Manhattan distance from a point to all obstacles
         def calculate_distance(point):
             return sum(abs(point[0] - obs[0]) + abs(point[1] - obs[1]) for obs in obstacles)
