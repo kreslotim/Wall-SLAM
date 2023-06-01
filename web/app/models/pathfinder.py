@@ -301,8 +301,6 @@ class PathFinder:
 
     def setTarget_xy_in_website(self, coordinates):
         self.togo_position = self.__website_to_grid((coordinates[0],coordinates[1]))
-        print(f"Website coord : {coordinates} ")
-
  
 
 
