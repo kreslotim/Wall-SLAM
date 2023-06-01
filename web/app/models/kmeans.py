@@ -125,8 +125,6 @@ def filter_clusters(cluster_assignments, centers, min_points=4):
     return filtered_cluster_assignments, centers
 
 class KMeans(object):
-
-
     """
     K-Means clustering class.
 

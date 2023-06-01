@@ -10,16 +10,12 @@ from app.models.pathfinder import PathFinder
 
 
 class ESP32Connection:
-
     def __init__(self, send_port, recv_port):
         print("Establishing Connection")
 
         # INPUT
         self.send_port = send_port
         self.recv_port = recv_port
-
-        
-     
 
         # Connection variable
         self.espIP = None
