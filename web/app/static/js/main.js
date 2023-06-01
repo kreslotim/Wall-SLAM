@@ -599,6 +599,26 @@ function initMouvement(){
   };
   // Define the data array with both traces
   var allData = [gridTrace, pathTrace,startTrace,endTrace];
+    // Calculate the endpoint of the vector based on the angle
+    var angle = 45; // Replace with your desired angle in degrees
+    var angleRad = angle * (Math.PI / 180);
+    var vectorX = Math.cos(angleRad);
+    var vectorY = Math.sin(angleRad);
+  
+    // Create the trace for the vector
+    var vectorTrace = {
+      x: [pathCoordinates[0][1], pathCoordinates[0][1] + vectorX],
+      y: [pathCoordinates[0][0], pathCoordinates[0][0] + vectorY],
+      mode: 'lines',
+      line: {
+        color: 'green',
+        width: 2
+      },
+      name: 'vector'
+    };
+  
+    allData.push(vectorTrace); // Add the vector trace to the data array
+  
 
   // Define the layout
   var layout = {
@@ -617,33 +637,7 @@ function initMouvement(){
   // Create the plot
   Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
 
-  /*
-    // Function to update the new trace data
-    function updatePath() {
-      $.ajax({
-        url: '/get_new_trace_data',
-        type: 'GET',
-        success: function(data) {
-          // TODO add a new trace, a single point from data.robot. 
-          var newPoints = data.points;
-          robot.x = [data.robot[0]];
-          robot.y = [data.robot[1]];
-          togo.x = [data.togo[0]];
-          togo.y = [data.togo[1]];
-          console.log(togo.x, togo.y)
-          path.x = newPoints.map(point => point[0]);
-          path.y = newPoints.map(point => point[1]);
-        
-
-          Plotly.newPlot('map', chartData.data, chartData.layout,{ displayModeBar: false });
-        
-        },
-        error: function(error) {
-          console.log(error);
-        }
-      });
-    }
-    */
+  
   var togo = [0,0]
   function updateMap() {
     toggleUpdate("movement",updateMap);
@@ -684,7 +678,28 @@ function initMouvement(){
           // Update allData array
           allData = [gridTrace, pathTrace, startTrace, endTrace];
 
-          // Redraw the plot
+              // Calculate the endpoint of the vector based on the angle
+          var angle = newData.angle; // Replace with your desired angle in degrees
+          var angleRad = angle * (Math.PI / 180);
+          var vectorX = Math.cos(angleRad);
+          var vectorY = Math.sin(angleRad);
+        
+          // Create the trace for the vector
+          var vectorTrace = {
+            x: [pathCoordinates[0][1], pathCoordinates[0][1] + vectorX],
+            y: [pathCoordinates[0][0], pathCoordinates[0][0] + vectorY],
+            mode: 'lines',
+            line: {
+              color: 'green',
+              width: 2
+            },
+            name: 'Orientation'
+          };
+        
+          
+          allData.push(vectorTrace); // Add the vector trace to the data array
+  
+                // Redraw the plot
           Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
 
           graphMovement.on('plotly_click', handlePlotlyClick);

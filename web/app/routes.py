@@ -193,7 +193,8 @@ def get_graph_movement():
         response_data = {   
         'gridData': espT.path_finder.generate_list_of_obstacles_for_website(),  
         'pathX': x_route,
-        'pathY': y_route
+        'pathY': y_route,
+        'angle' : espT.slam_data.list_of_100_orr.at(-1)
         }
 
         return jsonify(data=json.dumps(response_data))

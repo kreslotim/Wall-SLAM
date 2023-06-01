@@ -1,12 +1,11 @@
-import pywifi
-import time
-obs = [[10,0],[0,10],[-10,0]]  # Example obstacle coordinates
+import plotly.graph_objects as go
+import matplotlib.pyplot as plt
+from pathfinder import PathFinder
+
+obs = [[10,0],[0,10],[-10,0], [-30, -30], [-40, -40] ,[-40, 0], [40, 0], [ 60, 0], [70,-10] ] # Example obstacle coordinates
 grid_rad = 100  # Example grid radius
 
-
-    iface.disconnect()  # Disconnect from any existing Wi-Fi connection
-    time.sleep(1)
-
+path_finder = PathFinder(obs, cell_dim=10, grid_rad=grid_rad)
 
 current_position = (0,0)  # Example current position
 
@@ -21,24 +20,11 @@ action_numbers = path_finder.path_to_actionNumber(current_orr=0)
 obstacles_for_website = path_finder.generate_list_of_obstacles_for_website()
 print(f"########")
 
-for s in obs:
-    print(path_finder.car_to_grid(s))
-print(f"Car position in car : {current_position}")
-print(f"Car position in grid : {path_finder.car_to_grid(current_position)}")
-print(f"Togo in grid : {path_finder.togo_position}")
-
-
-print("########")
-for s in obs:
-    print(path_finder.get_in_grid_coords(path_finder.car_to_grid(s)))
-print(f"Car position in web : {path_finder.get_in_grid_coords(path_finder.car_to_grid(current_position))}")
-
-
-
 
 print(f"Togo in grid : {path_finder.togo_position}")
 print("Shortest Path:", path)
 print("Obstacles for Website:", obstacles_for_website)
+print(f"Sequence will then be {path_finder.path_to_actionNumber()}")
 
 for this in path :
     if this != -1:

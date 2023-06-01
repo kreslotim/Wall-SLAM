@@ -139,7 +139,7 @@ class PathFinder:
         # If there is no path to the destination
         return [-1]
 
-    def path_to_actionNumber(self, current_orr=180):
+    def path_to_actionNumber(self, current_orr=0):
         """
         Produce a sequence of instruction that the car need to follow.
 
@@ -150,13 +150,13 @@ class PathFinder:
             y: coordinate y in the grid
         """
         # 1 : move, 4 : turn left, 3 : turn right
+        current_orr = current_orr + 90 #offset
         path = self.path.copy()
         if len(path) == 0:
             return float(0)
         
         if path[0] == -1:
             return -2
-        
         action = []
         while len(path) > 1:
             axe = 1 if path[0][0] - path[1][0] == 0 else 0
