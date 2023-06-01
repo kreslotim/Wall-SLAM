@@ -89,9 +89,9 @@ class PathFinder:
 
             # Check if the current position is the destination
             if current_pos == self.togo_position:
-                self.path = [self.grid_to_website(current_pos)]
+                self.path = [self.__grid_to_website(current_pos)]
                 while current_pos in previous:
-                    self.path.append(self.grid_to_website(previous[current_pos]))
+                    self.path.append(self.__grid_to_website(previous[current_pos]))
                     current_pos = previous[current_pos]
 
                 self.path.reverse()
@@ -196,7 +196,7 @@ class PathFinder:
         if len(self.grid) != 0: 
             grid = np.array(self.grid)
             coordinates = np.argwhere(grid == 1)
-            obstacle_cell = [self.website_to_grid((int(x), int(y))) for x, y in coordinates]
+            obstacle_cell = [self.__website_to_grid((int(x), int(y))) for x, y in coordinates]
             return obstacle_cell
         return []
     
@@ -229,9 +229,10 @@ class PathFinder:
     
     ######## TRANSFORMATION #############
     '''
-    We are using three different coordinates system : Car, Grid, Website
+    We are using three different coordinates system : Car, Grid, Website.
+    Grid and Website transformation shouldn't be used outside of the class.
 
-    Car is a cartesian coordinates system
+    Car : is a cartesian coordinates system
 
     Grid :
             0 -------> y
@@ -266,9 +267,9 @@ class PathFinder:
         x = math.floor(x/self.cell_dim)
         y = math.floor(y/self.cell_dim)
         
-        return self.website_to_grid((x,y))
+        return self.__website_to_grid((x,y))
     
-    def website_to_grid(self, point_grid):
+    def __website_to_grid(self, point_grid):
         """
         Gets the content of the grid at (x,y). Since grid is constructed with [0,0] bottom left but in a array with [0,0] top left. This method allows you to make a transition.
 
@@ -282,7 +283,7 @@ class PathFinder:
         x = point_grid[1] 
         return x,y
     
-    def grid_to_website(self, point_array):
+    def __grid_to_website(self, point_array):
         """
         Gets the content of the grid at (x, y) based on array coordinates, where [0, 0] is the top left.
 
@@ -299,7 +300,7 @@ class PathFinder:
     ############ SETTER ############
 
     def setTarget_xy_in_website(self, coordinates):
-        self.togo_position = self.website_to_grid((coordinates[0],coordinates[1]))
+        self.togo_position = self.__website_to_grid((coordinates[0],coordinates[1]))
         print(f"Website coord : {coordinates} ")
 
  

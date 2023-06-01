@@ -28,7 +28,7 @@ print(f"Sequence will then be {path_finder.path_to_actionNumber()}")
 
 for this in path :
     if this != -1:
-        print(path_finder.grid_to_website(this))
+        print(path_finder.__grid_to_website(this))
 # Plotting the grid with obstacles
 
 # Plotting the obstacles

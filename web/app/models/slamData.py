@@ -123,7 +123,7 @@ class SlamData:
 
         return filtered_obs
 
-############ HELPER METHOD ############
+    ############ Private METHODs ############
 
     def __dataToObstacle(self, x_car, y_car, distance, orientation):  
         """
