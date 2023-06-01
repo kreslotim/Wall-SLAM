@@ -1,5 +1,4 @@
 import math
-import random
 
 class SlamData:
     def __init__(self):

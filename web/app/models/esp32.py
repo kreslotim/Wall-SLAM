@@ -47,7 +47,7 @@ class ESP32Connection:
 
         # Data variable
         self.slam_data = SlamData()
-        self.path_finder = PathFinder([])
+        self.path_finder = PathFinder()
         self.action_instruction_list = []
 
         self.ssid = "espWifi2"

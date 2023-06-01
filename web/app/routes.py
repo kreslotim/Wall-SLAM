@@ -1,16 +1,10 @@
-
-import threading
-from flask import Response, render_template, jsonify, request
+from flask import render_template, jsonify, request
 from flask import Blueprint
 import time
 import json
-import random
-import math
-import numpy as np
 
 from app.models.esp32 import ESP32Connection
 
-from app.models.dummyData import DummyData
 from app.models.mapK import ClusterChart
 
 main = Blueprint('main', __name__)
@@ -24,17 +18,12 @@ send_port = 8889
 global togo
 togoX = (0,0)
 
-
-
-
 startTime= time.time()
 
 espT = ESP32Connection(send_port=send_port,recv_port=recv_port)
-espT.start_thread() # Always on
+#espT.start_thread() # Always on
 global cluster_chart
 cluster_chart  =  ClusterChart()
-dataD = DummyData(10)
-
 
 global settingConnection
 settingConnection = False
@@ -86,8 +75,7 @@ def post_move():
 ############ GRAPH API ############ 
 @main.route('/get-graph-distance', methods=['GET'])
 def get_graph_distance():
-    list_of_obs = espT.slam_data.list_of_100_orr
-
+    list_of_obs = espT.slam_data.list_of_temp_orr
 
     # Create multiple arrays
     result = [[t[i] for t in list_of_obs] for i in range(4)]
@@ -134,10 +122,9 @@ def get_graph_obs_raw():
     response_data = {
         'x_car': espT.slam_data.curr_x_car,
         'y_car': espT.slam_data.curr_y_car,
-        'x_obs': espT.slam_data.list_of_100_x_obs.copy(),
-        'y_obs': espT.slam_data.list_of_100_y_obs.copy()
+        'x_obs': espT.slam_data.list_of_temp_x_obs,
+        'y_obs': espT.slam_data.list_of_temp_y_obs
     }
-    espT.slam_data._clear_temp_list()
     return jsonify(data=json.dumps(response_data))
 
 @main.route('/get-graph-redundancy', methods=['GET'])
@@ -179,19 +166,17 @@ def get_graph_kmeans():
 def get_graph_movement():
         if 'togo' in request.form:
             togo_coordinates = json.loads(request.form['togo'])
-            print(f"togo fro web:{togo_coordinates}")
             espT.path_finder.setTarget_xy_in_website( togo_coordinates)
             espT.map_all()
             
         x_route = [coord[0] for coord in espT.path_finder.path]
         y_route = [coord[1] for coord in espT.path_finder.path]
 
-        print(espT.path_finder.generate_list_of_obstacles_for_website())
         response_data = {   
         'gridData': espT.path_finder.generate_list_of_obstacles_for_website(),  
         'pathX': x_route,
         'pathY': y_route,
-        'angle' : espT.slam_data.list_of_100_orr.at(-1)
+        'angle' : espT.slam_data.list_of_temp_orr[-1] if len(espT.slam_data.list_of_temp_orr) != 0 else []
         }
 
         return jsonify(data=json.dumps(response_data))
