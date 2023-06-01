@@ -2,14 +2,14 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 from pathfinder import PathFinder
 
-obs = [[10,0],[0,10],[-10,0], [-30, -30], [-40, -40] ,[-40, 0], [40, 0], [ 60, 0], [70,-10] ] # Example obstacle coordinates
+obs = [[0,0] ] # Example obstacle coordinates
 grid_rad = 100  # Example grid radius
 
 path_finder = PathFinder(obs, cell_dim=10, grid_rad=grid_rad)
 
 current_position = (0,0)  # Example current position
 
-path_finder.setTarget_xy_in_website((0,0))  # Example target position
+path_finder.setTarget_xy_in_website((0,1))  # Example target position
 
 path = path_finder.dijkstra_shortest_path(path_finder.car_to_grid(current_position)).copy()
 
@@ -28,7 +28,7 @@ print(f"Sequence will then be {path_finder.path_to_actionNumber()}")
 
 for this in path :
     if this != -1:
-        print(path_finder.__grid_to_website(this))
+        print(path_finder.grid_to_website(this))
 # Plotting the grid with obstacles
 
 # Plotting the obstacles

@@ -19,9 +19,10 @@ startTime = time.time()
 global togo
 togo = (0,0)
 
-# espT.start_thread() # Always on
 global cluster_chart
 cluster_chart  =  ClusterChart()
+
+espT.start_thread()
 
 # Know if you are connected or not
 global settingConnection
@@ -47,8 +48,6 @@ def post_move():
     """
     direction = request.form.get('direction')
     repCode = 0
-    print("moving")
-    print(direction)
 
     if direction == 'forward':
         repCode = espT._sendMove_Forward()
@@ -174,11 +173,9 @@ def get_graph_kmeans():
             for y in range(min_y_grid, max_y_grid + 1):
                 cells.append((x, y))
     
-        espT.path_finder.fill_grid(cells)
-        espT.path_finder.togo_position = espT.path_finder.car_to_grid(togo)
-    print("Data calculated")
-    print(espT.path_finder.togo_position)
-    print(cells)
+        #espT.path_finder.fill_grid(cells)
+        #espT.path_finder.togo_position = espT.path_finder.car_to_grid(togo)
+
     return jsonify(mapJson)
 
 @main.route('/get-graph-movement', methods=['POST'])
@@ -189,8 +186,10 @@ def get_graph_movement():
     """
     if 'togo' in request.form:
         togo_coordinates = json.loads(request.form['togo'])
-        espT.path_finder.setTarget_xy_in_website( togo_coordinates)
-        espT.map_all()
+        print(f"togo_coordinates : {togo_coordinates}")
+        if len(togo_coordinates) != 0 :
+            espT.path_finder.setTarget_xy_in_website( togo_coordinates)
+            espT.map_all()
             
     x_route = [coord[0] for coord in espT.path_finder.path]
     y_route = [coord[1] for coord in espT.path_finder.path]

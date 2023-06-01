@@ -48,10 +48,6 @@ class ESP32Connection:
 
         self.ssid = "espWifi2"
         self.password = "0123456789A"
-
-
-
-
  
     def connect_to_wifi(self):
         ssid = self.ssid
@@ -317,14 +313,16 @@ class ESP32Connection:
 ############ PATH FINDING ############
     def _sendPath_Instruction(self):
         while self.running:
-            if  self.connected :
+            if  self.connected and self.path_finder.togo_position is not None :
                 actionNumber = self.map_all()
                 print(f"actionNumber : {actionNumber}")
 
-                if actionNumber != -1 :
+                if len(actionNumber) == 0 :
+                    self._send_actionNumber(float(0))
+                elif actionNumber != -1 :
                     self._send_actionNumber(actionNumber[0])
 
-            threading.Event().wait(5)  
+            threading.Event().wait(1)  
 
         timeOfRep = round( time.time() - self.time, 2)
         self.info.append((timeOfRep, "Listen Thread stopped")) 

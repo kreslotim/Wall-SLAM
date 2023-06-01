@@ -13,7 +13,7 @@ class PathFinder:
             grid_rad (int): The radius of the grid.
 
         """
-        self.togo_position = (10,10)
+        self.togo_position = None
 
         # "Radius" of the square grid cm
         self.cell_dim = cell_dim
@@ -64,7 +64,7 @@ class PathFinder:
         Returns:
             paths (array): a list of cell indices representing the optimal path
         """
-        if self.grid[current_position[1]][current_position[0]] == 1:
+        if len(self.grid) == 0 or self.grid[current_position[1]][current_position[0]] == 1:
             return []
 
 
@@ -152,14 +152,14 @@ class PathFinder:
 
         """
         # 1 : move, 4 : turn left, 3 : turn right
-        current_orr = current_orr + 90 #offset
+        current_orr = current_orr #offset
         path = self.path.copy()
         if len(path) == 0:
-            return float(0)
+            return [float(0)]
         
-        if path[0] == -1:
-            return -2
+        print(f"path : {path}")
         action = []
+
         while len(path) > 1:
             axe = 1 if path[0][0] - path[1][0] == 0 else 0
             moved = 0
@@ -168,8 +168,7 @@ class PathFinder:
                 togo_orr = 90 + axe*90# relative orr
             if path[0][axe] - path[1][axe] < 0:
                 togo_orr =  270 -axe*270 
-            if path[0][axe] - path[1][axe] == 0:
-                togo_orr = 0
+            
                 
             while moved == 0:
                 if current_orr == togo_orr :
@@ -177,14 +176,14 @@ class PathFinder:
                     moved = 1
                     path.pop(0)
                     
-                if current_orr < togo_orr :
+                if current_orr > togo_orr :
                     action.append(3)
                     current_orr = current_orr + 90
 
-                if current_orr > togo_orr :
+                if current_orr < togo_orr :
                     action.append(4)
                     current_orr = current_orr - 90
-        return action
+        return action  if len(path) != 0 else [float(0)]
     
     def generate_list_of_obstacles_for_website(self): 
         """
@@ -284,6 +283,21 @@ class PathFinder:
         return x,y
     
     def __grid_to_website(self, point_array):
+        """
+        Gets the content of the grid at (x, y) based on array coordinates, where [0, 0] is the top left.
+
+        Arguments:
+            point_array (tuple): coordinates of the grid in array format as (x, y)
+        Returns:
+            x (int): coordinate x in the array
+            y (int): coordinate y in the array
+        """
+        y = point_array[0]
+        x = len(self.grid) - point_array[1] - 1
+        return x, y
+    
+    
+    def grid_to_website(self, point_array):
         """
         Gets the content of the grid at (x, y) based on array coordinates, where [0, 0] is the top left.
 

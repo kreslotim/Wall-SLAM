@@ -638,7 +638,7 @@ function initMouvement(){
   Plotly.newPlot('graph-movement', allData, layout,{ displayModeBar: false });
 
   
-  var togo = [0,0]
+  var togo = []
   function updateMap() {
     toggleUpdate("movement",updateMap);
 
