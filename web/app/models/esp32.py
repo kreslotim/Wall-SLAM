@@ -192,10 +192,10 @@ class ESP32Connection:
                             self.obs_stat.append(timeOfRep)
 
                         # Adding obstacles with Front Lidar
-                        self.slam_data._add_and_delete_obstacle(self.slam_data.curr_x_car,  self.slam_data.curr_y_car, distanceFront, orientation)
+                        self.slam_data.add_and_delete_obstacle(self.slam_data.curr_x_car,  self.slam_data.curr_y_car, distanceFront, orientation)
 
                         # Adding obstacles with Back Lidar
-                        self.slam_data._add_and_delete_obstacle(self.slam_data.curr_x_car,  self.slam_data.curr_y_car, distanceBack, orientation)
+                        self.slam_data.add_and_delete_obstacle(self.slam_data.curr_x_car,  self.slam_data.curr_y_car, distanceBack, orientation)
                         
 
                 
