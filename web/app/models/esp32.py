@@ -132,7 +132,6 @@ class ESP32Connection:
 
     def thread_connect(self):
         while self.running:
-            
             if not self.connected :
                 timeOfRep = round( time.time() - self.time, 2)
                 self.info.append((timeOfRep, "Connection Thread Reconnecting ..."))
@@ -149,8 +148,6 @@ class ESP32Connection:
                     # Receive data from the client socket
                     data = self.recv_socket.recv(48)
 
-                
-
                     if data:
                       
                         try :
@@ -158,6 +155,7 @@ class ESP32Connection:
                         except Exception as e:
                             print("Connection error :", e)
                             print(len(data))
+
                         # Use the data 
                         distanceFront = data_decoded[2]
                         distanceBack = data_decoded[3]
@@ -174,34 +172,20 @@ class ESP32Connection:
                         timeOfRep = round( time.time() - self.time, 2)
                         self.recv_stat.append(timeOfRep)
 
-                        # Filter invalid distances to 0, to allow negative distances
-                        if (distanceFront == -1) :
-                            distanceFront = 0
-                        else :
+                        # Filter invalid distances, to allow negative distances
+                        if (distanceFront != -1) :
                             distanceFront += 20
                             self.obs_stat.append(timeOfRep)
+                            self.slam_data.add_and_delete_obstacle(self.slam_data.curr_x_car,  self.slam_data.curr_y_car, distanceFront, orientation)
 
-                        if (distanceBack == -1) :
-                            distanceBack = 0
-                        else :
+                        if(distanceBack != -1) :
                             distanceBack = -distanceBack - 20
                             self.obs_stat.append(timeOfRep)
-
-                        # Adding obstacles with Front Lidar
-                        self.slam_data.add_and_delete_obstacle(self.slam_data.curr_x_car,  self.slam_data.curr_y_car, distanceFront, orientation)
-
-                        # Adding obstacles with Back Lidar
-                        self.slam_data.add_and_delete_obstacle(self.slam_data.curr_x_car,  self.slam_data.curr_y_car, distanceBack, orientation)
-                        
-
-                
-                       
-
+                             # Adding obstacles with Back Lidar
+                            self.slam_data.add_and_delete_obstacle(self.slam_data.curr_x_car,  self.slam_data.curr_y_car, distanceBack, orientation)
+                         
                 except Exception as e:
                          print("Connection error :", e)
-
-
-
 
         timeOfRep = round( time.time() - self.time, 2)
         self.info.append((timeOfRep, "Listen Thread stopped"))           

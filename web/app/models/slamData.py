@@ -54,7 +54,7 @@ class SlamData:
         Returns:
             list: A copy of the updated list of obstacles
         """
-        if obs_distance != 0 and -self.max_distance_detection < obs_distance < self.max_distance_detection:
+        if abs(obs_distance) != 20 and -self.max_distance_detection < obs_distance < self.max_distance_detection:
             x_new, y_new = self.__dataToObstacle(x_car, y_car, obs_distance,orientation)   
             self.list_of_obs.append([x_new,y_new])
             self.list_of_temp_x_obs.append(x_new)
