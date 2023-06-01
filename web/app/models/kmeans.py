@@ -1,8 +1,6 @@
 import numpy as np
 
 
-
-
 #global functions
 def compute_distance(data, centers):
     """

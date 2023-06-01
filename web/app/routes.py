@@ -35,9 +35,6 @@ global cluster_chart
 cluster_chart  =  ClusterChart()
 dataD = DummyData(10)
 
-#TODO to delete later
-number_min_of_obstacle = 2
-in_radius = 30
 
 global settingConnection
 settingConnection = False
@@ -145,9 +142,9 @@ def get_graph_obs_raw():
 
 @main.route('/get-graph-redundancy', methods=['GET'])
 def get_graph_redundancy():
-    #slist_of_obs = espT.slam_data._filter_obstacles(number_min_of_obstacle, in_radius)
-    x_obs = [coord[0] for coord in espT.slam_data.list_of_obs]
-    y_obs = [coord[1] for coord in espT.slam_data.list_of_obs]
+    list_of_obs = espT.slam_data.filter_obstacles()
+    x_obs = [coord[0] for coord in list_of_obs]
+    y_obs = [coord[1] for coord in list_of_obs]
     response_data = {
         'x_car': espT.slam_data.curr_x_car,
         'y_car': espT.slam_data.curr_y_car,
