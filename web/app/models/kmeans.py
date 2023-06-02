@@ -216,6 +216,7 @@ class KMeans(object):
             
             if len(ssd) >= 2:
                 rate_of_change = ssd[-1] - ssd[-2]
+                print(threshold)
 
                 if rate_of_change < threshold and rate_of_change > 0:
                     filtered_cluster_assignments,filter_centers = filter_clusters(cluster_assignments, self.centers, self.filter)

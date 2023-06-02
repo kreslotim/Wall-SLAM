@@ -235,6 +235,7 @@ function initGraphCom() {
       for (var i = minReceived; i <= maxReceived; i++) {
         seconds.push(i);
       }
+
       
 
       var sentValues = countPoints(sentData, seconds);
@@ -255,17 +256,18 @@ function initGraphCom() {
  // Helper function to count the number of points within each second
  function countPoints(data, seconds) {
   var count = Array(seconds.length).fill(0);
+
   
   for (var i = 0; i < data.length; i++) {
     var time = Math.floor(data[i]);
     var index = seconds.indexOf(time);
-    
+
     if (index !== -1) {
       count[index] += 1;
     }
   }
   
-  return count;
+  return count.slice(-2500);
 }
 
 
@@ -356,8 +358,7 @@ function initGraphRedundancy() {
 
 function initGraphNoise() {
     toggleUpdate("obs-raw",updateMap);
-     // EventSource for receiving SSE events
-     var eventSource = new EventSource('/stream-noisy-obstacle');
+
 
      // Plotly graph initialization
      var data = [{
@@ -408,7 +409,7 @@ function initGraphNoise() {
           var x_obs = eventData.x_obs;
           var y_obs = eventData.y_obs;
 
-          Plotly.extendTraces('graph-obs-raw', { x: [[x_car], x_obs], y: [[y_car], y_obs] });
+          Plotly.extendTraces('graph-obs-raw', { x: [ [x_car], x_obs], y: [[y_car], y_obs] }, [0,1]);
         }
       });
     }

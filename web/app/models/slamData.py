@@ -8,10 +8,10 @@ class SlamData:
         # Variables to modify the filter
         self.numberOfObsInOneGo = 100
         self.delete_distance_if_no_distance = 2000
-        self.delete_distance_linear_equation = 10
+        self.delete_distance_linear_equation = 20
         self.max_distance_detection = 2000
         self.number_min_of_obstacle = 3
-        self.in_radius = 40
+        self.in_radius = 80
 
         # Obstacles attributes
         self.list_of_obs = []
@@ -59,8 +59,11 @@ class SlamData:
             self.list_of_obs.append([x_new,y_new])
             self.list_of_temp_x_obs.append(x_new)
             self.list_of_temp_y_obs.append(y_new)
-        else :
+        elif obs_distance > 0:
             obs_distance = self.delete_distance_if_no_distance
+            x_new,y_new = self.__dataToObstacle(x_car,y_car,obs_distance, orientation)
+        else :
+            obs_distance = -self.delete_distance_if_no_distance
             x_new, y_new = self.__dataToObstacle(x_car,y_car, obs_distance,orientation)   
 
         # Calculate the linear equation between the car and new obstacle
