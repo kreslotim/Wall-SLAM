@@ -173,7 +173,8 @@ def get_graph_kmeans():
 
     espT.path_finder.fill_grid(cells)
     print(togo , espT.path_finder.car_to_grid(togo))
-    espT.path_finder.togo_position = espT.path_finder.car_to_grid(togo)
+    if (espT.path_finder.togo_position != espT.path_finder.car_to_grid(togo) and espT.path_finder.togo_position and len(espT.path_finder.path)<2) or espT.path_finder.togo_position is None:
+        espT.path_finder.togo_position = espT.path_finder.car_to_grid(togo)
     espT.map_all()
     x_route = [coord[0] for coord in espT.path_finder.path]
     y_route = [coord[1] for coord in espT.path_finder.path]
