@@ -10,8 +10,8 @@ class SlamData:
         self.delete_distance_if_no_distance = 2000
         self.delete_distance_linear_equation = 10
         self.max_distance_detection = 2000
-        self.number_min_of_obstacle = 1
-        self.in_radius = 10
+        self.number_min_of_obstacle = 3
+        self.in_radius = 40
 
         # Obstacles attributes
         self.list_of_obs = []

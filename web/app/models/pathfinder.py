@@ -152,7 +152,7 @@ class PathFinder:
 
         """
         # 1 : move, 4 : turn left, 3 : turn right
-        current_orr = current_orr #offset
+        current_orr = current_orr  #offset
         path = self.path.copy()
         if len(path) == 0:
             return [float(0)]
@@ -164,25 +164,34 @@ class PathFinder:
             axe = 1 if path[0][0] - path[1][0] == 0 else 0
             moved = 0
 
-            if path[0][axe] - path[1][axe] > 0:
-                togo_orr = 90 + axe*90# relative orr
             if path[0][axe] - path[1][axe] < 0:
-                togo_orr =  270 -axe*270 
+                togo_orr = 90 - axe * 90 # relative orr
+            if path[0][axe] - path[1][axe] > 0:
+                togo_orr =  270 - axe * 90 
             
                 
             while moved == 0:
+                print(f"current_orr {current_orr}, togo : {togo_orr}")
                 if current_orr == togo_orr :
                     action.append(1)
                     moved = 1
                     path.pop(0)
                     
-                if current_orr > togo_orr :
+                if togo_orr == (current_orr + 90) % 360 :
+                    print(f"turn right ")
                     action.append(3)
-                    current_orr = current_orr + 90
+                    current_orr = (current_orr + 90) % 360
 
-                if current_orr < togo_orr :
+                if togo_orr == (current_orr + 180) % 360:
+                    print(f"turn right ")
+                    action.append(3)
+                    current_orr = (current_orr + 90) % 360
+
+                if togo_orr == (current_orr + 270) % 360:
+                    print(f"turn left ")
                     action.append(4)
-                    current_orr = current_orr - 90
+                    current_orr = (current_orr + 270) % 360
+
         return action  if len(path) != 0 else [float(0)]
     
     def generate_list_of_obstacles_for_website(self): 

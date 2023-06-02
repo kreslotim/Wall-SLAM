@@ -186,8 +186,8 @@ def get_graph_movement():
     """
     if 'togo' in request.form:
         togo_coordinates = json.loads(request.form['togo'])
-        print(f"togo_coordinates : {togo_coordinates}")
         if len(togo_coordinates) != 0 :
+            print(f"togo_coordinates : {togo_coordinates}")
             espT.path_finder.setTarget_xy_in_website( togo_coordinates)
             espT.map_all()
             
@@ -198,7 +198,7 @@ def get_graph_movement():
     'gridData': espT.path_finder.generate_list_of_obstacles_for_website(),  
     'pathX': x_route,
     'pathY': y_route,
-    'angle' : espT.slam_data.list_of_temp_orr[-1] if len(espT.slam_data.list_of_temp_orr) != 0 else []
+    'angle' : espT.slam_data.list_of_temp_orr[-1][2] if len(espT.slam_data.list_of_temp_orr) != 0 else []
     }
 
     return jsonify(data=json.dumps(response_data))

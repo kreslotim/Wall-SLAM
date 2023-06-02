@@ -316,13 +316,15 @@ class ESP32Connection:
             if  self.connected and self.path_finder.togo_position is not None :
                 actionNumber = self.map_all()
                 print(f"actionNumber : {actionNumber}")
+                print(f"orientation arduino : {self.slam_data.perfect_orientation}")
+
 
                 if len(actionNumber) == 0 :
                     self._send_actionNumber(float(0))
                 elif actionNumber != -1 :
                     self._send_actionNumber(actionNumber[0])
 
-            threading.Event().wait(1)  
+            threading.Event().wait(0.5)  
 
         timeOfRep = round( time.time() - self.time, 2)
         self.info.append((timeOfRep, "Listen Thread stopped")) 

@@ -622,8 +622,9 @@ function initMouvement(){
 
   // Define the layout
   var layout = {
-    xaxis: { title: 'Y' },
-    yaxis: { title: 'X' },
+    xaxis: { title: 'X',
+      range: [0, numCols-1] },
+    yaxis: { title: 'Y', range: [0, numCols-1] },
     margin: {
       t: 10, // Top margin
       l: 40, // Left margin
@@ -683,11 +684,14 @@ function initMouvement(){
           var angleRad = angle * (Math.PI / 180);
           var vectorX = Math.cos(angleRad);
           var vectorY = Math.sin(angleRad);
-        
+          console.log("angle")
+          console.log(angle)
+          console.log(newData.pathX[0])
+          console.log(newData.pathY[0])
           // Create the trace for the vector
           var vectorTrace = {
-            x: [pathCoordinates[0][1], pathCoordinates[0][1] + vectorX],
-            y: [pathCoordinates[0][0], pathCoordinates[0][0] + vectorY],
+            x: [newData.pathX[0], newData.pathX[0] + vectorX],
+            y: [newData.pathY[0], newData.pathY[0] + vectorY],
             mode: 'lines',
             line: {
               color: 'green',
