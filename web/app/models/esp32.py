@@ -324,7 +324,7 @@ class ESP32Connection:
                 elif actionNumber != -1 :
                     self._send_actionNumber(actionNumber[0])
 
-            threading.Event().wait(0.5)  
+            threading.Event().wait(1)  
 
         timeOfRep = round( time.time() - self.time, 2)
         self.info.append((timeOfRep, "Listen Thread stopped")) 
@@ -341,7 +341,7 @@ class ESP32Connection:
     
     def map_all(self) :
             point_car = self.path_finder.car_to_grid((self.slam_data.curr_x_car, self.slam_data.curr_y_car))
-            self.path_finder.generateGrid(self.slam_data.list_of_obs)
+            #self.path_finder.generateGrid(self.slam_data.list_of_obs)
             self.path_finder.dijkstra_shortest_path(point_car)
             actionNumber = self.path_finder.path_to_actionNumber(int(self.slam_data.perfect_orientation))
             return actionNumber

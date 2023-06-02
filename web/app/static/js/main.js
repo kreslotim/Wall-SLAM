@@ -237,8 +237,6 @@ function initGraphCom() {
       }
       
 
-
-      
       var sentValues = countPoints(sentData, seconds);
       var receivedValues = countPoints(receivedData, seconds);
       var obsValues = countPoints(obstacleData,seconds)

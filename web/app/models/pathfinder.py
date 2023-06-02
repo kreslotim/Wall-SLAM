@@ -3,7 +3,7 @@ import math
 import numpy as np
 
 class PathFinder:
-    def __init__(self, obs = [], cell_dim = 10, grid_rad = 100):
+    def __init__(self, obs = [], cell_dim = 100, grid_rad = 1000):
         """
         Initializes the PathFinder object. Handles all data related to finding an optimized path (Grid, path, obstacles...). 
 
@@ -152,7 +152,6 @@ class PathFinder:
 
         """
         # 1 : move, 4 : turn left, 3 : turn right
-        current_orr = current_orr  #offset
         path = self.path.copy()
         if len(path) == 0:
             return [float(0)]
@@ -224,7 +223,6 @@ class PathFinder:
         
         obstacle_coordinates = obs.copy()
         
-
         # Iterate through the list of obstacle coordinates
         for obstacle in obstacle_coordinates:
             # Convert obstacle coordinates to grid coordinates
@@ -233,6 +231,7 @@ class PathFinder:
             if 0 <= grid_x < len(self.grid) and 0 <= grid_y < len(self.grid):
                 self.grid[grid_y, grid_x] = 1
 
+        print(self.grid)
         return self.grid
     
     ######## TRANSFORMATION #############

@@ -106,8 +106,8 @@ class ClusterChart:
         x_std = np.std(xtrain, keepdims=True)
 
         # Normalize the training and test sets using the training set's statistics
-        xtrain = (xtrain - x_mean) / x_std
-        xtest = (xtest - x_mean) / x_std
+        #xtrain = (xtrain - x_mean) / x_std
+        #xtest = (xtest - x_mean) / x_std
 
         # Filter hence breaking the shape.  
     
