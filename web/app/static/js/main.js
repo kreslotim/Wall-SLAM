@@ -235,8 +235,8 @@ function initGraphCom() {
       for (var i = minReceived; i <= maxReceived; i++) {
         seconds.push(i);
       }
-
       
+
 
       var sentValues = countPoints(sentData, seconds);
       var receivedValues = countPoints(receivedData, seconds);
@@ -256,12 +256,12 @@ function initGraphCom() {
  // Helper function to count the number of points within each second
  function countPoints(data, seconds) {
   var count = Array(seconds.length).fill(0);
-
+  
   
   for (var i = 0; i < data.length; i++) {
     var time = Math.floor(data[i]);
     var index = seconds.indexOf(time);
-
+    
     if (index !== -1) {
       count[index] += 1;
     }
@@ -443,6 +443,61 @@ function initKmeanGraph() {
     hovermode: 'closest',
     clickmode: 'event+select',
   }; 
+  
+  // Define the path coordinates
+  var pathCoordinates = [
+    [0, 1], // Starting cell at row 0, column 1
+    [1, 1],  // Ending cell at row 1, column 1
+    [1, 2],  // Ending cell at row 1, column 1
+    [1, 3],  // Ending cell at row 1, column 1
+    [1, 4],  // Ending cell at row 1, column 1
+  ];
+
+  // Create the trace for the grid
+  var gridTrace = {
+    z: data,
+    type: 'heatmap',
+    colorscale: [[0, 'gray'], [1, 'white']],
+    showscale: false
+  };
+
+  // Create the trace for the path
+  var pathTrace = {
+    x: pathCoordinates.map(coord => coord[1]), // Column coordinates
+    y: pathCoordinates.map(coord => coord[0]), // Row coordinates
+    mode: 'lines',
+    line: {
+      color: 'red',
+      width: 3
+    }
+  };
+
+  // Create the trace for the markers
+  var startTrace = {
+    x: [pathCoordinates[0][1]], // Column coordinates of markers
+    y: [pathCoordinates[0][0]], // Row coordinates of markers
+    mode: 'markers',
+    marker: {
+      symbol: 'circle',
+      size: 10,
+      color: 'blue'
+    },
+    name: 'robot'
+  };
+
+  var endTrace = {
+    x: [pathCoordinates.at(-1)[1]], // Column coordinates of markers
+    y: [pathCoordinates.at(-1)[0]], // Row coordinates of markers
+    mode: 'markers',
+    marker: {
+      symbol: 'circle',
+      size: 10,
+      color: 'orange'
+    },
+    name: 'toGo'
+  };
+
+  
  
   var chartData =  { data: [], layout: layout };
 
@@ -455,6 +510,40 @@ function initKmeanGraph() {
       type: 'GET',
       success: function(data) {
          var newChartData = JSON.parse(data);
+          // Update path trace
+          pathTrace.x = newData.pathX;
+          pathTrace.y = newData.pathY;
+    
+          // Update start trace
+          startTrace.x = [newData.pathX[0]];
+          startTrace.y = [newData.pathY[0]];
+    
+          // Update end trace
+          endTrace.x = [newData.pathX.at(-1)];
+          endTrace.y = [newData.pathY.at(-1)];
+
+          // Update allData array
+          newChartData.push(pathTrace, startTrace, endTrace);
+
+              // Calculate the endpoint of the vector based on the angle
+          var angle = newData.angle; // Replace with your desired angle in degrees
+          var angleRad = angle * (Math.PI / 180);
+          var vectorX = Math.cos(angleRad);
+          var vectorY = Math.sin(angleRad);
+        
+          // Create the trace for the vector
+          var vectorTrace = {
+            x: [newData.pathX[0],newData.pathX[0] + vectorX],
+            y: [newData.pathY[0], newData.pathY[0] + vectorY],
+            mode: 'lines',
+            line: {
+              color: 'green',
+              width: 2
+            },
+            name: 'Orientation'
+          };
+          newChartData.push(vectorTrace)
+        
          Plotly.newPlot('graph-kmeans', newChartData.data, newChartData.layout);
         }
       

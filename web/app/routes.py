@@ -180,6 +180,12 @@ def get_graph_kmeans():
     y_route = [espT.path_finder.grid_to_car(coord)[1] for coord in espT.path_finder.path]
         #espT.path_finder.togo_position = espT.path_finder.car_to_grid(togo)
 
+    response_data = {   
+    'map': mapJson,
+    'pathX': x_route,
+    'pathY': y_route,
+    'angle' : espT.slam_data.list_of_temp_orr[-1][2] if len(espT.slam_data.list_of_temp_orr) != 0 else []
+    }
     return jsonify(mapJson)
 
 @main.route('/get-graph-movement', methods=['POST'])
