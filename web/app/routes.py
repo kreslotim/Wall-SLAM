@@ -176,6 +176,8 @@ def get_graph_kmeans():
                 cells.append((x, y))
     print(cells)
     espT.path_finder.fill_grid(cells)
+    x_route = [espT.path_finder.grid_to_car(coord)[0] for coord in espT.path_finder.path]
+    y_route = [espT.path_finder.grid_to_car(coord)[1] for coord in espT.path_finder.path]
         #espT.path_finder.togo_position = espT.path_finder.car_to_grid(togo)
 
     return jsonify(mapJson)
