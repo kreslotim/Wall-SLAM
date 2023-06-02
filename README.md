@@ -598,10 +598,4 @@ Overall, this code provides a framework for controlling a robot's movement, read
     The code defines various routes for different functionalities of the application, such as movement control, graph data retrieval, and setting updates. Each route corresponds to a specific functionality and has its own handler function that implements the logic for that functionality. 
     
 
-## References
 
-- [1] Figure 1 : Alain Godot. Algorithmes SLAM (Simultaneous Localization and Mapping). May 2019. URL: https://www.innowtech.com/2019/05/16/les-algorithmes-slam-simultaneous-localization-and-mapping/
-- [2] Figure 2 : @CodersCafeTech. DIY Radar With Ultrasonic Sensor And Chat-GPT Generated Arduino Code — Coders Cafe. Youtube. 2023. URL: https://youtube.com/shorts /o7DMHJKhpws?feature=share
-- [3] Figure 3 : Channel Everything. Two ultrasonic sensors on a servo for angle and distance data. Youtube. 2016. URL: https://www.youtube.com/watch?v=dHZB0WhLl8g&t=12s
-- [4] Figure 4 : Hani’s Experiments. How to make an ultrasonic Radar. Youtube. 2021. URL: https://www.youtube.com/watch?v=xngpwyQKnRw
-- [5] Figure 5 : Kevin McAleer. SMARS Fan. 2018. URL: https://www.smarsfan.com
