@@ -163,6 +163,7 @@ class ESP32Connection:
                         angleGyro = data_decoded[9]
                         angleKalman = data_decoded[10]
                         self.slam_data.perfect_orientation = data_decoded[11]
+                        
 
                         self.slam_data.add_orr(angleMap,angleGyro,angleKalman, timeOfReading)
                         timeOfRep = round( time.time() - self.time, 2)

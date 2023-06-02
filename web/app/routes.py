@@ -167,12 +167,10 @@ def get_graph_kmeans():
     for rec in rectangle:
         min_x_grid, max_y_grid =  espT.path_finder.car_to_grid((rec[0], rec[2]))
         max_x_grid, min_y_grid =  espT.path_finder.car_to_grid((rec[1],rec[3]))
-        for x in range(min_x_grid-1,max_x_grid + 2):
-            for y in range(min_y_grid-1, max_y_grid + 2):
+        for x in range(min_x_grid,max_x_grid + 1):
+            for y in range(min_y_grid, max_y_grid + 1):
                 cells.append((x, y))
 
-    x_rec = [coord[0] for coord in espT.path_finder.path]
-    y_rec = [coord[1] for coord in espT.path_finder.path]
     espT.path_finder.fill_grid(cells)
     print(togo , espT.path_finder.car_to_grid(togo))
     espT.path_finder.togo_position = espT.path_finder.car_to_grid(togo)

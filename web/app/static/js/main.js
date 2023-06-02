@@ -431,7 +431,7 @@ function initGraphNoise() {
 };
 
 function initKmeanGraph() {
-  toggleUpdate("kmeans",updateMap());
+  toggleUpdate("kmeans", updateMap());
   var config = { responsive: true };
   var layout = {
     margin: {
