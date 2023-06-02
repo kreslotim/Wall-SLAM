@@ -3,7 +3,7 @@ import math
 import numpy as np
 
 class PathFinder:
-    def __init__(self, obs = [], cell_dim = 100, grid_rad = 1000):
+    def __init__(self, obs = [], cell_dim = 100, grid_rad = 1000, passed_weight = 1):
         """
         Initializes the PathFinder object. Handles all data related to finding an optimized path (Grid, path, obstacles...). 
 
@@ -23,6 +23,9 @@ class PathFinder:
         self.grid = []
         self.path = []
 
+        self.grid_weights = []
+        self.PASSED_WEIGHT = passed_weight
+
         self.generateGrid(obs)
 
     def generateGrid(self, obs):
@@ -36,6 +39,7 @@ class PathFinder:
         """
         # Initialize the 2D array representing the grid map
         self.grid = np.zeros((int(2*self.grid_rad / self.cell_dim), int(2*self.grid_rad / self.cell_dim)))
+        self.grid_weights = np.zeros(self.grid.shape)
 
         obstacle_coordinates = obs.copy()
         
@@ -52,7 +56,6 @@ class PathFinder:
                 self.grid[grid_x, grid_y] += 1
 
         self.grid = np.where(self.grid < sensitivity, 0, 1)
-
         return self.grid.copy()
    
     def dijkstra_shortest_path(self, current_position):
@@ -67,6 +70,7 @@ class PathFinder:
         if len(self.grid) == 0 or self.grid[current_position[1]][current_position[0]] == 1:
             return []
 
+        self.grid_weights[current_position[1]][current_position[0]] = self.PASSED_WEIGHT
 
         rows = len(self.grid)
         cols = len(self.grid[0])
@@ -131,7 +135,7 @@ class PathFinder:
                      
 
                         # Update the distance if it's shorter than the previously recorded distance
-                        new_dist = current_dist + 1 + direction_cost
+                        new_dist = current_dist + 1 + direction_cost + self.grid_weights[y][x]
                         if new_pos not in distances or new_dist < distances[new_pos]:
                             distances[new_pos] = new_dist
                             previous[new_pos] = current_pos
