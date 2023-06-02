@@ -318,7 +318,6 @@ class ESP32Connection:
                 print(f"actionNumber : {actionNumber}")
                 print(f"orientation arduino : {self.slam_data.perfect_orientation}")
 
-
                 if len(actionNumber) == 0 :
                     self._send_actionNumber(float(0))
                 elif actionNumber != -1 :
@@ -343,6 +342,7 @@ class ESP32Connection:
             point_car = self.path_finder.car_to_grid((self.slam_data.curr_x_car, self.slam_data.curr_y_car))
             #self.path_finder.generateGrid(self.slam_data.list_of_obs)
             self.path_finder.dijkstra_shortest_path(point_car)
+            print(self.path_finder.path)
             actionNumber = self.path_finder.path_to_actionNumber(int(self.slam_data.perfect_orientation))
             return actionNumber
     

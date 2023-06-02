@@ -453,13 +453,6 @@ function initKmeanGraph() {
     [1, 4],  // Ending cell at row 1, column 1
   ];
 
-  // Create the trace for the grid
-  var gridTrace = {
-    z: data,
-    type: 'heatmap',
-    colorscale: [[0, 'gray'], [1, 'white']],
-    showscale: false
-  };
 
   // Create the trace for the path
   var pathTrace = {
@@ -499,7 +492,7 @@ function initKmeanGraph() {
 
   
  
-  var chartData =  { data: [], layout: layout };
+  var chartData =  { data: [pathTrace,startTrace,endTrace], layout: layout };
 
 
   Plotly.newPlot('graph-kmeans', chartData, layout, config,{ displayModeBar: false });
@@ -508,8 +501,10 @@ function initKmeanGraph() {
     $.ajax({
       url: '/get-graph-kmeans',
       type: 'GET',
-      success: function(data) {
-         var newChartData = JSON.parse(data);
+      success: function(response) {
+         var newData = JSON.parse(response.data);
+         var newChartData = JSON.parse(newData.map);
+         console.log(newChartData);
           // Update path trace
           pathTrace.x = newData.pathX;
           pathTrace.y = newData.pathY;
@@ -523,7 +518,11 @@ function initKmeanGraph() {
           endTrace.y = [newData.pathY.at(-1)];
 
           // Update allData array
-          newChartData.push(pathTrace, startTrace, endTrace);
+          var test =  newChartData.data;
+          console.log(test);
+          test.push(pathTrace)
+          test.push( startTrace)
+          test.push(endTrace);
 
               // Calculate the endpoint of the vector based on the angle
           var angle = newData.angle; // Replace with your desired angle in degrees
@@ -542,7 +541,7 @@ function initKmeanGraph() {
             },
             name: 'Orientation'
           };
-          newChartData.push(vectorTrace)
+          test.push(vectorTrace)
         
          Plotly.newPlot('graph-kmeans', newChartData.data, newChartData.layout);
         }
@@ -778,12 +777,12 @@ function initMouvement(){
           console.log(newData.pathY[0])
           // Create the trace for the vector
           var vectorTrace = {
-            x: [newData.pathX[0], newData.pathX[0] + vectorX],
-            y: [newData.pathY[0], newData.pathY[0] + vectorY],
+            x: [newData.pathX[0], newData.pathX[0] + 100000*vectorX],
+            y: [newData.pathY[0], newData.pathY[0] + 100000*vectorY],
             mode: 'lines',
             line: {
               color: 'green',
-              width: 2
+              width: 10000
             },
             name: 'Orientation'
           };

@@ -89,9 +89,9 @@ class PathFinder:
 
             # Check if the current position is the destination
             if current_pos == self.togo_position:
-                self.path = [self.__grid_to_website(current_pos)]
+                self.path = [self.grid_to_car(current_pos)]
                 while current_pos in previous:
-                    self.path.append(self.__grid_to_website(previous[current_pos]))
+                    self.path.append(self.grid_to_car(previous[current_pos]))
                     current_pos = previous[current_pos]
 
                 self.path.reverse()
@@ -170,24 +170,20 @@ class PathFinder:
             
                 
             while moved == 0:
-                print(f"current_orr {current_orr}, togo : {togo_orr}")
                 if current_orr == togo_orr :
                     action.append(1)
                     moved = 1
                     path.pop(0)
                     
                 if togo_orr == (current_orr + 90) % 360 :
-                    print(f"turn right ")
                     action.append(3)
                     current_orr = (current_orr + 90) % 360
 
                 if togo_orr == (current_orr + 180) % 360:
-                    print(f"turn right ")
                     action.append(3)
                     current_orr = (current_orr + 90) % 360
 
                 if togo_orr == (current_orr + 270) % 360:
-                    print(f"turn left ")
                     action.append(4)
                     current_orr = (current_orr + 270) % 360
 
@@ -229,10 +225,10 @@ class PathFinder:
             grid_x, grid_y = obstacle
             # Increment the value of the corresponding grid cell, ensure that its valid too
             if 0 <= grid_x < len(self.grid) and 0 <= grid_y < len(self.grid):
-                self.grid[grid_y, grid_x] = 1
+                self.grid[grid_x, grid_y] = 1
 
         print(self.grid)
-        return self.grid
+        return self.grid.copy()
     
     ######## TRANSFORMATION #############
     '''
@@ -248,6 +244,7 @@ class PathFinder:
             |
             v
             x
+
     Website :
 
             y
@@ -289,8 +286,8 @@ class PathFinder:
 
         x_grid, y_grid = self.__grid_to_website(point_grid)
 
-        x = (x_grid+ 1/2) * self.cell_dim - (len(self.grid[0]) * self.cell_dim) / 2
-        y = (y_grid+ 1/2 ) * self.cell_dim - (len(self.grid[1]) * self.cell_dim) / 2
+        x = (x_grid + 0.5 ) * self.cell_dim - (len(self.grid[0]) * self.cell_dim) / 2
+        y = (y_grid + 0.5 ) * self.cell_dim - (len(self.grid[1]) * self.cell_dim) / 2
 
         return x, y
     

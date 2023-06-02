@@ -10,7 +10,7 @@ import matplotlib.cm as cm
 
 
 class ClusterChart:
-    def __init__(self, train_split=0.9, threshold=0.3, max_k = 40, filter=10):
+    def __init__(self, train_split=0.9, threshold=1, max_k = 10, filter=3):
         """
         Helper class to utilize kmeans.py in the application. 
         It allows to generate a Plotly chart from its output
@@ -193,7 +193,7 @@ class ClusterChart:
                     'marker': {'color': color}
                 })
 
-        max_point = self.find_furthest_point(2, centers)
+        max_point = self.find_furthest_point(800, centers)
 
         # Add the furthest point as a scatter marker with a red 'x' marker
         data.append({
@@ -225,8 +225,8 @@ class ClusterChart:
         # Find the point with the maximum distance from obstacles
         max_distance = 0
         max_point = None
-        for x in range(-grid_size // 2, grid_size // 2 + 1):
-            for y in range(-grid_size // 2, grid_size // 2 + 1):
+        for x in range(-grid_size , grid_size  + 1, 10):
+            for y in range(-grid_size , grid_size  + 1, 10):
                 point = (x, y)
                 distance = calculate_distance(point)
                 if distance > max_distance:

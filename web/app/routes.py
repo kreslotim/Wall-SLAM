@@ -128,7 +128,6 @@ def get_graph_obs_raw():
     Route handler for the "/get-graph-obs-raw" endpoint with the GET method.
     Retrieves the raw list of obstacles with from espT.slam_data and returns it as a JSON response.
     """
-    print(" obs-raw ")
     response_data = {
         'x_car': espT.slam_data.curr_x_car,
         'y_car': espT.slam_data.curr_y_car,
@@ -160,25 +159,26 @@ def get_graph_kmeans():
     Route handler for the "/get-graph-kmeans" endpoint with the GET method.
     Generates a chart JSON using cluster_chart with K-means and returns it as a JSON response.
     """
-    global cluster_chart, togo
+    global cluster_chart
     mapJson, togo, rectangle = cluster_chart.generate_chart_json(espT.slam_data.list_of_obs)
 
     # Generate the list of occupied cells
     cells = []
     for rec in rectangle:
-        min_x_grid, min_y_grid =  espT.path_finder.car_to_grid((rec[0], rec[2]))
-        max_x_grid, max_y_grid =  espT.path_finder.car_to_grid((rec[1],rec[3]))
-        print(f" adding x : {min_x_grid}, {max_x_grid}")
-        print(f" adding y : {min_y_grid}, {max_y_grid}")
-        print(" ")
-        for x in range(min_x_grid,max_x_grid + 1):
-            for y in range(min_y_grid, max_y_grid + 1):
+        min_x_grid, max_y_grid =  espT.path_finder.car_to_grid((rec[0], rec[2]))
+        max_x_grid, min_y_grid =  espT.path_finder.car_to_grid((rec[1],rec[3]))
+        for x in range(min_x_grid-1,max_x_grid + 2):
+            for y in range(min_y_grid-1, max_y_grid + 2):
                 cells.append((x, y))
-    print(cells)
+
+    x_rec = [coord[0] for coord in espT.path_finder.path]
+    y_rec = [coord[1] for coord in espT.path_finder.path]
     espT.path_finder.fill_grid(cells)
-    x_route = [espT.path_finder.grid_to_car(coord)[0] for coord in espT.path_finder.path]
-    y_route = [espT.path_finder.grid_to_car(coord)[1] for coord in espT.path_finder.path]
-        #espT.path_finder.togo_position = espT.path_finder.car_to_grid(togo)
+    print(togo , espT.path_finder.car_to_grid(togo))
+    espT.path_finder.togo_position = espT.path_finder.car_to_grid(togo)
+    espT.map_all()
+    x_route = [coord[0] for coord in espT.path_finder.path]
+    y_route = [coord[1] for coord in espT.path_finder.path]
 
     response_data = {   
     'map': mapJson,
@@ -186,7 +186,7 @@ def get_graph_kmeans():
     'pathY': y_route,
     'angle' : espT.slam_data.list_of_temp_orr[-1][2] if len(espT.slam_data.list_of_temp_orr) != 0 else []
     }
-    return jsonify(mapJson)
+    return jsonify(data=json.dumps(response_data))
 
 @main.route('/get-graph-movement', methods=['POST'])
 def get_graph_movement():

@@ -5,4 +5,4 @@ if __name__ == '__main__':
     """
     Run the Flask Application
     """
-    app.run()
+    app.run(threaded = True)
