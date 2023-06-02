@@ -3,7 +3,7 @@ import math
 import numpy as np
 
 class PathFinder:
-    def __init__(self, obs = [], cell_dim = 100, grid_rad = 2000, passed_weight = 1):
+    def __init__(self, obs = [], cell_dim = 100, grid_length = 4000, passed_weight = 1):
         """
         Initializes the PathFinder object. Handles all data related to finding an optimized path (Grid, path, obstacles...). 
 
@@ -17,7 +17,7 @@ class PathFinder:
 
         # "Radius" of the square grid cm
         self.cell_dim = cell_dim
-        self.grid_rad = grid_rad
+        self.grid_length = grid_length
         self.obs = obs
 
         self.grid = []
@@ -38,7 +38,7 @@ class PathFinder:
             grid (Array) : The grid with obstacles, if an obstacle is present the cell index will be 1 otherwise 0.
         """
         # Initialize the 2D array representing the grid map
-        self.grid = np.zeros((int(2*self.grid_rad / self.cell_dim), int(2*self.grid_rad / self.cell_dim)))
+        self.grid = np.zeros((int(self.grid_length / self.cell_dim), int(self.grid_length / self.cell_dim)))
         self.grid_weights = np.zeros(self.grid.shape)
 
         obstacle_coordinates = obs.copy()
@@ -53,7 +53,7 @@ class PathFinder:
 
             # Increment the value of the corresponding grid cell, ensure that its valid too
             if 0 <= grid_x < len(self.grid) and 0 <= grid_y < len(self.grid):
-                self.grid[grid_x, grid_y] += 1
+                self.grid[grid_y][grid_x] += 1
 
         self.grid = np.where(self.grid < sensitivity, 0, 1)
         return self.grid.copy()
@@ -192,20 +192,6 @@ class PathFinder:
                     current_orr = (current_orr + 270) % 360
 
         return action  if len(path) != 0 else [float(0)]
-    
-    def generate_list_of_obstacles_for_website(self): 
-        """
-        Generates a list of obstacle coordinates in web format for website visualization.
-
-        Returns:
-            obstacles (list): List of obstacle coordinates in grid format.
-        """
-        if len(self.grid) != 0: 
-            grid = np.array(self.grid)
-            coordinates = np.argwhere(grid == 1)
-            obstacle_cell = [self.__website_to_grid((int(x), int(y))) for x, y in coordinates]
-            return obstacle_cell
-        return []
     
     ############ K-Means Helper ############
 

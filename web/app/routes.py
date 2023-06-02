@@ -165,8 +165,8 @@ def get_graph_kmeans():
     # Generate the list of occupied cells
     cells = []
     for rec in rectangle:
-        min_x_grid, max_y_grid =  espT.path_finder.car_to_grid((rec[0], rec[2]))
-        max_x_grid, min_y_grid =  espT.path_finder.car_to_grid((rec[1],rec[3]))
+        min_x_grid, min_y_grid =  espT.path_finder.car_to_grid((rec[0], rec[2]))
+        max_x_grid, max_y_grid =  espT.path_finder.car_to_grid((rec[1],rec[3]))
         for x in range(min_x_grid,max_x_grid + 1):
             for y in range(min_y_grid, max_y_grid + 1):
                 cells.append((x, y))
