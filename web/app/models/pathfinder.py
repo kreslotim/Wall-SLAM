@@ -276,6 +276,24 @@ class PathFinder:
         
         return self.__website_to_grid((x,y))
     
+    def grid_to_car(self, point_grid):
+        """
+        Compute the car coordinates in the car's reference frame given the grid coordinates.
+
+        Arguments: 
+            point_grid (tuple) : coordinates of a point in the grid such as (x, y) 
+        Returns:
+            x (float): x-coordinate in the car's reference frame
+            y (float): y-coordinate in the car's reference frame
+        """
+
+        x_grid, y_grid = self.__grid_to_website(point_grid)
+
+        x = (x_grid+ 1/2) * self.cell_dim - (len(self.grid[0]) * self.cell_dim) / 2
+        y = (y_grid+ 1/2 ) * self.cell_dim - (len(self.grid[1]) * self.cell_dim) / 2
+
+        return x, y
+    
     def __website_to_grid(self, point_grid):
         """
         Gets the content of the grid at (x,y). Since grid is constructed with [0,0] bottom left but in a array with [0,0] top left. This method allows you to make a transition.
@@ -304,20 +322,6 @@ class PathFinder:
         x = len(self.grid) - point_array[1] - 1
         return x, y
     
-    
-    def grid_to_website(self, point_array):
-        """
-        Gets the content of the grid at (x, y) based on array coordinates, where [0, 0] is the top left.
-
-        Arguments:
-            point_array (tuple): coordinates of the grid in array format as (x, y)
-        Returns:
-            x (int): coordinate x in the array
-            y (int): coordinate y in the array
-        """
-        y = point_array[0]
-        x = len(self.grid) - point_array[1] - 1
-        return x, y
     
     ############ SETTER ############
 
