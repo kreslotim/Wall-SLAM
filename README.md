@@ -2,8 +2,7 @@
 
 Timofey Kreslo, Sylvain Pichot, Finn MacNamara, Alonso Coaguila, Florian Dejean.
 
-
-![chewby](https://github.com/kreslotim/Wall-SLAM/assets/73421792/da1ffdf1-7803-49f7-8f3c-9e4dbe255364)
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/73421792/da1ffdf1-7803-49f7-8f3c-9e4dbe255364" width = 500/>
 June 2023
 
 ## Description
