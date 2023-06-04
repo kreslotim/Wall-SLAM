@@ -342,8 +342,9 @@ In order to process our data, we utilize a python code that run intensive comput
     self.send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self.send_socket.settimeout(5)  # set a timeout of 2 seconds
     self.send_socket.connect((self.espIP, self.send_port))
-    Then to read or sent data, we can simple run those command. We will pin a thread to constantly run __listen().
     ```
+    Then to read or sent data, we can simple run those command. We will pin a thread to constantly run __listen().
+    
     
     ```python
     def __listen(self):
