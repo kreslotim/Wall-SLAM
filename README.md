@@ -16,10 +16,11 @@ The primary objective of the project was to build a cost-effective and compact S
 
 ## Overview
 
+https://github.com/kreslotim/Wall-SLAM/assets/56829239/a7d6daf9-7e9c-4008-a5e7-d5f0c00a2a69
+
 Main idea:
 
 We utilize the data from the distance sensors (Ultrasonic and LIDAR), IMU (Inertial Measurement Unit) sensor, and Stepper motors to estimate the robot's pose (position and orientation) and simultaneously construct a map of the environment. All this data will be processed and then displayed on on a website that  This involved integrating data from different sensors using techniques such as sensor calibration, fusion and Kalman filtering algorithms.
-
 
 ## Components and supplies
 
