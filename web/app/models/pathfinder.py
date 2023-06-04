@@ -3,7 +3,7 @@ import math
 import numpy as np
 
 class PathFinder:
-    def __init__(self, obs = [], cell_dim = 100, grid_rad = 1000, passed_weight = 1):
+    def __init__(self, obs = [], cell_dim = 100, grid_length = 4000, passed_weight = 1):
         """
         Initializes the PathFinder object. Handles all data related to finding an optimized path (Grid, path, obstacles...). 
 
@@ -17,7 +17,7 @@ class PathFinder:
 
         # "Radius" of the square grid cm
         self.cell_dim = cell_dim
-        self.grid_rad = grid_rad
+        self.grid_length = grid_length
         self.obs = obs
 
         self.grid = []
@@ -38,7 +38,7 @@ class PathFinder:
             grid (Array) : The grid with obstacles, if an obstacle is present the cell index will be 1 otherwise 0.
         """
         # Initialize the 2D array representing the grid map
-        self.grid = np.zeros((int(2*self.grid_rad / self.cell_dim), int(2*self.grid_rad / self.cell_dim)))
+        self.grid = np.zeros((int(self.grid_length / self.cell_dim), int(self.grid_length / self.cell_dim)))
         self.grid_weights = np.zeros(self.grid.shape)
 
         obstacle_coordinates = obs.copy()
@@ -53,7 +53,7 @@ class PathFinder:
 
             # Increment the value of the corresponding grid cell, ensure that its valid too
             if 0 <= grid_x < len(self.grid) and 0 <= grid_y < len(self.grid):
-                self.grid[grid_x, grid_y] += 1
+                self.grid[grid_y][grid_x] += 1
 
         self.grid = np.where(self.grid < sensitivity, 0, 1)
         return self.grid.copy()
@@ -193,20 +193,6 @@ class PathFinder:
 
         return action  if len(path) != 0 else [float(0)]
     
-    def generate_list_of_obstacles_for_website(self): 
-        """
-        Generates a list of obstacle coordinates in web format for website visualization.
-
-        Returns:
-            obstacles (list): List of obstacle coordinates in grid format.
-        """
-        if len(self.grid) != 0: 
-            grid = np.array(self.grid)
-            coordinates = np.argwhere(grid == 1)
-            obstacle_cell = [self.__website_to_grid((int(x), int(y))) for x, y in coordinates]
-            return obstacle_cell
-        return []
-    
     ############ K-Means Helper ############
 
     def fill_grid(self, obs):
@@ -229,7 +215,7 @@ class PathFinder:
             grid_x, grid_y = obstacle
             # Increment the value of the corresponding grid cell, ensure that its valid too
             if 0 <= grid_x < len(self.grid) and 0 <= grid_y < len(self.grid):
-                self.grid[grid_x, grid_y] = 1
+                self.grid[grid_y][grid_x] = 1
 
         print(self.grid)
         return self.grid.copy()
@@ -275,7 +261,7 @@ class PathFinder:
         x = math.floor(x/self.cell_dim)
         y = math.floor(y/self.cell_dim)
         
-        return self.__website_to_grid((x,y))
+        return x,y
     
     def grid_to_car(self, point_grid):
         """
@@ -288,46 +274,13 @@ class PathFinder:
             y (float): y-coordinate in the car's reference frame
         """
 
-        x_grid, y_grid = self.__grid_to_website(point_grid)
+        x_grid, y_grid = point_grid
 
         x = (x_grid + 0.5 ) * self.cell_dim - (len(self.grid[0]) * self.cell_dim) / 2
         y = (y_grid + 0.5 ) * self.cell_dim - (len(self.grid[1]) * self.cell_dim) / 2
 
-        return x, y
-    
-    def __website_to_grid(self, point_grid):
-        """
-        Gets the content of the grid at (x,y). Since grid is constructed with [0,0] bottom left but in a array with [0,0] top left. This method allows you to make a transition.
-
-        Arguments: 
-            point_grid (tuple): cooridnates of the grid as (x,y) 
-        Returns:
-            x (int): coordinate x in the grid
-            y (int): coordinate y in the grid
-        """
-        y = len(self.grid) - point_grid[0] - 1
-        x = point_grid[1] 
         return x,y
     
-    def __grid_to_website(self, point_array):
-        """
-        Gets the content of the grid at (x, y) based on array coordinates, where [0, 0] is the top left.
-
-        Arguments:
-            point_array (tuple): coordinates of the grid in array format as (x, y)
-        Returns:
-            x (int): coordinate x in the array
-            y (int): coordinate y in the array
-        """
-        y = point_array[0]
-        x = len(self.grid) - point_array[1] - 1
-        return x, y
-    
-    
-    ############ SETTER ############
-
-    def setTarget_xy_in_website(self, coordinates):
-        self.togo_position = self.__website_to_grid((coordinates[0],coordinates[1]))
  
 
 

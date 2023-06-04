@@ -193,7 +193,7 @@ class ClusterChart:
                     'marker': {'color': color}
                 })
 
-        max_point = self.find_furthest_point(800, centers)
+        max_point = self.find_furthest_point(1800, centers)
 
         # Add the furthest point as a scatter marker with a red 'x' marker
         data.append({
