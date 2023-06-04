@@ -46,11 +46,13 @@ We decided to shift our focus to functionalities that would enable mapping of th
 
 ### 1. Sketches
 
+<img align = "left" src = "https://user-images.githubusercontent.com/56829239/232310112-f7f68b36-d2c5-4ecf-8979-ef074a0ed3eb.png" width = 500>
+
 We started by sketching our ideas and figuring out how to arrange electronic components in the best way possible. Our main goal was to create a compact design that would make the assembly process easier and speed up 3D printing. This approach aimed to make the construction phase more efficient overall.
 
 We initiated the development process by focusing on the chassis design. Subsequently, we proceeded to devise an arrangement strategy. The robot incorporated two stepper motors along with their corresponding drivers, a servo, a battery, and a micro-controller. For the initial prototype, we positioned both stepper motors at the rear section of the chassis. In order to counterbalance the weight distribution, the batteries and the micro-controller were placed at the front section. Lastly, the servo, responsible for holding the sensors, was centrally positioned within the chassis.
 
-<img src = "https://user-images.githubusercontent.com/56829239/232310112-f7f68b36-d2c5-4ecf-8979-ef074a0ed3eb.png" width = 500>
+<img align = "left" src = "https://user-images.githubusercontent.com/56829239/232310079-931594a3-6049-4ff0-9cc0-58b74d3c37e4.png" width = 500>
 
 This approach was promptly dismissed as it became apparent that in order to facilitate turning, both motors needed to rotate in opposite directions, necessitating the rotation of the entire car around its vertical axis.
 
@@ -58,7 +60,6 @@ The rotation of the machine necessitates the alignment of the servo and the prim
 
 Consequently, we proposed an alternative design to address this limitation.
 
-![https://user-images.githubusercontent.com/56829239/232310079-931594a3-6049-4ff0-9cc0-58b74d3c37e4.png](https://user-images.githubusercontent.com/56829239/232310079-931594a3-6049-4ff0-9cc0-58b74d3c37e4.png)
 
 This design greatly appealed to us, and we made the decision to proceed in this particular direction. During our exploration on the web, we chanced upon a robot named
 
