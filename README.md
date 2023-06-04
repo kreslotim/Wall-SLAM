@@ -61,11 +61,7 @@ The rotation of the machine necessitates the alignment of the servo and the prim
 Consequently, we proposed an alternative design to address this limitation.
 
 
-This design greatly appealed to us, and we made the decision to proceed in this particular direction. During our exploration on the web, we chanced upon a robot named
-
-[SMARS](https://www.smarsfan.com/)
-
-(Screwed/Screwless Modular assemblable Robotic System), which seemed to align closely with our envisioned requirements. We found inspiration in its design and opted to incorporate a chassis that closely resembled to SMARS. To assess the feasibility of the track concept, we even went as far as designing the entire SMARS idea to evaluate its effectiveness.
+This design greatly appealed to us, and we made the decision to proceed in this particular direction. During our exploration on the web, we chanced upon a robot named [SMARS](https://www.smarsfan.com/) (Screwed/Screwless Modular assemblable Robotic System), which seemed to align closely with our envisioned requirements. We found inspiration in its design and opted to incorporate a chassis that closely resembled to SMARS. To assess the feasibility of the track concept, we even went as far as designing the entire SMARS idea to evaluate its effectiveness.
 
 Having appreciated the remarkable ingenuity behind the notion of using the printing filament as a means to securely bind the tracks together, as well as the exceptional functionality of this approach in practical implementation, we wholeheartedly adopted this design for our project. Consequently, this decision entailed the utilization of the same wheels, as the tracks had been meticulously tailored to ensure precise compatibility with these specific wheel components. This deliberate alignment not only guaranteed optimal performance but also facilitated seamless integration between the tracks and wheels, thereby fortifying the overall effectiveness of our system.
 
@@ -75,7 +71,7 @@ As soon as we agreed on the placement of all the components, we started designin
 
 Here’s what we’ve come up with.
 
-![https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22](https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22)
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22">
 
 ![https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46](https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46)
 
