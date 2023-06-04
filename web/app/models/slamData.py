@@ -8,7 +8,7 @@ class SlamData:
         # Variables to modify the filter
         self.numberOfObsInOneGo = 100
         self.delete_distance_if_no_distance = 2000
-        self.delete_distance_linear_equation = 20
+        self.delete_distance_linear_equation = 10
         self.max_distance_detection = 2000
         self.number_min_of_obstacle = 3
         self.in_radius = 80
@@ -45,6 +45,8 @@ class SlamData:
         """
         Adds an obstacle and deletes obstacles lying on the linear equation between the new obstacle and the origin. It adds to the temporary list as well as the obstacles list.
 
+        Distances equivalent to 20 mm is equivalent to detecting nothhing due to the fact that we add 20mm for the offset of the lidars and the lidars send 0 mm if nothing is detected.
+
         Args:
             x_car (float): X-coordinate of the car
             y_car (float): Y-coordinate of the car
@@ -54,15 +56,18 @@ class SlamData:
         Returns:
             list: A copy of the updated list of obstacles
         """
+        # Check if the distance is valid and reliable if not put a delete distance. 
         if abs(obs_distance) != 20 and -self.max_distance_detection < obs_distance < self.max_distance_detection:
             x_new, y_new = self.__dataToObstacle(x_car, y_car, obs_distance,orientation)   
             self.list_of_obs.append([x_new,y_new])
             self.list_of_temp_x_obs.append(x_new)
             self.list_of_temp_y_obs.append(y_new)
         elif obs_distance > 0:
+            # Put a positive delete distance, if it is the front lidar 
             obs_distance = self.delete_distance_if_no_distance
             x_new,y_new = self.__dataToObstacle(x_car,y_car,obs_distance, orientation)
         else :
+            # Put a negative delete distance, if it is the back lidar 
             obs_distance = -self.delete_distance_if_no_distance
             x_new, y_new = self.__dataToObstacle(x_car,y_car, obs_distance,orientation)   
 
@@ -80,24 +85,24 @@ class SlamData:
         for obstacle in self.list_of_obs:
             x_obs, y_obs = obstacle
 
-            # Check if the obstacle lies on the linear equation
+            # Calculate the distance between the old obstacles and new obstacles
             if m != float('inf'):
                 distance = abs(y_obs - m * x_obs - b) / math.sqrt(1 + m**2)
             else:
                 distance = abs(y_car - y_new)
 
-            # Check if the obstacle lies between the new obstacle and the origin
+            # Check if the obstacle lies between the new obstacle and the car
             if (x_car < x_obs < x_new  or x_car > x_obs > x_new ) and (y_car  < y_obs < y_new  or y_car > y_obs > y_new )and self.delete_distance_linear_equation > distance :
                     obstacles_to_delete.append(obstacle)
 
-        # Remove the obstacles that lie on the linear equation between the new obstacle and the origin
+        # Remove the obstacles that lie on the linear equation between the new obstacle and the car
         self.list_of_obs = [obstacle for obstacle in self.list_of_obs if obstacle not in obstacles_to_delete]
 
         return self.list_of_obs.copy()
 
     def filter_obstacles(self):
         """
-        Filters obstacles based on the number of nearby obstacles within a given radius. Modifies the list of 
+        Filters obstacles based on the number of nearby obstacles within a given radius. Modifies the list of obstacles
 
         Args:
             number_min_of_obstacle (int): Minimum number of obstacles required to keep an obstacle
