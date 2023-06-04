@@ -197,7 +197,7 @@ To navigate and treat the data we receive from the robot we have elaborated diff
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/73421792/00b7bc57-6bfb-498e-97f6-08204f556cb7" width = 500>
 </p>
 
-   In order to determine if there is a real obstacle, we will use kmean to determine their position and center. Finding those center are useful to move to the less dense zone, the zone that is unexplored or empty. Due to our Djikstra algorithm, we added high weight to already explore area, hence resulting in a path that will always try to explore. If a path cannot explore anymore, this mean we have map the whole area.
+   In order to determine if there is a real obstacle, we are using kmean algorithm to determine their position and center. Finding those center are useful to move to the less dense zone, the zone that is unexplored or empty. Due to our Djikstra algorithm, we added high weight to already explore area, hence resulting in a path that will always try to explore. If a path cannot explore anymore, this mean we have map the whole area.
     
    - Kmean try to assign K cluster to a data set and optimize the distance between the point from a center.
        - To determine the best K, so our number of obstacle, we run multiple time the algorithm and look for the minimal distance of the cluster related to their center. ***(Elbow method)***
