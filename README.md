@@ -110,14 +110,15 @@ Once the design was ready, it was printed at EPFL in DLL, and partly at home. Mo
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a" width = 700>
 </p>
 
-To make power control easier, a switch has been added on top of the cover that holds the servo :
+To make power control easier, a switch has been added on top of the cover that holds the servo.
+Given that multiple components, including the Arduino, operate at the same power level and share a common ground, the wires are soldered together in a centralized manner resembling the arrangement of an octopus
 
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/0c49d524-4f6e-45af-a541-f1add8a3db69" width = 500>
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/9da87210-9a63-49e8-aca9-97f923d56dd9" width = 500>
 
 The opposite side of the switch features the motion sensor (IMU) securely attached to the cover that holds the servo, using screws:
 
-![https://github.com/kreslotim/Wall-SLAM/assets/56829239/6b4e3ff5-6718-4936-b830-be0c61812fe6](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6b4e3ff5-6718-4936-b830-be0c61812fe6)
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/6b4e3ff5-6718-4936-b830-be0c61812fe6" width = 500>
 
 Here the difficulty turned out to be to establish connections between numerous devices that rely on the I2C (Inter-Integrated Circuit) serial communication protocol. In particular, there was an issue with two lidars having the same address, preventing them from being connected on the same I2C bus. One possible solution would have been to use a multiplexer, but since one was not available, an alternative approach was devised through code.
 
