@@ -101,8 +101,8 @@ The cover slides over the battery and encases the servo on top.
 
 The servo, in return, holds both lidars (distance sensors) that are sneaked on the servo’s arm.
 <p float = "left">
-<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c" width = 500>
-<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83" width = 500>
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c" width = 450>
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83" width = 450>
 </p>
  
 ### 2. Assembly
