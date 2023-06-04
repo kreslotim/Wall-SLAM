@@ -50,19 +50,19 @@ def post_move():
     repCode = 0
 
     if direction == 'forward':
-        repCode = espT._sendMove_Forward()
+        repCode = espT.sendMove_Forward()
         pass
     elif direction == 'stop':
-        repCode = espT._sendStop()
+        repCode = espT.sendStop()
         pass
     elif direction == 'right':
-        repCode = espT._sendMove_Right()
+        repCode = espT.sendMove_Right()
         pass
     elif direction == 'left':
-        repCode = espT._sendMove_Left()
+        repCode = espT.sendMove_Left()
         pass
     elif direction == 'backward':
-        repCode = espT._sendMove_Backward()
+        repCode = espT.sendMove_Backward()
         pass
     else:
         repCode = 404

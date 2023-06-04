@@ -11,6 +11,9 @@ from app.models.pathfinder import PathFinder
 
 class ESP32Connection:
     def __init__(self, send_port, recv_port):
+        """
+        Initializes the ESP32Connection class. Handles all data sending and recieving between the Computer and the ESP32
+        """
         print("Establishing Connection")
 
         # INPUT
@@ -50,6 +53,12 @@ class ESP32Connection:
         self.password = "0123456789A"
  
     def connect_to_wifi(self):
+        """
+        Connects to a WiFi network using the provided SSID and password.
+
+        Returns:
+            bool: True if the connection is successful, False otherwise.
+        """
         ssid = self.ssid
         password = self.password
         wifi = pywifi.PyWiFi()  # Create a PyWiFi object
@@ -76,6 +85,12 @@ class ESP32Connection:
         return iface.status() == pywifi.const.IFACE_CONNECTED
 
     def check_wifi_connection(self):
+        """
+        Checks the WiFi connection status.
+
+        Returns:
+            bool: True if connected, False otherwise.
+        """
         wifi = pywifi.PyWiFi()  # Create a PyWiFi object
         iface = wifi.interfaces()[0]  # Get the first available network interface
         print(f" checking status  : { iface.status() == pywifi.const.IFACE_CONNECTED}")
@@ -84,12 +99,17 @@ class ESP32Connection:
 ######## Thread Looping #############
 
     def stop_thread(self):
+        """
+        Stops the execution of the threads.
+        """
         timeOfRep = round( time.time() - self.time, 2)
         self.info.append((timeOfRep, "Stopping threads ..."))
         self.running = False
 
     def start_thread(self):
-
+        """
+        Starts the main threads for establishing connection, listening, and sending path instructions.
+        """
         connected = False
         while not connected:
             connected = self.connect_to_wifi()
@@ -119,25 +139,31 @@ class ESP32Connection:
         self.info.append((timeOfRep, "Starting threads ..."))
         self.running = True
         connectLoop = threading.Thread(target=self.thread_connect) 
-        listenLoop = threading.Thread(target=self._listen)
-        pathLoop = threading.Thread(target=self._sendPath_Instruction)
+        listenLoop = threading.Thread(target=self.__listen)
+        pathLoop = threading.Thread(target=self.__sendPath_Instruction)
 
         pathLoop.start()
         connectLoop.start()
         listenLoop.start()
 
     def thread_connect(self):
+        """
+        Starts the main threads for establishing connection, listening, and sending path instructions.
+        """
         while self.running:
             if not self.connected :
                 timeOfRep = round( time.time() - self.time, 2)
                 self.info.append((timeOfRep, "Connection Thread Reconnecting ..."))
                 self.connected = False
-                self._connect()
+                self.__connect()
             threading.Event().wait(1)  # Wait for 1 seconds
         timeOfRep = round( time.time() - self.time, 2)
         self.info.append((timeOfRep, "Connection Thread Stopped"))
 
-    def _listen(self):
+    def __listen(self):
+        """
+        Listens for incoming data from the ESP32 device.
+        """
         while self.running:
             if self.connected:
                 try:
@@ -190,14 +216,12 @@ class ESP32Connection:
 ############ COMMUNICATION METHOD #############
 
     
-    def _connect(self):
+    def __connect(self):
+        """
+        Establishes a connection with the ESP32 device using a TCP socket.
+        """
         try:
-            # create a socket object for receiving data from the
-            # wait for a client to connect
-
             timeOfRep = round( time.time() - self.time, 2)
-        
-
 
             self.send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.send_socket.settimeout(5)  # set a timeout of 2 seconds
@@ -224,7 +248,16 @@ class ESP32Connection:
             self.connected = False
             
 
-    def _send_actionNumber(self, actionNumber):
+    def __send_actionNumber(self, actionNumber):
+        """
+        Sends an action number to the ESP32 and waits for a response.
+
+        Args:
+            action_number (int): The action number to send.
+
+        Returns:
+            int: if 200 the action is successfully sent, 400 otherwise.
+        """
         if self.connected:
             try:
                 # Send the packed angles over the socket
@@ -234,18 +267,18 @@ class ESP32Connection:
                 # Wait for a response from the ESP32
                 response = 0
 
-                while (self._is_socket_alive() and not response == "200") :
+                while (self.__is_socket_alive() and not response == "200") :
                     
                     response = self.send_socket.recv(1024).decode()   
                     print("Received response from ESP32:", response)
 
-                if not self._is_socket_alive() :  
+                if not self.__is_socket_alive() :  
                     print("Invalid response from ESP32, reconnecting...")
                     self.recv_socket.close()
                     self.send_socket.close()
-                    self._connect() 
-                    self._send_actionNumber(actionNumber)
-                    return 410
+                    self.__connect() 
+                    self.__send_actionNumber(actionNumber)
+                    return 400
                
             except Exception as e:
                 print("Connection error :", e)
@@ -266,8 +299,11 @@ class ESP32Connection:
 
 ############ ESP DIRECT COMMAND METHOD ############
 
-    def _sendStop(self):
-        repStatut = self._send_actionNumber(0)
+    def sendStop(self):
+        """
+        Sends a stop command to the ESP32.
+        """
+        repStatut = self.__send_actionNumber(0)
         timeOfRep = round( time.time() - self.time, 2)
         if repStatut == 200 :
             self.output.append((timeOfRep, 'Sent stop successful :' + str(repStatut))) 
@@ -275,8 +311,11 @@ class ESP32Connection:
             self.output.append((timeOfRep, 'Sent Move fail : ' + str(repStatut)))
         return repStatut
  
-    def _sendMove_Forward(self):
-        repStatut = self._send_actionNumber(1)
+    def sendMove_Forward(self):
+        """
+        Sends a move forward command to the ESP32.
+        """
+        repStatut = self.__send_actionNumber(1)
         timeOfRep = round( time.time() - self.time, 2)
         if repStatut == 200 :
             self.output.append((timeOfRep, 'Sent Move Forward successful :' + str(repStatut))) 
@@ -284,8 +323,11 @@ class ESP32Connection:
             self.output.append((timeOfRep, 'Sent Move Forward fail : ' + str(repStatut))) 
         return repStatut
     
-    def _sendMove_Backward(self):
-        repStatut = self._send_actionNumber(2)
+    def sendMove_Backward(self):
+        """
+        Sends a move backward command to the ESP32.
+        """
+        repStatut = self.__send_actionNumber(2)
         timeOfRep = round( time.time() - self.time, 2)
         if repStatut == 200 :
             self.output.append((timeOfRep, 'Sent Move Forward successful :' + str(repStatut))) 
@@ -293,8 +335,11 @@ class ESP32Connection:
             self.output.append((timeOfRep, 'Sent Move Forward fail  : ' + str(repStatut))) 
         return repStatut
 
-    def _sendMove_Right(self):
-        repStatut = self._send_actionNumber(3)
+    def sendMove_Right(self):
+        """
+        Sends a move right command to the ESP32.
+        """
+        repStatut = self.__send_actionNumber(3)
         timeOfRep = round( time.time() - self.time, 2)
         if repStatut == 200 :
             self.output.append((timeOfRep, 'Sent Move Forward successful :' + str(repStatut))) 
@@ -302,8 +347,11 @@ class ESP32Connection:
             self.output.append((timeOfRep, 'Sent Move Forward fail  : ' + str(repStatut))) 
         return repStatut
 
-    def _sendMove_Left(self):
-        repStatut = self._send_actionNumber(4)
+    def sendMove_Left(self):
+        """
+        Sends a move left command to the ESP32.
+        """
+        repStatut = self.__send_actionNumber(4)
         timeOfRep = round( time.time() - self.time, 2)
         if repStatut == 200 :
             self.output.append((timeOfRep, 'Sent Move Forward successful : ' + str(repStatut))) 
@@ -312,7 +360,10 @@ class ESP32Connection:
         return repStatut
     
 ############ PATH FINDING ############
-    def _sendPath_Instruction(self):
+    def __sendPath_Instruction(self):
+        """
+        Sends path instructions to the ESP32 device.
+        """
         while self.running:
             if  self.connected and self.path_finder.togo_position is not None :
                 actionNumber = self.map_all()
@@ -320,9 +371,9 @@ class ESP32Connection:
                 print(f"orientation arduino : {self.slam_data.perfect_orientation}")
 
                 if len(actionNumber) == 0 :
-                    self._send_actionNumber(float(0))
+                    self.__send_actionNumber(float(0))
                 elif actionNumber != -1 :
-                    self._send_actionNumber(actionNumber[0])
+                    self.__send_actionNumber(actionNumber[0])
 
             threading.Event().wait(1)  
 
@@ -333,15 +384,29 @@ class ESP32Connection:
 
 ############ HELPER METHOD ############
 
-    def _is_socket_alive(self):
+    def __is_socket_alive(self):
+        """
+        Checks if the socket connection is still alive.
+
+        Args:
+            s (socket.socket): The socket connection.
+
+        Returns:
+            bool: True if the socket is alive, False otherwise.
+        """
         if self.send_socket is None: 
             return False
         err = self.send_socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
         return err == 0
     
     def map_all(self) :
+            """
+            Find the best move to take for the robot to achieve the targeted postion in slam_data.
+
+            Returns:
+                actionNumber (float): the next action the robot must take to reach it's destination
+            """
             point_car = self.path_finder.car_to_grid((self.slam_data.curr_x_car, self.slam_data.curr_y_car))
-            #self.path_finder.generateGrid(self.slam_data.list_of_obs)
             self.path_finder.dijkstra_shortest_path(point_car)
             print(self.path_finder.path)
             actionNumber = self.path_finder.path_to_actionNumber(int(self.slam_data.perfect_orientation))
