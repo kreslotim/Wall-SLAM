@@ -1,7 +1,5 @@
 # Wall-SLAM - Simultaneous Localization And Mapping
 
-# Contents
-
 Timofey Kreslo, Sylvain Pichot, Finn MacNamara, Alonso Coaguila, Florian Dejean.
 
 June 2023
