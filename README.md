@@ -20,6 +20,7 @@ Main idea:
 
 We utilize the data from the distance sensors (Ultrasonic and LIDAR), IMU (Inertial Measurement Unit) sensor, and Stepper motors to estimate the robot's pose (position and orientation) and simultaneously construct a map of the environment. All this data will be processed and then displayed on on a website that  This involved integrating data from different sensors using techniques such as sensor calibration, fusion and Kalman filtering algorithms.
 
+
 ## Components and supplies
 
 - ESP32
