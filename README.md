@@ -167,6 +167,8 @@ Unfortunately, the SLAM algorithm is too memory-bound and computationally slow f
 
 To see in real time the advancement of the mapping and for debugging purpose, we made a complete interface that display every step of the data flow. To do so, we are using Flask, Plotly and bootstrap.
 
+<img src = "Pictures/Mozilla Firefox 2023-06-04 16-34-36 - Trim.gif">
+
 <p align = "center">
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/73421792/00b7bc57-6bfb-498e-97f6-08204f556cb7" width = 600>
 </p>
