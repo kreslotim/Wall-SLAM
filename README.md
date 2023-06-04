@@ -400,6 +400,8 @@ At an earlier stage of the project, we tried to create a simulation to test diff
 
 To simulate the LIDAR that the robot used, we created a python class with static methods to handle the light collisions with Numpy with the shapes called Geometry which was called by the Playground class which would contain all the landmarks which was called by the Rover class which represents the robot. Unfortunately if its . To get a better picture of the area, the rover could move from point to point. To add some realism, every time rover scanned it would add a noise random varialbe that is ajustable with a modifiable scalar.
 
+![simulation](https://github.com/kreslotim/Wall-SLAM/assets/100040759/df899282-23aa-4720-8ff3-f07543068743)
+
 As mentioned before, we ended up not using the simulation much, with hindsight, we admit that it was not useful within the time frame we had. Maybe if the time frame was bigger, we could have used it to developp the the navigation algorithmns, it could have helped with not having to depend on the robot for more realistic tests and allow parrallel workflows.
 
 ### 5. Software Overview
