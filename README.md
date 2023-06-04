@@ -106,14 +106,14 @@ The servo, in return, holds both lidars (distance sensors) that are sneaked on t
 ### 2. Assembly
 
 Once the design was ready, it was printed at EPFL in DLL, and partly at home. Mostly PETG material was used, except for the tracks which were printed using FLEX rubber filament, under the consent of Sébastien Martinerie - 3D printing Coach at the SPOT. Caterpillars are connected by means of an ordinary filament in its initial form, as mentioned above.
-
-![https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a](https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a)
+<p align = "center">
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a" width = 700>
+</p>
 
 To make power control easier, a switch has been added on top of the cover that holds the servo :
 
-![https://github.com/kreslotim/Wall-SLAM/assets/56829239/0c49d524-4f6e-45af-a541-f1add8a3db69](https://github.com/kreslotim/Wall-SLAM/assets/56829239/0c49d524-4f6e-45af-a541-f1add8a3db69)
-
-![https://github.com/kreslotim/Wall-SLAM/assets/56829239/9da87210-9a63-49e8-aca9-97f923d56dd9](https://github.com/kreslotim/Wall-SLAM/assets/56829239/9da87210-9a63-49e8-aca9-97f923d56dd9)
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/0c49d524-4f6e-45af-a541-f1add8a3db69" width = 500>
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/9da87210-9a63-49e8-aca9-97f923d56dd9" width = 500>
 
 The opposite side of the switch features the motion sensor (IMU) securely attached to the cover that holds the servo, using screws:
 
