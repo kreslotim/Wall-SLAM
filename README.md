@@ -199,15 +199,15 @@ To navigate and treat the data we receive from the robot we have elaborated diff
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/73421792/78efdc26-d8c6-4f3f-8294-cb8b9af3a81c">
 
 
-    In order to determine if there is a real obstacle, we will use kmean to determine their position and center. Finding those center are useful to move to the less dense zone, the zone that is unexplored or empty. Due to our Djikstra algorithm, we added high weight to already explore area, hence resulting in a path that will always try to explore. If a path cannot explore anymore, this mean we have map the whole area.
+   In order to determine if there is a real obstacle, we will use kmean to determine their position and center. Finding those center are useful to move to the less dense zone, the zone that is unexplored or empty. Due to our Djikstra algorithm, we added high weight to already explore area, hence resulting in a path that will always try to explore. If a path cannot explore anymore, this mean we have map the whole area.
     
-    - Kmean try to assign K cluster to a data set and optimize the distance between the point from a center.
-        - To determine the best K, so our number of obstacle, we run multiple time the algorithm and look for the minimal distance of the cluster related to their center. ***(Elbow method)***
+   - Kmean try to assign K cluster to a data set and optimize the distance between the point from a center.
+       - To determine the best K, so our number of obstacle, we run multiple time the algorithm and look for the minimal distance of the cluster related to their center. ***(Elbow method)***
         - To initiate our center, we already approximate where the center should be ***(kmean ++).*** Then we move again the center to approach the center of mass better till we converge.
     - In order to reduce noise, which can be seen as the outlier and stand alone point in our dataset, we slice our data randomly before training kmean. If a cluster is assign less than a fixed number of point, we will modify the label to be considered as a noisy cluster, represented with the red dots on the above graphic.
     - To represent an obstacle, we decided to turn them into rectangle taking the minimum and maximum. This lead to more strict threshold since our obstacle are hollow shape and to create multiple rectangle for one obstacle depending on its size.
     
-    **kmean.py** handle all the necessary function to run the kmean++ algorithm and the Elbow method using numpy.
+   **kmean.py** handle all the necessary function to run the kmean++ algorithm and the Elbow method using numpy.
     
    **mapk.py** handle how to interpret this data in your main app.
     
