@@ -2,8 +2,9 @@
 
 Timofey Kreslo, Sylvain Pichot, Finn MacNamara, Alonso Coaguila, Florian Dejean.
 
-June 2023
+
 ![chewby](https://github.com/kreslotim/Wall-SLAM/assets/73421792/da1ffdf1-7803-49f7-8f3c-9e4dbe255364)
+June 2023
 
 ## Description
 
@@ -397,7 +398,7 @@ One of the main issue we ran into, is the instability of the connection. In earl
 
 At an earlier stage of the project, we tried to create a simulation to test different algorithms but unfortunately we had to divert our attention to other aspects. Nevertheless a prototype was developed, in which the robot is represented as a point mass and the landmarks are a string of 2d points.
 
-To simulate the LIDAR that the robot used, we created a python class with static methods to handle the light collisions with Numpy with the shapes called Geometry which was called by the Playground class which would contain all the landmarks which was called by the Rover class which represents the robot. Unfortunately if its . To get a better picture of the area, the rover could move from point to point. To add some realism, every time rover scanned it would add a noise random varialbe that is ajustable with a modifiable scalar.
+To simulate the LIDAR that the robot used, we created a python class with static methods to handle the light collisions with Numpy with the shapes called Geometry which was called by the Playground class which would contain all the landmarks which was called by the Rover class which represents the robot. To get a better picture of the area, the rover could move from point to point. To add some realism, every time rover scanned it would add a noise random varialbe that is ajustable with a modifiable scalar.
 
 ![simulation](https://github.com/kreslotim/Wall-SLAM/assets/100040759/df899282-23aa-4720-8ff3-f07543068743)
 
@@ -409,7 +410,7 @@ As mentioned before, we ended up not using the simulation much, with hindsight, 
 
 ### 6. Problems and Risks
 
-Due to how litle testing we were able to do in real situation, our kmean hyperparameters may not be fit for a complete mapping or may need to be dynamicaly adjusted depending of the size explored.
+Due to how little testing we were able to do in real scenarios, our kmean hyperparameters may not be fit for a complete mapping or may need to be adjusted depending of the size explored.
 
 ## Why Chewbacca ?
 We decided to named our robot Chewbacca, with all his wiring they just look similar. Chewbacca has problem navigating around his surrounding with all of hair covering his eye just like our robot. Chewbacca has his powerful blaster, our robot has powerful Lidar guns. Chewbacca has two legs, our robots has two motors. Chewbacca has good balaance, our robot has an IMU that can easily find his orientation. I hope you enjoyed the little adventure with our Chewbacca, sadly this is the end of his story... or is it ?   
