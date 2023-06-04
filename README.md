@@ -83,14 +83,18 @@ Now we will explain the choice we’ve made for positioning the electronic piece
 
 While we adopted the wheel design from SMARS ([link for STLs](https://www.thingiverse.com/thing:2662828)), we had to adapt it’s axle mount to fit the rectangular axle of the motor we are using. Furthermore, it is essential to align the axle of the slave wheel with the motor’s axle to ensure that both wheels are at the same level.
 
-<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/3dcc6850-5950-4f5f-9a45-e38546c61ef8" width = 500>
-
+<p align = "center">
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/3dcc6850-5950-4f5f-9a45-e38546c61ef8" width = 700>
+</p>
+ 
 In order to optimize the efficiency of the printing and assembly process, we strategically positioned all the components in close proximity to one another, ensuring minimal wasted space on the chassis.
 
 As the heaviest electronic component of the entire construction, the battery serves as a central anchor within the overall design. By positioning it at the center, we establish a stable foundation upon which the remaining components, i.e. the servo and the sensors are securely mounted and connected.
 
+<p align = "center">
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/f2b20805-2bfe-478f-b751-ee17c3dc3ad8" width = 800>
-
+</p>
+ 
 The cover slides over the battery and encases the servo on top.
 
 The servo, in return, holds both lidars (distance sensors) that are sneaked on the servo’s arm.
