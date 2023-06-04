@@ -8,7 +8,7 @@ class SlamData:
         # Variables to modify the filter
         self.numberOfObsInOneGo = 100
         self.delete_distance_if_no_distance = 2000
-        self.delete_distance_linear_equation = 20
+        self.delete_distance_linear_equation = 10
         self.max_distance_detection = 2000
         self.number_min_of_obstacle = 3
         self.in_radius = 80
