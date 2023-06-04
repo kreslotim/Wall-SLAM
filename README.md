@@ -129,10 +129,10 @@ Here the difficulty turned out to be to establish connections between numerous d
 To overcome this challenge, some of the ESP32 GPIOs needed to be reconfigured to function as I2C pins, to which we connected the front lidar. Subsequently, the motion sensor was connected to the standard I2C pins, and the back lidar was also connected to these same pins as well. This was possible because the motion sensor and the lidar had different addresses assigned to them, ensuring that there was no conflict in their communication over the shared I2C bus. Finally, to ensure proper insulation and protection, we applied heat shrink tubing at the junction point where the three wires met.
 
 <br/><br/>
+<br/><br/>
+<br/><br/>
 
 A detailed circuit diagram of all connections is shown below:
-
-<br/><br/>
 
 <p align = "center">
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/c93e14a5-a572-4767-83b8-24d0dcf6c076">
