@@ -5,8 +5,9 @@
 Timofey Kreslo, Sylvain Pichot, Finn MacNamara, Alonso Coaguila, Florian Dejean.
 
 June 2023
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/1c891612-474e-4033-a6df-3f43d410a8dd">
 
-![photo_2023-06-04_19-11-03.jpg](Wall-SLAM%20-%20Simultaneous%20Localization%20And%20Mapping%207e6082d39c184f15afff20c598117ae1/photo_2023-06-04_19-11-03.jpg)
+
 
 ## Description
 
