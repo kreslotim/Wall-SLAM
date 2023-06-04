@@ -168,10 +168,6 @@ Unfortunately, the SLAM algorithm is too memory-bound and computationally slow f
 To see in real time the advancement of the mapping and for debugging purpose, we made a complete interface that display every step of the data flow. To do so, we are using Flask, Plotly and bootstrap.
 
 <img src = "Pictures/Mozilla Firefox 2023-06-04 16-34-36 - Trim.gif">
-
-<p align = "center">
-<img src = "https://github.com/kreslotim/Wall-SLAM/assets/73421792/00b7bc57-6bfb-498e-97f6-08204f556cb7" width = 600>
-</p>
  
 *Sample setup*
 
@@ -196,9 +192,10 @@ To navigate and treat the data we receive from the robot we have elaborated diff
     *Photo of the Pathfinding Algorithm in action right below…*
     
 - **Map - kmean.py and mapK.py**
-
-<img src = "https://github.com/kreslotim/Wall-SLAM/assets/73421792/78efdc26-d8c6-4f3f-8294-cb8b9af3a81c">
-
+<p float = "left">
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/73421792/78efdc26-d8c6-4f3f-8294-cb8b9af3a81c" width = 500>
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/73421792/00b7bc57-6bfb-498e-97f6-08204f556cb7" width = 600>
+</p>
 
    In order to determine if there is a real obstacle, we will use kmean to determine their position and center. Finding those center are useful to move to the less dense zone, the zone that is unexplored or empty. Due to our Djikstra algorithm, we added high weight to already explore area, hence resulting in a path that will always try to explore. If a path cannot explore anymore, this mean we have map the whole area.
     
