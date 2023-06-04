@@ -214,7 +214,7 @@ To navigate and treat the data we receive from the robot we have elaborated diff
     *Here is a the graph without the filter:*  
     ![noisy_example](https://github.com/kreslotim/Wall-SLAM/assets/73421792/e273c981-825e-441b-81e7-4f7f59a3de8a)
 
-    *Here it is with the filter (the lump present in [0,200] is the charging cable attached to the car with is not accidental and not present in the photo withe the observed obstacles):*
+    *Here it is with the filter (the lump present in [0,200] is the charging cable attached to the car with is accidental and not present in the photo with the observed obstacles):*
     ![filter_example](https://github.com/kreslotim/Wall-SLAM/assets/73421792/951d0479-695e-4062-83f1-0511c76d06bd)
 
 
