@@ -38,7 +38,7 @@ We utilize the data from the distance sensors (Ultrasonic and LIDAR), IMU (Inert
 
 As zealous devotees of the enchanting Disney’s figure Wall-E, we couldn’t resist the temptation to transform our prototype into his spitting image. But, alas, our professor promptly intervened, bursting our bubble of whimsy with a comic remark. He reminded us that while Wall-E excelled in garbage collection and exuded undeniable cuteness, our project’s aspirations extended beyond those realms. Thus, we bid farewell to our beloved Wall-E robot, sparing it from a destiny of cuteness overload and instead refocusing our efforts on more practical endeavors.
 
-<img align="right" src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/6667b767-95a2-45b7-8b5e-17c26d23500b" width = 500>
+<img align="left" src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/6667b767-95a2-45b7-8b5e-17c26d23500b" width = 500>
 
 We decided to shift our focus to functionalities that would enable mapping of the surrounding environment, which is covered by SLAM. Additionally, we chose to retain the concept of tracks with wheels, as it offers enhanced precision in movement and rotation (especially the ability to turn on the spot), while opting for rubber tracks to minimize slippage during maneuvering. The adventure of building a SLAM robot starts here. Our first step is to build our robot, that we later named... Chewbacca, we will give a reason for that name at the end of the report. Meanwhile lets see how we built it. 
 
