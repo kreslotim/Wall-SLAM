@@ -92,17 +92,17 @@ In order to optimize the efficiency of the printing and assembly process, we str
 As the heaviest electronic component of the entire construction, the battery serves as a central anchor within the overall design. By positioning it at the center, we establish a stable foundation upon which the remaining components, i.e. the servo and the sensors are securely mounted and connected.
 
 <p align = "center">
-<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/f2b20805-2bfe-478f-b751-ee17c3dc3ad8" width = 800>
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/f2b20805-2bfe-478f-b751-ee17c3dc3ad8" width = 700>
 </p>
  
 The cover slides over the battery and encases the servo on top.
 
 The servo, in return, holds both lidars (distance sensors) that are sneaked on the servo’s arm.
-
-![https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c)
-
-![https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83](https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83)
-
+<p align = "center">
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c">
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83">
+</p>
+ 
 ### 2. Assembly
 
 Once the design was ready, it was printed at EPFL in DLL, and partly at home. Mostly PETG material was used, except for the tracks which were printed using FLEX rubber filament, under the consent of Sébastien Martinerie - 3D printing Coach at the SPOT. Caterpillars are connected by means of an ordinary filament in its initial form, as mentioned above.
