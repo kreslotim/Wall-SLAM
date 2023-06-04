@@ -557,7 +557,7 @@ void moveForward() {
   }
   stepperRight.runSpeed();
   
-  //correctHeading();
+  correctHeading();
 }
 
 // Moves the car backward
