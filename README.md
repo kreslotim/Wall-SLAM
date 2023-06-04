@@ -40,7 +40,7 @@ As zealous devotees of the enchanting Disney’s figure Wall-E, we couldn’t re
 
 ![https://github.com/kreslotim/Wall-SLAM/assets/56829239/6667b767-95a2-45b7-8b5e-17c26d23500b](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6667b767-95a2-45b7-8b5e-17c26d23500b)
 
-We decided to shift our focus to functionalities that would enable mapping of the surrounding environment, which is covered by SLAM. Additionally, we chose to retain the concept of tracks with wheels, as it offers enhanced precision in movement and rotation (especially the ability to turn on the spot), while opting for rubber tracks to minimize slippage during maneuvering. The adventure of building a SLAM robot starts here. Our first step is to build our robot, that we later named... Chewbacca, we will give a reason for that name at the end of the report Meanwhile lets see how we built him. 
+We decided to shift our focus to functionalities that would enable mapping of the surrounding environment, which is covered by SLAM. Additionally, we chose to retain the concept of tracks with wheels, as it offers enhanced precision in movement and rotation (especially the ability to turn on the spot), while opting for rubber tracks to minimize slippage during maneuvering. The adventure of building a SLAM robot starts here. Our first step is to build our robot, that we later named... Chewbacca, we will give a reason for that name at the end of the report. Meanwhile lets see how we built it. 
 
 ### 1. Sketches
 
@@ -100,7 +100,7 @@ The servo, in return, holds both lidars (distance sensors) that are sneaked on t
 
 ### 2. Assembly
 
-Once the design was ready, it was printed at EPFL in DLLEL, and partly at home. Mostly PETG material was used, except for the tracks which were printed using FLEX rubber filament, under the consent of Sébastien Martinerie - 3D printing Coach at the SPOT. Caterpillars are connected by means of an ordinary filament in its initial form, as mentioned above.
+Once the design was ready, it was printed at EPFL in DLL, and partly at home. Mostly PETG material was used, except for the tracks which were printed using FLEX rubber filament, under the consent of Sébastien Martinerie - 3D printing Coach at the SPOT. Caterpillars are connected by means of an ordinary filament in its initial form, as mentioned above.
 
 ![https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a](https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a)
 
@@ -410,7 +410,7 @@ As mentioned before, we ended up not using the simulation much, with hindsight, 
 
 ### 6. Problems and Risks
 
-Due to how little testing we were able to do in real scenarios, our kmean hyperparameters may not be fit for a complete mapping or may need to be adjusted depending of the size explored.
+Due to how little testing we were able to do in real scenarios, our kmean hyperparameters may not fit for a complete mapping or may need to be adjusted depending of the size explored.
 
 ## Why Chewbacca ?
 We decided to named our robot Chewbacca, with all his wiring they just look similar. Chewbacca has problem navigating around his surrounding with all of hair covering his eye just like our robot. Chewbacca has his powerful blaster, our robot has powerful Lidar guns. Chewbacca has two legs, our robots has two motors. Chewbacca has good balaance, our robot has an IMU that can easily find his orientation. I hope you enjoyed the little adventure with our Chewbacca, sadly this is the end of his story... or is it ?   
