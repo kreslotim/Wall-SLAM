@@ -40,7 +40,7 @@ We utilize the data from the distance sensors (Ultrasonic and LIDAR), IMU (Inert
 
 As zealous devotees of the enchanting Disney’s figure Wall-E, we couldn’t resist the temptation to transform our prototype into his spitting image. But, alas, our professor promptly intervened, bursting our bubble of whimsy with a witty remark. He reminded us that while Wall-E excelled in garbage collection and exuded undeniable cuteness, our project’s aspirations extended beyond those realms. Thus, we bid farewell to our beloved Wall-E robot, sparing it from a destiny of cuteness overload and instead refocusing our efforts on more practical endeavors.
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/6667b767-95a2-45b7-8b5e-17c26d23500b](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6667b767-95a2-45b7-8b5e-17c26d23500b)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/6667b767-95a2-45b7-8b5e-17c26d23500b](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6667b767-95a2-45b7-8b5e-17c26d23500b)
 
 We decided to shift our focus to functionalities that would enable mapping of the surrounding environment, which is covered by SLAM. Additionally, we chose to retain the concept of tracks with wheels, as it offers enhanced precision in movement and rotation (especially the ability to turn on the spot), while opting for rubber tracks to minimize slippage during maneuvering.
 
@@ -74,57 +74,57 @@ As soon as we agreed on the placement of all the components, we started designin
 
 Here’s what we’ve come up with.
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22](https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22](https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22)
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46](https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46](https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46)
 
 Now we will explain the choice we’ve made for positioning the electronic pieces. The parts that are highlighted in green are those that we designed ourselves. The Ultrasonic sensor’s frame as well as the wheels and the tracks were borrowed from SMARS project, because they fit our requirements well.
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/9eac749d-10e7-4cae-a3eb-60efbaca4600](https://github.com/kreslotim/Wall-SLAM/assets/56829239/9eac749d-10e7-4cae-a3eb-60efbaca4600)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/9eac749d-10e7-4cae-a3eb-60efbaca4600](https://github.com/kreslotim/Wall-SLAM/assets/56829239/9eac749d-10e7-4cae-a3eb-60efbaca4600)
 
 While we adopted the wheel design from SMARS ([link for STLs](https://www.thingiverse.com/thing:2662828)), we had to adapt it’s axle mount to fit the rectangular axle of the motor we are using. Furthermore, it is essential to align the axle of the slave wheel with the motor’s axle to ensure that both wheels are at the same level.
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/3dcc6850-5950-4f5f-9a45-e38546c61ef8](https://github.com/kreslotim/Wall-SLAM/assets/56829239/3dcc6850-5950-4f5f-9a45-e38546c61ef8)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/3dcc6850-5950-4f5f-9a45-e38546c61ef8](https://github.com/kreslotim/Wall-SLAM/assets/56829239/3dcc6850-5950-4f5f-9a45-e38546c61ef8)
 
 In order to optimize the efficiency of the printing and assembly process, we strategically positioned all the components in close proximity to one another, ensuring minimal wasted space on the chassis.
 
 As the heaviest electronic component of the entire construction, the battery serves as a central anchor within the overall design. By positioning it at the center, we establish a stable foundation upon which the remaining components, i.e. the servo and the sensors are securely mounted and connected.
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/f2b20805-2bfe-478f-b751-ee17c3dc3ad8](https://github.com/kreslotim/Wall-SLAM/assets/56829239/f2b20805-2bfe-478f-b751-ee17c3dc3ad8)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/f2b20805-2bfe-478f-b751-ee17c3dc3ad8](https://github.com/kreslotim/Wall-SLAM/assets/56829239/f2b20805-2bfe-478f-b751-ee17c3dc3ad8)
 
 The cover slides over the battery and encases the servo on top.
 
 The servo, in return, holds both lidars (distance sensors) that are sneaked on the servo’s arm.
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c)
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83](https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83](https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83)
 
 ### Assembly
 
 Once the design was ready, it was printed at EPFL in DLLEL, and partly at home. Mostly PETG material was used, except for the tracks which were printed using FLEX rubber filament, under the consent of Sébastien Martinerie - 3D printing Coach at the SPOT. Caterpillars are connected by means of an ordinary filament in its initial form, as mentioned above.
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a](https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a](https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a)
 
 To make power control easier, a switch has been added on top of the cover that holds the servo :
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/0c49d524-4f6e-45af-a541-f1add8a3db69](https://github.com/kreslotim/Wall-SLAM/assets/56829239/0c49d524-4f6e-45af-a541-f1add8a3db69)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/0c49d524-4f6e-45af-a541-f1add8a3db69](https://github.com/kreslotim/Wall-SLAM/assets/56829239/0c49d524-4f6e-45af-a541-f1add8a3db69)
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/9da87210-9a63-49e8-aca9-97f923d56dd9](https://github.com/kreslotim/Wall-SLAM/assets/56829239/9da87210-9a63-49e8-aca9-97f923d56dd9)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/9da87210-9a63-49e8-aca9-97f923d56dd9](https://github.com/kreslotim/Wall-SLAM/assets/56829239/9da87210-9a63-49e8-aca9-97f923d56dd9)
 
 The opposite side of the switch features the motion sensor (IMU) securely attached to the cover that holds the servo, using screws:
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/6b4e3ff5-6718-4936-b830-be0c61812fe6](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6b4e3ff5-6718-4936-b830-be0c61812fe6)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/6b4e3ff5-6718-4936-b830-be0c61812fe6](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6b4e3ff5-6718-4936-b830-be0c61812fe6)
 
 Here the difficulty turned out to be to establish connections between numerous devices that rely on the I2C (Inter-Integrated Circuit) serial communication protocol. In particular, there was an issue with two lidars having the same address, preventing them from being connected on the same I2C bus. One possible solution would have been to use a multiplexer, but since one was not available, an alternative approach was devised through code.
 
 To overcome this challenge, some of the ESP GPIOs needed to be reconfigured to function as I2C pins, to which we connected the front lidar. Subsequently, the motion sensor was connected to the standard I2C pins, and the back lidar was also connected to these same pins as well. This was possible because the motion sensor and the lidar had different addresses assigned to them, ensuring that there was no conflict in their communication over the shared I2C bus. Finally, to ensure proper insulation and protection, we applied heat shrink tubing at the junction point where the three wires met :
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/550c9bed-20b3-41ab-b2bd-64b25c6ab565](https://github.com/kreslotim/Wall-SLAM/assets/56829239/550c9bed-20b3-41ab-b2bd-64b25c6ab565)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/550c9bed-20b3-41ab-b2bd-64b25c6ab565](https://github.com/kreslotim/Wall-SLAM/assets/56829239/550c9bed-20b3-41ab-b2bd-64b25c6ab565)
 
 A detailed circuit diagram of all connections is shown below:
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/c93e14a5-a572-4767-83b8-24d0dcf6c076](https://github.com/kreslotim/Wall-SLAM/assets/56829239/c93e14a5-a572-4767-83b8-24d0dcf6c076)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/c93e14a5-a572-4767-83b8-24d0dcf6c076](https://github.com/kreslotim/Wall-SLAM/assets/56829239/c93e14a5-a572-4767-83b8-24d0dcf6c076)
 
 ## Data & Algorithm Software
 
@@ -135,6 +135,8 @@ Unfortunately, the SLAM algorithm is too memory-bound and computationally slow f
 ### 1. **Web Interface**
 
 To see in real time the advancement of the mapping and for debugging purpose, we made a complete interface that display every step of the data flow. To do so, we are using Flask, Plotly and bootstrap.
+
+![https://github.com/kreslotim/Wall-SLAM/Pictures/interface](https://github.com/kreslotim/Wall-SLAM/Pictures/interface.png)
 
 ![image_2023-05-31_22-02-14.png](Wall-SLAM%20-%20Simultaneous%20Localization%20And%20Mapping%207e6082d39c184f15afff20c598117ae1/image_2023-05-31_22-02-14.png)
 
@@ -168,7 +170,7 @@ To navigate and treat the data we receive from the robot we have elaborated diff
     - In order to reduce noise, which can be seen as the outlier and stand alone point in our dataset, we slice our data randomly before training kmean. If a cluster is assign less than a fixed number of point, we will modify the label to be considered as a noisy cluster, represented with the red dots on the above graphic.
     - To represent an obstacle, we decided to turn them into rectangle taking the minimum and maximum. This lead to more strict threshold since our obstacle are hollow shape and to create multiple rectangle for one obstacle depending on its size.
     
-    k[mean.py](http://kmean.py/) handle all the necessary function to run the kmean++ algorithm and the Elbow method using numpy.
+    [Kmean.py](http://kmean.py/) handle all the necessary function to run the kmean++ algorithm and the Elbow method using numpy.
     
     [mapk.py](http://mapk.py/) handle how to interpret this data in your main app.
     
