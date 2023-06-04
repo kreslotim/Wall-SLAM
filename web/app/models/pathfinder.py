@@ -30,7 +30,8 @@ class PathFinder:
 
     def generateGrid(self, obs):
         """
-        Generate grid from collected obstacle scans
+        Generate grid from collected obstacle scans 
+        (fill_grid has the same purpose but is more specific to K-means) 
 
         Arguments: 
             obs (list): Raw list of obstacles in car coordinates.
@@ -44,7 +45,7 @@ class PathFinder:
         obstacle_coordinates = obs.copy()
         
         # Sensitivity (obstacle points per block, think of it as a threshold)
-        sensitivity = 1
+        sensitivity = 10
 
         # Iterate through the list of obstacle coordinates
         for obstacle in obstacle_coordinates:
@@ -67,11 +68,11 @@ class PathFinder:
         Returns:
             paths (array): a list of cell indices representing the optimal path
         """
+        # Check if grid exits or if the starting position is not an obstacle
         if len(self.grid) == 0 or self.grid[current_position[1]][current_position[0]] == 1:
             return []
 
         self.grid_weights[current_position[1]][current_position[0]] = self.PASSED_WEIGHT
-
         rows = len(self.grid)
         cols = len(self.grid[0])
 
@@ -129,10 +130,7 @@ class PathFinder:
                         if (dx == prev_dx or dy == prev_dy):
                             direction_cost = 0 
                         else:
-                            direction_cost = 0
-                           
-
-                     
+                            direction_cost = 4
 
                         # Update the distance if it's shorter than the previously recorded distance
                         new_dist = current_dist + 1 + direction_cost + self.grid_weights[y][x]
@@ -160,13 +158,14 @@ class PathFinder:
         if len(path) == 0:
             return [float(0)]
         
-        print(f"path : {path}")
         action = []
 
         while len(path) > 1:
+            #   Find in which axe we are moving 0 if X and 1 if Y
             axe = 1 if path[0][0] - path[1][0] == 0 else 0
             moved = 0
 
+            # Set the new targeted orientation
             if path[0][axe] - path[1][axe] < 0:
                 togo_orr = 90 - axe * 90 # relative orr
             if path[0][axe] - path[1][axe] > 0:
@@ -174,24 +173,27 @@ class PathFinder:
             
                 
             while moved == 0:
+                # Move forward if we are already in the good direction
                 if current_orr == togo_orr :
                     action.append(1)
                     moved = 1
                     path.pop(0)
-                    
+    
+                # Move Right if 90 degree turn is necessary
                 if togo_orr == (current_orr + 90) % 360 :
                     action.append(3)
                     current_orr = (current_orr + 90) % 360
 
+                # Move Right if 189 degree turn is necessary
                 if togo_orr == (current_orr + 180) % 360:
                     action.append(3)
                     current_orr = (current_orr + 90) % 360
-
+                
+                # Move Right if -90 degree turn is necessary
                 if togo_orr == (current_orr + 270) % 360:
                     action.append(4)
                     current_orr = (current_orr + 270) % 360
-
-        return action  if len(path) != 0 else [float(0)]
+        return action  
     
     ############ K-Means Helper ############
 
@@ -221,29 +223,6 @@ class PathFinder:
         return self.grid.copy()
     
     ######## TRANSFORMATION #############
-    '''
-    We are using three different coordinates system : Car, Grid, Website.
-    Grid and Website transformation shouldn't be used outside of the class.
-
-    Car : is a cartesian coordinates system
-
-    Grid :
-            0 -------> y
-            |
-            |
-            |
-            v
-            x
-
-    Website :
-
-            y
-            ^
-            |
-            |
-            |
-            0-------> x
-    '''
 
     def car_to_grid(self, point_car):
         """
