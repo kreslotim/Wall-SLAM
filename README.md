@@ -71,13 +71,13 @@ As soon as we agreed on the placement of all the components, we started designin
 
 Here’s what we’ve come up with.
 
-<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22">
+<img align = "left" src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22" width = 600>
 
-![https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46](https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46)
+<img align = "right" src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46" width = 600>
 
 Now we will explain the choice we’ve made for positioning the electronic pieces. The parts that are highlighted in green are those that we designed ourselves. The Ultrasonic sensor’s frame as well as the wheels and the tracks were borrowed from SMARS project, because they fit our requirements well.
 
-![https://github.com/kreslotim/Wall-SLAM/assets/56829239/9eac749d-10e7-4cae-a3eb-60efbaca4600](https://github.com/kreslotim/Wall-SLAM/assets/56829239/9eac749d-10e7-4cae-a3eb-60efbaca4600)
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/9eac749d-10e7-4cae-a3eb-60efbaca4600" width = 500>
 
 While we adopted the wheel design from SMARS ([link for STLs](https://www.thingiverse.com/thing:2662828)), we had to adapt it’s axle mount to fit the rectangular axle of the motor we are using. Furthermore, it is essential to align the axle of the slave wheel with the motor’s axle to ensure that both wheels are at the same level.
 
