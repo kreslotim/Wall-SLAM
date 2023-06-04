@@ -195,7 +195,8 @@ To navigate and treat the data we receive from the robot we have elaborated diff
     *Photo of the Pathfinding Algorithm in action right below…*
     
 - **Map - kmean.py and mapK.py**
-    ![kmean_example](https://github.com/kreslotim/Wall-SLAM/assets/73421792/78efdc26-d8c6-4f3f-8294-cb8b9af3a81c)
+
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/73421792/78efdc26-d8c6-4f3f-8294-cb8b9af3a81c">
 
 
     In order to determine if there is a real obstacle, we will use kmean to determine their position and center. Finding those center are useful to move to the less dense zone, the zone that is unexplored or empty. Due to our Djikstra algorithm, we added high weight to already explore area, hence resulting in a path that will always try to explore. If a path cannot explore anymore, this mean we have map the whole area.
