@@ -120,13 +120,15 @@ The opposite side of the switch features the motion sensor (IMU) securely attach
 <p align = "center">
 <img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/6b4e3ff5-6718-4936-b830-be0c61812fe6" width = 500>
 </p>
- 
+
+<br/><br/>
 
 <img align = "left" src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/550c9bed-20b3-41ab-b2bd-64b25c6ab565" width = 500>
 Here the difficulty turned out to be to establish connections between numerous devices that rely on the I2C (Inter-Integrated Circuit) serial communication protocol. In particular, there was an issue with two lidars having the same address, preventing them from being connected on the same I2C bus. One possible solution would have been to use a multiplexer, but since one was not available, an alternative approach was devised through code.
 
 To overcome this challenge, some of the ESP32 GPIOs needed to be reconfigured to function as I2C pins, to which we connected the front lidar. Subsequently, the motion sensor was connected to the standard I2C pins, and the back lidar was also connected to these same pins as well. This was possible because the motion sensor and the lidar had different addresses assigned to them, ensuring that there was no conflict in their communication over the shared I2C bus. Finally, to ensure proper insulation and protection, we applied heat shrink tubing at the junction point where the three wires met :
 
+<br/><br/>
 
 A detailed circuit diagram of all connections is shown below:
 
