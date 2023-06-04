@@ -42,6 +42,8 @@ As zealous devotees of the enchanting Disney’s figure Wall-E, we couldn’t re
 
 We decided to shift our focus to functionalities that would enable mapping of the surrounding environment, which is covered by SLAM. Additionally, we chose to retain the concept of tracks with wheels, as it offers enhanced precision in movement and rotation (especially the ability to turn on the spot), while opting for rubber tracks to minimize slippage during maneuvering. The adventure of building a SLAM robot starts here. Our first step is to build our robot, that we later named... Chewbacca, we will give a reason for that name at the end of the report. Meanwhile lets see how we built it. 
 
+ <br/><br/>
+
 ### 1. Sketches
 
 We started by sketching our ideas and figuring out how to arrange electronic components in the best way possible. Our main goal was to create a compact design that would make the assembly process easier and speed up 3D printing. This approach aimed to make the construction phase more efficient overall.
