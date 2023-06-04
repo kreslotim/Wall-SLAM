@@ -435,3 +435,8 @@ Due to how little testing we were able to do in real scenarios, our kmean hyperp
 
 ## Why Chewbacca ?
 We decided to named our robot Chewbacca, with all his wiring they just look similar. Chewbacca has problem navigating around his surrounding with all of hair covering his eye just like our robot. Chewbacca has his powerful blaster, our robot has powerful Lidar guns. Chewbacca has two legs, our robots has two motors. Chewbacca has good balaance, our robot has an IMU that can easily find his orientation. I hope you enjoyed the little adventure with our Chewbacca, sadly this is the end of his story... or is it ?   
+<p align = "center">
+<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/15c72f3c-c543-44f1-b874-adf7db9965ad">
+</p>
+
+
