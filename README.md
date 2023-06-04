@@ -68,7 +68,7 @@ Having appreciated the remarkable ingenuity behind the notion of using the print
 
 The subsequent focus of our attention revolved around the development of the chassis, and the incorporation of the battery, the motors and the sensors.
 
-As soon as we agreed on the placement of all the components, we started designing in 3D. In order to leverage the collaborative design features, we opted to use Fusion 360, enabling effective teamwork during the design process. Minor design changes have been made in FreeCad, in order to save time.
+As soon as we agreed on the placement of all the components, we started designing in 3D. In order to leverage the collaborative design features, we opted to use Fusion 360, allowing for effective teamwork during the design process. Minor design changes have been made in FreeCad, in order to save time.
 
 Here’s what we’ve come up with.
 
@@ -392,7 +392,7 @@ In order to process our data, we utilize a python code that run intensive comput
 
 ### Problems and Risks
 
-One of the main issue we ran into, is the instability of the connection. In early stage of the project, we had to manually connected to Wifi, due to frequent reboot of the esp, our OS refused to directly reconnect leading to wait a few minute for between every try. The solution we found was to force the reconnection by using a python library.
+One of the main issues we ran into, is the instability of the connection. In early stage of the project, we had to manually connected to Wifi, due to frequent reboot of the esp, our OS refused to directly reconnect leading to wait a few minute for between every try. The solution we found was to force the reconnection by using a python library.
 
 ### 4. Simulation
 
