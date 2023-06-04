@@ -5,10 +5,7 @@
 Timofey Kreslo, Sylvain Pichot, Finn MacNamara, Alonso Coaguila, Florian Dejean.
 
 June 2023
-
-<img src = "https://github.com/kreslotim/Wall-SLAM/assets/56829239/1c891612-474e-4033-a6df-3f43d410a8dd" width = 500/>
-
-
+![chewby](https://github.com/kreslotim/Wall-SLAM/assets/73421792/da1ffdf1-7803-49f7-8f3c-9e4dbe255364)
 
 ## Description
 
@@ -40,11 +37,11 @@ We utilize the data from the distance sensors (Ultrasonic and LIDAR), IMU (Inert
 
 ## 3D Design
 
-As zealous devotees of the enchanting Disney’s figure Wall-E, we couldn’t resist the temptation to transform our prototype into his spitting image. But, alas, our professor promptly intervened, bursting our bubble of whimsy with a comic remark. He reminded us that while Wall-E excelled in garbage collection and exuded undeniable cuteness, our project’s aspirations extended beyond those realms. Thus, we bid farewell to our beloved Wall-E robot, sparing it from a destiny of cuteness overload and instead refocusing our efforts on more practical endeavors.
+As zealous devotees of the enchanting Disney’s figure Wall-E, we couldn’t resist the temptation to transform our prototype into his spitting image. But, alas, our professor promptly intervened, bursting our bubble of whimsy with a witty remark. He reminded us that while Wall-E excelled in garbage collection and exuded undeniable cuteness, our project’s aspirations extended beyond those realms. Thus, we bid farewell to our beloved Wall-E robot, sparing it from a destiny of cuteness overload and instead refocusing our efforts on more practical endeavors.
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/6667b767-95a2-45b7-8b5e-17c26d23500b](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6667b767-95a2-45b7-8b5e-17c26d23500b)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/6667b767-95a2-45b7-8b5e-17c26d23500b](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6667b767-95a2-45b7-8b5e-17c26d23500b)
 
-We decided to shift our focus to functionalities that would enable mapping of the surrounding environment, which is covered by SLAM. Additionally, we chose to retain the concept of tracks with wheels, as it offers enhanced precision in movement and rotation (especially the ability to turn on the spot), while opting for rubber tracks to minimize slippage during maneuvering. The adventure of building a SLAM robot starts here. Our first step is to build our robot, that we later named... Chewbacca, we will give a reason for that name at the end of the report Meanwhile lets see how we built him. 
+We decided to shift our focus to functionalities that would enable mapping of the surrounding environment, which is covered by SLAM. Additionally, we chose to retain the concept of tracks with wheels, as it offers enhanced precision in movement and rotation (especially the ability to turn on the spot), while opting for rubber tracks to minimize slippage during maneuvering.
 
 ### 1. Sketches
 
@@ -76,57 +73,57 @@ As soon as we agreed on the placement of all the components, we started designin
 
 Here’s what we’ve come up with.
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22](https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22](https://github.com/kreslotim/Wall-SLAM/assets/56829239/182bb3ea-2b7f-49c3-83fd-62bc438a0f22)
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46](https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46](https://github.com/kreslotim/Wall-SLAM/assets/56829239/4402e84b-2550-423e-8a4e-7c284bb5df46)
 
 Now we will explain the choice we’ve made for positioning the electronic pieces. The parts that are highlighted in green are those that we designed ourselves. The Ultrasonic sensor’s frame as well as the wheels and the tracks were borrowed from SMARS project, because they fit our requirements well.
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/9eac749d-10e7-4cae-a3eb-60efbaca4600](https://github.com/kreslotim/Wall-SLAM/assets/56829239/9eac749d-10e7-4cae-a3eb-60efbaca4600)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/9eac749d-10e7-4cae-a3eb-60efbaca4600](https://github.com/kreslotim/Wall-SLAM/assets/56829239/9eac749d-10e7-4cae-a3eb-60efbaca4600)
 
 While we adopted the wheel design from SMARS ([link for STLs](https://www.thingiverse.com/thing:2662828)), we had to adapt it’s axle mount to fit the rectangular axle of the motor we are using. Furthermore, it is essential to align the axle of the slave wheel with the motor’s axle to ensure that both wheels are at the same level.
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/3dcc6850-5950-4f5f-9a45-e38546c61ef8](https://github.com/kreslotim/Wall-SLAM/assets/56829239/3dcc6850-5950-4f5f-9a45-e38546c61ef8)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/3dcc6850-5950-4f5f-9a45-e38546c61ef8](https://github.com/kreslotim/Wall-SLAM/assets/56829239/3dcc6850-5950-4f5f-9a45-e38546c61ef8)
 
 In order to optimize the efficiency of the printing and assembly process, we strategically positioned all the components in close proximity to one another, ensuring minimal wasted space on the chassis.
 
 As the heaviest electronic component of the entire construction, the battery serves as a central anchor within the overall design. By positioning it at the center, we establish a stable foundation upon which the remaining components, i.e. the servo and the sensors are securely mounted and connected.
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/f2b20805-2bfe-478f-b751-ee17c3dc3ad8](https://github.com/kreslotim/Wall-SLAM/assets/56829239/f2b20805-2bfe-478f-b751-ee17c3dc3ad8)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/f2b20805-2bfe-478f-b751-ee17c3dc3ad8](https://github.com/kreslotim/Wall-SLAM/assets/56829239/f2b20805-2bfe-478f-b751-ee17c3dc3ad8)
 
 The cover slides over the battery and encases the servo on top.
 
 The servo, in return, holds both lidars (distance sensors) that are sneaked on the servo’s arm.
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6061ea20-960f-4265-97e7-7a94cdba535c)
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83](https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83](https://github.com/kreslotim/Wall-SLAM/assets/56829239/a595e70b-5473-4abe-b3f3-71a7b0facc83)
 
 ### 2. Assembly
 
 Once the design was ready, it was printed at EPFL in DLLEL, and partly at home. Mostly PETG material was used, except for the tracks which were printed using FLEX rubber filament, under the consent of Sébastien Martinerie - 3D printing Coach at the SPOT. Caterpillars are connected by means of an ordinary filament in its initial form, as mentioned above.
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a](https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a](https://github.com/kreslotim/Wall-SLAM/assets/56829239/243612a9-e803-44b0-9ae7-f1f7f143721a)
 
 To make power control easier, a switch has been added on top of the cover that holds the servo :
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/0c49d524-4f6e-45af-a541-f1add8a3db69](https://github.com/kreslotim/Wall-SLAM/assets/56829239/0c49d524-4f6e-45af-a541-f1add8a3db69)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/0c49d524-4f6e-45af-a541-f1add8a3db69](https://github.com/kreslotim/Wall-SLAM/assets/56829239/0c49d524-4f6e-45af-a541-f1add8a3db69)
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/9da87210-9a63-49e8-aca9-97f923d56dd9](https://github.com/kreslotim/Wall-SLAM/assets/56829239/9da87210-9a63-49e8-aca9-97f923d56dd9)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/9da87210-9a63-49e8-aca9-97f923d56dd9](https://github.com/kreslotim/Wall-SLAM/assets/56829239/9da87210-9a63-49e8-aca9-97f923d56dd9)
 
 The opposite side of the switch features the motion sensor (IMU) securely attached to the cover that holds the servo, using screws:
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/6b4e3ff5-6718-4936-b830-be0c61812fe6](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6b4e3ff5-6718-4936-b830-be0c61812fe6)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/6b4e3ff5-6718-4936-b830-be0c61812fe6](https://github.com/kreslotim/Wall-SLAM/assets/56829239/6b4e3ff5-6718-4936-b830-be0c61812fe6)
 
 Here the difficulty turned out to be to establish connections between numerous devices that rely on the I2C (Inter-Integrated Circuit) serial communication protocol. In particular, there was an issue with two lidars having the same address, preventing them from being connected on the same I2C bus. One possible solution would have been to use a multiplexer, but since one was not available, an alternative approach was devised through code.
 
 To overcome this challenge, some of the ESP32 GPIOs needed to be reconfigured to function as I2C pins, to which we connected the front lidar. Subsequently, the motion sensor was connected to the standard I2C pins, and the back lidar was also connected to these same pins as well. This was possible because the motion sensor and the lidar had different addresses assigned to them, ensuring that there was no conflict in their communication over the shared I2C bus. Finally, to ensure proper insulation and protection, we applied heat shrink tubing at the junction point where the three wires met :
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/550c9bed-20b3-41ab-b2bd-64b25c6ab565](https://github.com/kreslotim/Wall-SLAM/assets/56829239/550c9bed-20b3-41ab-b2bd-64b25c6ab565)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/550c9bed-20b3-41ab-b2bd-64b25c6ab565](https://github.com/kreslotim/Wall-SLAM/assets/56829239/550c9bed-20b3-41ab-b2bd-64b25c6ab565)
 
 A detailed circuit diagram of all connections is shown below:
 
-[https://github.com/kreslotim/Wall-SLAM/assets/56829239/c93e14a5-a572-4767-83b8-24d0dcf6c076](https://github.com/kreslotim/Wall-SLAM/assets/56829239/c93e14a5-a572-4767-83b8-24d0dcf6c076)
+![https://github.com/kreslotim/Wall-SLAM/assets/56829239/c93e14a5-a572-4767-83b8-24d0dcf6c076](https://github.com/kreslotim/Wall-SLAM/assets/56829239/c93e14a5-a572-4767-83b8-24d0dcf6c076)
 
 In conclusion, the assembly of our car involved strategically placing two lidars on top of a servo that rotated around the same vertical axle as the car itself. This configuration enabled us to detect obstacles within a proximity of 4 meters by performing a single 180-degree servo rotation. 
 
@@ -134,7 +131,7 @@ Additionally, we positioned an ultrasonic sensor at the front of the car, ensuri
 
 ### 3. Problems and Risks
 
-There were several risks and issues we encountered during the project, primarily related to the management of batteries. One significant problem arose from the frequent changing of batteries, which required manipulating multiple components and wires. In hindsight, it would have been more advisable to use a lipo battery that offers greater stability and ease of use. 
+There were several risks and issues we encountered during the project, primarily related to the management of batteries. One significant problem arose from the frequent changing of batteries, which required manipulating multiple components and wires. In hindsight, it would have been more advisable to use a LIPO battery that offers greater stability and ease of use. 
 
 Additionally, a critical mistake was made when we placed the voltage regulator on a very thin layer of double-sided tape directly attached to the battery case, which had metal circles on its surface. This design flaw led to a potential short circuit between the six batteries and the voltage regulator when components were pushed against each other. This short circuit had the potential to cause severe damage to the entire system and possibly lead to its complete failure or even a fire hazard.
 
@@ -156,9 +153,7 @@ Unfortunately, the SLAM algorithm is too memory-bound and computationally slow f
 
 To see in real time the advancement of the mapping and for debugging purpose, we made a complete interface that display every step of the data flow. To do so, we are using Flask, Plotly and bootstrap.
 
-![image_2023-05-31_22-02-14.png](Wall-SLAM%20-%20Simultaneous%20Localization%20And%20Mapping%207e6082d39c184f15afff20c598117ae1/image_2023-05-31_22-02-14.png)
-
-![qsdqsdqsd.jpeg](Wall-SLAM%20-%20Simultaneous%20Localization%20And%20Mapping%207e6082d39c184f15afff20c598117ae1/qsdqsdqsd.jpeg)
+![environement_layout](https://github.com/kreslotim/Wall-SLAM/assets/73421792/00b7bc57-6bfb-498e-97f6-08204f556cb7)
 
 *Sample setup*
 
@@ -182,10 +177,10 @@ To navigate and treat the data we receive from the robot we have elaborated diff
     
     *Photo of the Pathfinding Algorithm in action right below…*
     
-- **Map - [kmean.py](http://kmean.py/) and mapK.py**
-    
-    ![Untitled](Wall-SLAM%20-%20Simultaneous%20Localization%20And%20Mapping%207e6082d39c184f15afff20c598117ae1/Untitled.png)
-    
+- **Map - kmean.py and mapK.py**
+    ![kmean_example](https://github.com/kreslotim/Wall-SLAM/assets/73421792/78efdc26-d8c6-4f3f-8294-cb8b9af3a81c)
+
+
     In order to determine if there is a real obstacle, we will use kmean to determine their position and center. Finding those center are useful to move to the less dense zone, the zone that is unexplored or empty. Due to our Djikstra algorithm, we added high weight to already explore area, hence resulting in a path that will always try to explore. If a path cannot explore anymore, this mean we have map the whole area.
     
     - Kmean try to assign K cluster to a data set and optimize the distance between the point from a center.
@@ -194,9 +189,9 @@ To navigate and treat the data we receive from the robot we have elaborated diff
     - In order to reduce noise, which can be seen as the outlier and stand alone point in our dataset, we slice our data randomly before training kmean. If a cluster is assign less than a fixed number of point, we will modify the label to be considered as a noisy cluster, represented with the red dots on the above graphic.
     - To represent an obstacle, we decided to turn them into rectangle taking the minimum and maximum. This lead to more strict threshold since our obstacle are hollow shape and to create multiple rectangle for one obstacle depending on its size.
     
-    k[mean.py](http://kmean.py/) handle all the necessary function to run the kmean++ algorithm and the Elbow method using numpy.
+    **kmean.py** handle all the necessary function to run the kmean++ algorithm and the Elbow method using numpy.
     
-    [mapk.py](http://mapk.py/) handle how to interpret this data in your main app.
+   **mapk.py** handle how to interpret this data in your main app.
     
 - **Noise Correction - Kalman**
     
@@ -217,13 +212,11 @@ To navigate and treat the data we receive from the robot we have elaborated diff
     In order to check if a data point was even ready to be considered an obstacle in the real life, we perform a redundancy check. A simple check if the obstacle is still present or a check to see if there is enought detection points for it to be considered as an actual obstacles before giving the the list of points to as an input for K-means 
     
     *Here is a the graph without the filter:*  
-    
-    ![Untitled](Wall-SLAM%20-%20Simultaneous%20Localization%20And%20Mapping%207e6082d39c184f15afff20c598117ae1/Untitled%201.png)
-    
+    ![noisy_example](https://github.com/kreslotim/Wall-SLAM/assets/73421792/e273c981-825e-441b-81e7-4f7f59a3de8a)
+
     *Here it is with the filter (the lump present in [0,200] is the charging cable attached to the car with is not accidental and not present in the photo withe the observed obstacles):*
-    
-    ![Untitled](Wall-SLAM%20-%20Simultaneous%20Localization%20And%20Mapping%207e6082d39c184f15afff20c598117ae1/Untitled%202.png)
-    
+    ![filter_example](https://github.com/kreslotim/Wall-SLAM/assets/73421792/951d0479-695e-4062-83f1-0511c76d06bd)
+
 
 ### 3. **TCP Connection ESP32 ↔ CC (Python)**
 
@@ -294,9 +287,9 @@ In order to process our data, we utilize a python code that run intensive comput
     
     We quickly dove in other methods of connection :
     
-    - We tried having our the ESP32 connect throug our access point created by our laptop, but our amazing firewall prevented us from using the ports directly. To prevent any security issue we decided not to play around with it. 
+    - We tried having our the ESP32 connect throug our access point created by our laptop, but our amazing firewall prevented us from the ports directly. And if we weren’t using the wifi ports it would be just like the personal projet.
     
-    - We tried Bluetooth connection as well. Unfortunately even if we were able to successfully create the link with the computer the fact that we only had one port we got a lot of data confused. So we decided to stick with the ESP32 just creating an access point.
+    - We tried Bluetooth connection as well. Unfortunately even if we were able to successfully create the link with the computer the fact that we only had one c
     
 - *Esp32.py* : This automatically connect to the WIFI generated by the EspComm.ino.
     
@@ -403,16 +396,14 @@ One of the main issue we ran into, is the instability of the connection. In earl
 
 ### 4. Simulation
 
-At an earlier stage of the project2
+At an earlier stage of the project, we tried to create a simulation to test different algorithms but unfortunately we had to divert our attention to other aspects. Nevertheless a prototype was developed, in which the robot is represented as a point mass and the landmarks are a string of 2d points.
+
+To simulate the LIDAR that the robot used, we created a python class with static methods to handle the light collisions with the shapes called Geometry which was called by the Playground class which would contain all the landmarks which was called by the Rover class which represents the robot. 
 
 ### 5. Software Overview
 
-![Untitled](Wall-SLAM%20-%20Simultaneous%20Localization%20And%20Mapping%207e6082d39c184f15afff20c598117ae1/Untitled%203.png)
+![software_overview](https://github.com/kreslotim/Wall-SLAM/assets/73421792/5a94ce7e-97e6-4e1b-a4b2-8adc71c75500)
 
 ### 6. Problems and Risks
 
 Due to how litle testing we were able to do in real situation, our kmean hyperparameters may not be fit for a complete mapping or may need to be dynamicaly adjusted depending of the size explored.
-
-## Why Chewbacca ?
-We decided to named our robot Chewbacca, with all his wiring they just look similar. Chewbacca has problem navigating around his surrounding with all of hair covering his eye just like our robot. Chewbacca has his powerful blaster, our robot has powerful Lidar guns. Chewbacca has two legs, our robots has two motors. Chewbacca has good balaance, our robot has an IMU that can easily find his orientation. I hope you enjoyed the little adventure with our Chewbacca, sadly this is the end of his story... or is it ?   
-
